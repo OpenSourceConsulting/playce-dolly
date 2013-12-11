@@ -22,9 +22,8 @@ package com.athena.dolly.enhancer;
 
 import java.util.Collections;
 import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.infinispan.client.hotrod.RemoteCache;
 import org.infinispan.client.hotrod.RemoteCacheManager;
@@ -40,7 +39,7 @@ import org.infinispan.client.hotrod.configuration.ConfigurationBuilder;
 public class DollyManager {
 
     private static DollyManager _instance;
-	private static RemoteCache<String, Map<String, Object>> cache;
+	private static Map<String, Object> cache;
 
     public synchronized static DollyManager getInstance() {
         if (_instance == null) {
@@ -56,14 +55,19 @@ public class DollyManager {
 	    cache = new RemoteCacheManager(builder.withProperties(DollyConfig.properties).build()).getCache();
     }
     
-    public synchronized void setValue(String cacheName, String key, Object value) {
+	public Map<String, Object> getCache() {
+		return cache;
+	}
+
+	@SuppressWarnings("unchecked")
+	public synchronized void setValue(String cacheName, String key, Object value) {
     	
 		System.out.println("This is setValue() => args(" + cacheName + ", " + key + ", " + value + ")");
 		
-    	Map<String, Object> attribute = cache.get(cacheName);
+    	Map<String, Object> attribute = (Map<String, Object>)cache.get(cacheName);
 		
 		if (attribute == null) {
-			attribute = new HashMap<String, Object>();
+			attribute = new ConcurrentHashMap<String, Object>();
 		}
 		
 		attribute.put(key, value);
@@ -71,12 +75,13 @@ public class DollyManager {
 		printAllCache();
     }
     
-    public Object getValue(String cacheName, String key) {
+    @SuppressWarnings("unchecked")
+	public Object getValue(String cacheName, String key) {
 		System.out.println("This is getValue() => args(" + cacheName + ", " + key + ")");
 		
 		printAllCache();
 		
-    	Map<String, Object> attribute = cache.get(cacheName);
+    	Map<String, Object> attribute = (Map<String, Object>)cache.get(cacheName);
 		
 		if (attribute == null) {
 			return null;
@@ -85,11 +90,12 @@ public class DollyManager {
 		}
     }
     
-    public Enumeration<String> getValueNames(String cacheName) {
+    @SuppressWarnings("unchecked")
+	public Enumeration<String> getValueNames(String cacheName) {
     	
 		System.out.println("This is getValueNames() => args(" + cacheName + ")");
 		
-    	Map<String, Object> attribute = cache.get(cacheName);
+    	Map<String, Object> attribute = (Map<String, Object>)cache.get(cacheName);
 		
 		if (attribute == null) {
 			return null;
@@ -98,28 +104,27 @@ public class DollyManager {
 		}
     }
     
-    public synchronized void removeValue(String cacheName, String key) {
+    @SuppressWarnings("unchecked")
+	public synchronized void removeValue(String cacheName, String key) {
     	
 		System.out.println("This is removeValue() => args(" + cacheName + ", " + key + ")");
 		
-    	Map<String, Object> attribute = cache.get(cacheName);
+    	Map<String, Object> attribute = (Map<String, Object>)cache.get(cacheName);
 		
 		if (attribute != null) {
 			attribute.remove(key);
 		}
     }
     
-    public void printAllCache() {
-	    System.out.println("ProtocolVersion : " + cache.getProtocolVersion());
-	    System.out.println("Version : " + cache.getVersion());
+	public void printAllCache() {
+	    System.out.println("ProtocolVersion : " + ((RemoteCache<String, Object>)cache).getProtocolVersion());
+	    System.out.println("Version : " + ((RemoteCache<String, Object>)cache).getVersion());
 	    System.out.println("isEmpty : " + cache.isEmpty());
 	    System.out.println("Size : " + cache.size());
 	    
 	    Enumeration<String> cacheKeys = Collections.enumeration(cache.keySet());
 	    String cacheKey = null;
-    	Map<String, Object> data = null;
-    	Iterator<String> keys = null;
-    	String key = null;
+    	Object data = null;
 	    int i = 1;
 	    while (cacheKeys.hasMoreElements()) {
 	    	cacheKey = cacheKeys.nextElement();
@@ -129,12 +134,7 @@ public class DollyManager {
 	    	data = cache.get(cacheKey);
 	    	
 	    	if (data != null) {
-		    	keys = data.keySet().iterator();
-	    		
-	    		while (keys.hasNext()) {
-	    			key = keys.next();
-	    			System.out.println("[Key] : " + key + ", [Value] : " + data.get(key));
-	    		}
+    			System.out.println("Cache Data : " + data.toString());
 	    	} else {
 	    		System.out.println("Cache Data is NULL.");
 	    	}
