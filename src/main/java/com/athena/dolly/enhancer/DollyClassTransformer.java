@@ -34,7 +34,6 @@ import java.util.Map;
 
 import javassist.ClassPool;
 import javassist.CtClass;
-import javassist.CtConstructor;
 import javassist.CtMethod;
 import javassist.CtNewMethod;
 import javassist.LoaderClassPath;
@@ -76,10 +75,8 @@ public class DollyClassTransformer implements ClassFileTransformer {
                 
                 if (cl.subtypeOf(pool.get("javax.servlet.http.HttpSession"))) {
                 	return instumentHttpSession(className, cl);
-                } else if (cl.subtypeOf(pool.get("org.apache.catalina.session.ManagerBase"))) {
-                	return instumentManager(className, cl);
-                } else {
-                	return instrumentPojo(className, cl);
+                } else if (cl.subtypeOf(pool.get("org.apache.catalina.Manager"))) {
+            		return instumentManager(className, cl);
                 }
             }
         } catch (Exception e) {
@@ -94,131 +91,6 @@ public class DollyClassTransformer implements ClassFileTransformer {
         }
         
         return classfileBuffer;
-	}
-	
-	private byte[] instumentManager(String className, CtClass cl) throws Exception {
-		byte[] redefinedClassfileBuffer = null;
-		
-//		CtField field = cl.getDeclaredField("sessions");
-//		field.setName("_" + field.getName());
-//		
-//		String def = "protected java.util.Map sessions;";
-//		String init = "com.athena.dolly.enhancer.DollyManager.getInstance().getCache();";
-//		
-//		CtField newField = CtField.make(def, cl);
-//		cl.addField(newField, init);
-		
-		CtConstructor constructor = cl.getDeclaredConstructor(null);
-		constructor.insertAfter("sessions = com.athena.dolly.enhancer.DollyManager.getInstance().getCache();");
-		
-		CtMethod[] methods = cl.getDeclaredMethods();
-		for (int i = 0; i < methods.length; i++) {
-			if (methods[i].isEmpty()) {
-				continue;
-			}
-			
-			if (methods[i].getName().equals("createSession")) {
-				methods[i].insertBefore("System.out.println(\"=========== createSession() ===========\");");
-				methods[i].insertAfter("com.athena.dolly.enhancer.DollyManager.getInstance().printAllCache();");
-			} else if (methods[i].getName().equals("findSession")) {
-				methods[i].insertBefore("System.out.println(\"=========== findSession(\" + $1 + \") ===========\");");
-				methods[i].insertAfter("com.athena.dolly.enhancer.DollyManager.getInstance().printAllCache();");
-			} else if (methods[i].getName().equals("findSessions")) {
-				String body = "{ return new org.apache.catalina.Session[0]; }";
-				
-				CtMethod newMethod = CtNewMethod.copy(methods[i], cl, null);
-				methods[i].setName("_" + methods[i].getName());
-				newMethod.setBody(body);
-				cl.addMethod(newMethod);
-				
-				if (verbose) {
-					System.out.println(className.replace('/', '.') + "." + methods[i].getName() + "() is successfully enhanced.");
-				}
-			} else if (methods[i].getName().equals("remove")) {
-				//String body = "{ sessions.put($1.getIdInternal(), null); }";
-				//String body = "{ System.out.println(\"Can not remove session : \" + $1.getIdInternal()); }";
-				String body = "{ System.out.println(\"Can not remove session.\"); }";
-				
-				CtMethod newMethod = CtNewMethod.copy(methods[i], cl, null);
-				methods[i].setName("_" + methods[i].getName());
-				newMethod.setBody(body);
-				cl.addMethod(newMethod);
-				
-				if (verbose) {
-					System.out.println(className.replace('/', '.') + "." + methods[i].getName() + "() is successfully enhanced.");
-				}
-			} else if (methods[i].getName().equals("add")) {
-				methods[i].insertBefore("System.out.println(\"=========== add(\" + $1 + \") ===========\");");
-			}
-		}
-		
-		redefinedClassfileBuffer = cl.toBytecode();
-		
-		return redefinedClassfileBuffer;
-	}
-	
-	private byte[] instrumentPojo(String className, CtClass cl) throws Exception {
-		byte[] redefinedClassfileBuffer = null;
-
-		if (cl.isInterface() == false) {
-			CtMethod[] methods = cl.getDeclaredMethods();
-			boolean isEnhanced = false;
-			for (int i = 0; i < methods.length; i++) {
-				if (methods[i].isEmpty()) {
-					continue;
-				}
-				
-				String body = null;
-				isEnhanced = false;
-				if (methods[i].getName().startsWith("set")) {
-					body =     "{" +
-							   "	com.athena.dolly.enhancer.DollyManager.getInstance().setValue(\"" + className.replace('/', '.') + "\", \"" + methods[i].getName().substring(3) + "\", $1);" +
-							   "	_" + methods[i].getName() + "($1);" +
-							   "}";
-					isEnhanced = true;
-				} else if (methods[i].getName().startsWith("get")) {
-					body =     "{" +
-							   "	java.lang.Object obj = com.athena.dolly.enhancer.DollyManager.getInstance().getValue(\"" + className.replace('/', '.') + "\", \"" + methods[i].getName().substring(3) + "\");" +
-							   "	if (obj == null) {" +
-							   "		obj = _" + methods[i].getName() + "();" +
-							   "	}" +
-							   "	return obj;" +
-							   "}";
-					isEnhanced = true;
-				} else if (methods[i].getName().startsWith("is")) {
-					body =     "{" +
-							   "	java.lang.Object obj = com.athena.dolly.enhancer.DollyManager.getInstance().getValue(\"" + className.replace('/', '.') + "\", \"" + methods[i].getName().substring(2) + "\");" +
-							   "	if (obj == null) {" +
-							   "		obj = _" + methods[i].getName() + "();" +
-							   "	}" +
-							   "	return obj;" +
-							   "}";
-					isEnhanced = true;
-				}
-				
-				if (isEnhanced) {
-					
-					System.out.println(">>> " + body);
-					
-					CtMethod newMethod = CtNewMethod.copy(methods[i], cl, null);
-					methods[i].setName("_" + methods[i].getName());
-
-					System.out.println(">>> " + newMethod);
-					
-					newMethod.setBody(body);
-					System.out.println("   <<< " + newMethod);
-					cl.addMethod(newMethod);
-					
-					if (verbose) {
-						System.out.println(className.replace('/', '.') + "." + methods[i].getName() + "() is successfully enhanced.");
-					}
-				}
-			}
-			
-			redefinedClassfileBuffer = cl.toBytecode();
-		}
-		
-		return redefinedClassfileBuffer;
 	}
 
 	private byte[] instumentHttpSession(String className, CtClass cl) throws Exception {
@@ -236,32 +108,32 @@ public class DollyClassTransformer implements ClassFileTransformer {
 				isEnhanced = false;
 				if (methods[i].getName().equals("setAttribute")) {
 					body =     "{" +
-							   "	com.athena.dolly.enhancer.DollyManager.getInstance().setValue(getId() + \"_attr\", $1, $2);" +
-							   "	try { _setAttribute($1, $2); } catch (Exception e) {}" +
+							   "	com.athena.dolly.enhancer.DollyManager.getInstance().setValue(getId(), $1, $2);" +
+							   "	try { _setAttribute($1, $2); } catch (Exception e) { e.printStackTrace(); }" +
 							   "}";
 					isEnhanced = true;
 				} else if (methods[i].getName().equals("getAttribute")) {
 					body =     "{" +
-							   "	java.lang.Object obj = com.athena.dolly.enhancer.DollyManager.getInstance().getValue(getId() + \"_attr\", $1);" +
+							   "	java.lang.Object obj = com.athena.dolly.enhancer.DollyManager.getInstance().getValue(getId(), $1);" +
 							   "	if (obj == null) {" +
-							   "		obj = _getAttribute($1);" +
+							   "		try { obj = _getAttribute($1); } catch (Exception e) { e.printStackTrace(); }" +
 							   "	}" +
 							   "	return obj;" +
 							   "}";
 					isEnhanced = true;
 				} else if (methods[i].getName().equals("getAttributeNames")) {
 					body =     "{" +
-							   "	java.util.Enumeration obj = com.athena.dolly.enhancer.DollyManager.getInstance().getValueNames(getId() + \"_attr\");" +
+							   "	java.util.Enumeration obj = com.athena.dolly.enhancer.DollyManager.getInstance().getValueNames(getId());" +
 							   "	if (obj == null) {" +
-							   "		obj = _getAttributeNames();" +
+							   "		try { obj = _getAttributeNames(); } catch (Exception e) { e.printStackTrace(); }" +
 							   "	}" +
 							   "	return obj;" +
 							   "}";
 					isEnhanced = true;
 				} else if (methods[i].getName().equals("removeAttribute")) {
 					body =     "{" +
-							   "	com.athena.dolly.enhancer.DollyManager.getInstance().removeValue(getId() + \"_attr\", $1);" +
-							   "	try { _removeAttribute($1); } catch (Exception e) {}" +
+							   "	com.athena.dolly.enhancer.DollyManager.getInstance().removeValue(getId(), $1);" +
+							   "	try { _removeAttribute($1); } catch (Exception e) { e.printStackTrace(); }" +
 							   "}";
 					isEnhanced = true;
 				}
@@ -280,6 +152,52 @@ public class DollyClassTransformer implements ClassFileTransformer {
 			
 			redefinedClassfileBuffer = cl.toBytecode();
 		}
+		
+		return redefinedClassfileBuffer;
+	}
+	
+	private byte[] instumentManager(String className, CtClass cl) throws Exception {
+		byte[] redefinedClassfileBuffer = null;
+		
+		CtMethod[] methods = cl.getDeclaredMethods();
+		for (int i = 0; i < methods.length; i++) {
+			if (methods[i].isEmpty()) {
+				continue;
+			}
+			
+			if (methods[i].getName().equals("findSession")) {
+				String body = 	"{" +
+						   		"	if ($1 == null) {" +
+						   		"		return null;" +
+						   		"	}" +
+						   		"	if (sessions.get($1) == null) {" +
+						   		"		return createSession($1);" +
+						   		"	} else {" +
+						   		"		return (org.apache.catalina.Session) sessions.get($1);" +
+						   		"	}" +
+						   		"}";
+
+				CtMethod newMethod = CtNewMethod.copy(methods[i], cl, null);
+				methods[i].setName("_" + methods[i].getName());
+				newMethod.setBody(body);
+				cl.addMethod(newMethod);
+				
+				//newMethod.insertBefore("System.out.println(\"=========== findSession(\" + $1 + \") ===========\");");
+				
+				if (verbose) {
+					System.out.println(className.replace('/', '.') + "." + methods[i].getName() + "() is successfully enhanced.");
+				}
+			}
+			/*
+			else if (methods[i].getName().equals("createSession")) {
+				methods[i].insertBefore("System.out.println(\"=========== createSession() ===========\");");
+			} else if (methods[i].getName().equals("add")) {
+				methods[i].insertBefore("System.out.println(\"=========== add(\" + $1 + \") ===========\");");
+			}
+			*/
+		}
+		
+		redefinedClassfileBuffer = cl.toBytecode();
 		
 		return redefinedClassfileBuffer;
 	}
