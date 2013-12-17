@@ -24,6 +24,7 @@
  */
 package com.athena.dolly.enhancer;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Map;
@@ -31,7 +32,10 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.infinispan.client.hotrod.RemoteCache;
 import org.infinispan.client.hotrod.RemoteCacheManager;
+import org.infinispan.client.hotrod.ServerStatistics;
 import org.infinispan.client.hotrod.configuration.ConfigurationBuilder;
+
+import com.athena.dolly.stats.DollyStats;
 
 /**
  * <pre>
@@ -43,7 +47,7 @@ import org.infinispan.client.hotrod.configuration.ConfigurationBuilder;
 public class DollyManager {
 
     private static DollyManager _instance;
-	private static Map<String, Object> cache;
+	private static RemoteCache<String, Object> cache;
 
     public synchronized static DollyManager getInstance() {
         if (_instance == null) {
@@ -59,15 +63,12 @@ public class DollyManager {
 	    cache = new RemoteCacheManager(builder.withProperties(DollyConfig.properties).build()).getCache();
     }
     
-	public Map<String, Object> getCache() {
-		return cache;
-	}
-
+    public void destory() {
+	    cache.stop();
+    }
+    
 	@SuppressWarnings("unchecked")
 	public synchronized void setValue(String cacheName, String key, Object value) {
-    	
-		System.out.println("This is setValue() => args(" + cacheName + ", " + key + ", " + value + ")");
-		
     	Map<String, Object> attribute = (Map<String, Object>)cache.get(cacheName);
 		
 		if (attribute == null) {
@@ -76,15 +77,10 @@ public class DollyManager {
 		
 		attribute.put(key, value);
 		cache.put(cacheName, attribute);
-		printAllCache();
     }
     
     @SuppressWarnings("unchecked")
 	public Object getValue(String cacheName, String key) {
-		System.out.println("This is getValue() => args(" + cacheName + ", " + key + ")");
-		
-		printAllCache();
-		
     	Map<String, Object> attribute = (Map<String, Object>)cache.get(cacheName);
 		
 		if (attribute == null) {
@@ -96,9 +92,6 @@ public class DollyManager {
     
     @SuppressWarnings("unchecked")
 	public Enumeration<String> getValueNames(String cacheName) {
-    	
-		System.out.println("This is getValueNames() => args(" + cacheName + ")");
-		
     	Map<String, Object> attribute = (Map<String, Object>)cache.get(cacheName);
 		
 		if (attribute == null) {
@@ -110,9 +103,6 @@ public class DollyManager {
     
     @SuppressWarnings("unchecked")
 	public synchronized void removeValue(String cacheName, String key) {
-    	
-		System.out.println("This is removeValue() => args(" + cacheName + ", " + key + ")");
-		
     	Map<String, Object> attribute = (Map<String, Object>)cache.get(cacheName);
 		
 		if (attribute != null) {
@@ -121,8 +111,8 @@ public class DollyManager {
     }
     
 	public void printAllCache() {
-	    System.out.println("ProtocolVersion : " + ((RemoteCache<String, Object>)cache).getProtocolVersion());
-	    System.out.println("Version : " + ((RemoteCache<String, Object>)cache).getVersion());
+	    System.out.println("ProtocolVersion : " + cache.getProtocolVersion());
+	    System.out.println("Version : " + cache.getVersion());
 	    System.out.println("isEmpty : " + cache.isEmpty());
 	    System.out.println("Size : " + cache.size());
 	    
@@ -147,5 +137,30 @@ public class DollyManager {
     		i++;  
 	    }
     }
+	
+	public DollyStats getStats() {
+		DollyStats stats = new DollyStats();
+		
+		stats.setProtocolVersion(cache.getProtocolVersion());
+		stats.setVersion(cache.getVersion());
+		stats.setName(cache.getName());
+		stats.setIsEmpty(cache.isEmpty());
+		stats.setSize(cache.size());
+		
+		ServerStatistics statistics = cache.stats();
+		stats.setTimeSinceStart(statistics.getStatistic(ServerStatistics.TIME_SINCE_START));
+		stats.setCurrentNumberOfEntries(statistics.getStatistic(ServerStatistics.CURRENT_NR_OF_ENTRIES));
+		stats.setTotalNumberOfEntries(statistics.getStatistic(ServerStatistics.TOTAL_NR_OF_ENTRIES));
+		stats.setStores(statistics.getStatistic(ServerStatistics.STORES));
+		stats.setRetrievals(statistics.getStatistic(ServerStatistics.RETRIEVALS));
+		stats.setHits(statistics.getStatistic(ServerStatistics.HITS));
+		stats.setMisses(statistics.getStatistic(ServerStatistics.MISSES));
+		stats.setRemoveHits(statistics.getStatistic(ServerStatistics.REMOVE_HITS));
+		stats.setRemoveMisses(statistics.getStatistic(ServerStatistics.REMOVE_MISSES));
+		
+		stats.setCacheKeys(new ArrayList<String>(cache.keySet()));
+		
+		return stats;
+	}
 }
 //end of DollyManager.java
