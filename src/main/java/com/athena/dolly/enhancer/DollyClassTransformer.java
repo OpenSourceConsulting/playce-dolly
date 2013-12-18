@@ -166,20 +166,31 @@ public class DollyClassTransformer implements ClassFileTransformer {
 			}
 			
 			if (methods[i].getName().equals("findSession")) {
+				
+				CtMethod method = cl.getDeclaredMethod("createSession");
+				CtClass[] params = method.getParameterTypes();
+
 				String body = 	"{" +
 						   		"	if ($1 == null) {" +
 						   		"		return null;" +
 						   		"	}" +
-						   		"	if (sessions.get($1) == null) {" +
-						   		"		return createSession($1);" +
-						   		"	} else {" +
-						   		"		return (org.apache.catalina.Session) sessions.get($1);" +
-						   		"	}" +
-						   		"}";
+						   		"	if (sessions.get($1) == null) {";
+				
+				// Jboss EAP 6의 경우 createSession()의 파라메타가 2개
+				if (params.length == 2) {
+					body +=		"		return createSession($1, null);";
+				} else {
+					body +=		"		return createSession($1);";
+				}
+				
+				body +=			"	} else {" +
+				   				"		return (org.apache.catalina.Session) sessions.get($1);" +
+				   				"	}" +
+				   				"}";
 
 				CtMethod newMethod = CtNewMethod.copy(methods[i], cl, null);
 				methods[i].setName("_" + methods[i].getName());
-				newMethod.setBody(body);
+				newMethod.setBody(body);				
 				cl.addMethod(newMethod);
 				
 				//newMethod.insertBefore("System.out.println(\"=========== findSession(\" + $1 + \") ===========\");");

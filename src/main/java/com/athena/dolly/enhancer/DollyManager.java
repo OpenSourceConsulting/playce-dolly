@@ -48,6 +48,7 @@ public class DollyManager {
 
     private static DollyManager _instance;
 	private static RemoteCache<String, Object> cache;
+	private static DollyConfig config;
 
     public synchronized static DollyManager getInstance() {
         if (_instance == null) {
@@ -59,6 +60,19 @@ public class DollyManager {
     }
     
     private static void init() {
+    	if (DollyConfig.properties == null || config == null) {
+    		try {
+                config = new DollyConfig().load();
+			} catch (ConfigurationException e) {
+	            System.err.println("[Dolly] Configuration error : " + e.getMessage());
+	            e.printStackTrace();
+			}
+    	}
+    	
+    	if (config.isVerbose()) {
+    		System.out.println("[Dolly] infinispan.client.hotrod.server_list=" + DollyConfig.properties.getProperty("infinispan.client.hotrod.server_list"));
+    	}
+    	
 		ConfigurationBuilder builder = new ConfigurationBuilder();
 	    cache = new RemoteCacheManager(builder.withProperties(DollyConfig.properties).build()).getCache();
     }

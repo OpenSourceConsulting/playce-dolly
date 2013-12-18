@@ -42,8 +42,8 @@ import java.util.Properties;
  */
 public class DollyConfig {
 
-    protected static final String CONFIG_FILE = "dolly.properties";
-    private static final String VERBOSE_PROPERTY = "dolly.verbose";
+	protected static final String CONFIG_FILE = "dolly.properties";
+	private static final String VERBOSE_PROPERTY = "dolly.verbose";
     private static final String TARGET_CLASS_PROPERTY = "dolly.instrument.target.class";
     
     public static Properties properties;
