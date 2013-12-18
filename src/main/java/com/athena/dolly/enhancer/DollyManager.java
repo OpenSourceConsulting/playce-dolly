@@ -79,6 +79,10 @@ public class DollyManager {
 		cache.put(cacheName, attribute);
     }
     
+	public Object getValue(String cacheName) {
+    	return cache.get(cacheName);
+    }
+    
     @SuppressWarnings("unchecked")
 	public Object getValue(String cacheName, String key) {
     	Map<String, Object> attribute = (Map<String, Object>)cache.get(cacheName);
