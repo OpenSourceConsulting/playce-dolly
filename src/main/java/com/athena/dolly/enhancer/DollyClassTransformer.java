@@ -40,7 +40,7 @@ import javassist.LoaderClassPath;
 
 /**
  * <pre>
- * 
+ * javassist를 이용하여 지정된 클래스에 대해 BCI(Byte Code Instrumentation)를 수행하는 변환 클래스
  * </pre>
  * @author Sang-cheon Park
  * @version 1.0
@@ -57,8 +57,11 @@ public class DollyClassTransformer implements ClassFileTransformer {
 	public DollyClassTransformer(List<String> classList, boolean verbose) {
 		this.classList = classList;
 		this.verbose = verbose;
-	}
+	}//end of constructor()
 
+	/* (non-Javadoc)
+	 * @see java.lang.instrument.ClassFileTransformer#transform(java.lang.ClassLoader, java.lang.String, java.lang.Class, java.security.ProtectionDomain, byte[])
+	 */
 	@Override
 	public byte[] transform(ClassLoader loader, String className, Class<?> classBeingRedefined, ProtectionDomain protectionDomain, byte[] classfileBuffer) throws IllegalClassFormatException {
         CtClass cl = null;
@@ -73,6 +76,7 @@ public class DollyClassTransformer implements ClassFileTransformer {
                 // Transform
                 cl = pool.makeClass(new ByteArrayInputStream(classfileBuffer));
                 
+                // only supports Tomcat 6/7, JBoss EAP 5/6
                 if (cl.subtypeOf(pool.get("javax.servlet.http.HttpSession"))) {
                 	return instumentHttpSession(className, cl);
                 } else if (cl.subtypeOf(pool.get("org.apache.catalina.Manager"))) {
@@ -91,8 +95,18 @@ public class DollyClassTransformer implements ClassFileTransformer {
         }
         
         return classfileBuffer;
-	}
+	}//end of transform()
 
+	/**
+	 * <pre>
+	 * HttpSession 구현 클래스에 대해 (set/get/remove)Attribute, getAttributeNames, invalidate 메소드 호출 시
+	 * Infinispan Data Grid에 해당 내용을 함께 저장/조회/삭제 하도록 byte code를 조작한다.
+	 * </pre>
+	 * @param className
+	 * @param cl
+	 * @return
+	 * @throws Exception
+	 */
 	private byte[] instumentHttpSession(String className, CtClass cl) throws Exception {
 		byte[] redefinedClassfileBuffer = null;
 
@@ -136,6 +150,12 @@ public class DollyClassTransformer implements ClassFileTransformer {
 							   "	try { _removeAttribute($1); } catch (Exception e) { e.printStackTrace(); }" +
 							   "}";
 					isEnhanced = true;
+				} else if (methods[i].getName().equals("invalidate")) {
+					body =     "{" +
+							   "	com.athena.dolly.enhancer.DollyManager.getInstance().removeValue(getId());" +
+							   "	try { _invalidate(); } catch (Exception e) { e.printStackTrace(); }" +
+							   "}";
+					isEnhanced = true;
 				}
 				
 				if (isEnhanced) {
@@ -154,8 +174,18 @@ public class DollyClassTransformer implements ClassFileTransformer {
 		}
 		
 		return redefinedClassfileBuffer;
-	}
+	}//end of instumentHttpSession()
 	
+	/**
+	 * <pre>
+	 * org.apache.catalina.Manager 구현 클래스에 대해 findSession 메소드 호출 시 해당하는 세션이 없으면
+	 * 인자에 해당하는 세션 아이디로 새로운 세션을 만들도록 byte code를 조작한다.
+	 * </pre>
+	 * @param className
+	 * @param cl
+	 * @return
+	 * @throws Exception
+	 */
 	private byte[] instumentManager(String className, CtClass cl) throws Exception {
 		byte[] redefinedClassfileBuffer = null;
 		
@@ -211,8 +241,15 @@ public class DollyClassTransformer implements ClassFileTransformer {
 		redefinedClassfileBuffer = cl.toBytecode();
 		
 		return redefinedClassfileBuffer;
-	}
+	}//end of instumentManager()
 
+	/**
+	 * <pre>
+	 * 주어진 ClassLoader에 해당하는 ClassPool을 반환한다.
+	 * </pre>
+	 * @param loader
+	 * @return
+	 */
 	private ClassPool getClassPool(ClassLoader loader) {
 		ClassPool pool = pools.get(loader);
 		
@@ -223,8 +260,15 @@ public class DollyClassTransformer implements ClassFileTransformer {
 		}
 		
 		return pool;
-	}
+	}//end of getClassPool()
 
+    /**
+     * <pre>
+     * 탐색된 클래스가 프로퍼티에 명시된 target class 인지 확인한다.
+     * </pre>
+     * @param className
+     * @return
+     */
     private boolean acceptClass(String className) {
     	/*
         for (String IGNORED_PACKAGE : IGNORED_PACKAGES) {
@@ -244,6 +288,6 @@ public class DollyClassTransformer implements ClassFileTransformer {
         }
         
         return false;
-    }
+    }//end of acceptClass()
 }
 //end of DollyClassTransformer.java

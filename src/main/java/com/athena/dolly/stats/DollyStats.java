@@ -28,7 +28,8 @@ import java.util.List;
 
 /**
  * <pre>
- * 
+ * Infinispan의 속성, 통계정보 및 저장된 키 목록을 저장하기 위한 Data Object
+ * - Cache Data는 포함되지 않으며 필요할 경우 <b>DollyManager.getInstance().getValue(key)</b>를 호출한다.
  * </pre>
  * @author Sang-cheon Park
  * @version 1.0

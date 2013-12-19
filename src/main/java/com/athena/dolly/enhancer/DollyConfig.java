@@ -35,7 +35,7 @@ import java.util.Properties;
 
 /**
  * <pre>
- * 
+ * BCI(Byte Code Instrumentation) 수행 대상 클래스 목록 및 Infinispan 관련 설정이 저장된 파일을 로드하고 파싱한다.
  * </pre>
  * @author Sang-cheon Park
  * @version 1.0
@@ -51,12 +51,26 @@ public class DollyConfig {
     private List<String> classList = new ArrayList<String>();
     private boolean verbose;
     
+	/**
+	 * <pre>
+	 * 프로퍼티 파일을 로드하고 파싱한다.
+	 * </pre>
+	 * @return
+	 * @throws ConfigurationException
+	 */
 	public DollyConfig load() throws ConfigurationException {
 		properties = loadConfigFile();
         parseConfigFile(properties);
         return this;
-    }
+    }//end of load()
 
+    /**
+     * <pre>
+     * System Property 또는 classpath에 존재하는 프로퍼티 파일을 로드한다.
+     * </pre>
+     * @return
+     * @throws ConfigurationException
+     */
     private Properties loadConfigFile() throws ConfigurationException {
     	InputStream configResource = null;
     	
@@ -83,13 +97,26 @@ public class DollyConfig {
             throw new ConfigurationException("Could not load the configuration file (" + CONFIG_FILE + "). " +
                     "Please make sure it exists at the root of the classpath or System Poroperty(-Ddolly.properties=Full Qualified File Name) path.", e);
         }
-    }
+    }//end of loadConfigFile()
     
+    /**
+     * <pre>
+     * 프로퍼티 파일을 파싱한다.
+     * </pre>
+     * @param config
+     * @throws ConfigurationException
+     */
     private void parseConfigFile(Properties config) throws ConfigurationException {
     	extractTargetClasses(config);
         extractVerbosity(config);
-    }
+    }//end of parseConfigFile()
 
+    /**
+     * <pre>
+     * BCI 대상 target class 들을 확인한다.
+     * </pre>
+     * @param config
+     */
     private void extractTargetClasses(Properties config) {
     	String[] classNames = config.getProperty(TARGET_CLASS_PROPERTY, "").split(",");
     	
@@ -101,18 +128,30 @@ public class DollyConfig {
     			classList.add(clazzName.replace(".", "/"));
     		}
     	}
-    }
+    }//end of extractTargetClasses()
 
+    /**
+     * <pre>
+     * verbose 여부를 확인한다.
+     * </pre>
+     * @param config
+     */
     private void extractVerbosity(Properties config) {
         this.verbose = Boolean.parseBoolean(config.getProperty(VERBOSE_PROPERTY, "false"));
-    }
-    
-    public List<String> getClassList() {
-    	return classList;
-    }
+    }//end of extractVerbosity()
 
-    public boolean isVerbose() {
-        return verbose;
-    }
+	/**
+	 * @return the classList
+	 */
+	public List<String> getClassList() {
+		return classList;
+	}
+
+	/**
+	 * @return the verbose
+	 */
+	public boolean isVerbose() {
+		return verbose;
+	}
 }
 //end of DollyConfig.java

@@ -26,7 +26,7 @@ package com.athena.dolly.enhancer;
 
 /**
  * <pre>
- * 
+ * Athena Dolly에서 사용하는 Exception Class
  * </pre>
  * @author Sang-cheon Park
  * @version 1.0

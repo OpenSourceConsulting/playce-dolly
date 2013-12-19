@@ -39,7 +39,7 @@ import com.athena.dolly.stats.DollyStats;
 
 /**
  * <pre>
- * 
+ * Infinispan Data Grid Server에 대한 접속, 데이터 입력/조회/삭제 기능을 수행하는 관리 클래스
  * </pre>
  * @author Sang-cheon Park
  * @version 1.0
@@ -50,6 +50,12 @@ public class DollyManager {
 	private static RemoteCache<String, Object> cache;
 	private static DollyConfig config;
 
+    /**
+     * <pre>
+     * Singleton 형태의 DollyManager 인스턴스를 가져온다.
+     * </pre>
+     * @return
+     */
     public synchronized static DollyManager getInstance() {
         if (_instance == null) {
         	init();
@@ -57,8 +63,13 @@ public class DollyManager {
         }
         
         return _instance;
-    }
+    }//end of getInstance()
     
+    /**
+     * <pre>
+     * 주어진 프로퍼티를 이용하여 Infinispan Data Grid Server에 접속하여 RemoteCache object를 가져온다. 
+     * </pre>
+     */
     private static void init() {
     	if (DollyConfig.properties == null || config == null) {
     		try {
@@ -75,59 +86,127 @@ public class DollyManager {
     	
 		ConfigurationBuilder builder = new ConfigurationBuilder();
 	    cache = new RemoteCacheManager(builder.withProperties(DollyConfig.properties).build()).getCache();
-    }
+    }//end of init()
     
+    /**
+     * <pre>
+     * RemoteCache를 중지한다.
+     * </pre>
+     */
     public void destory() {
 	    cache.stop();
-    }
+    }//end of ()
+
+	/**
+	 * <pre>
+	 * RemoteCache에 주어진 Key / Value로 저장한다. 
+	 * </pre>
+	 * @param cacheKey
+	 * @param value
+	 */
+	public synchronized void setValue(String cacheKey, Object value) {
+		cache.put(cacheKey, value);
+    }//end of setValue()
     
+	/**
+	 * <pre>
+	 * RemoteCache에 Map 형태의 Data를 저장하기 위해 사용하며, 주어진 Cache Key / Data Key / Data Value로 저장한다.
+	 * </pre>
+	 * @param cacheKey
+	 * @param dataKey
+	 * @param value
+	 */
 	@SuppressWarnings("unchecked")
-	public synchronized void setValue(String cacheName, String key, Object value) {
-    	Map<String, Object> attribute = (Map<String, Object>)cache.get(cacheName);
+	public synchronized void setValue(String cacheKey, String dataKey, Object value) {
+    	Map<String, Object> attribute = (Map<String, Object>)cache.get(cacheKey);
 		
 		if (attribute == null) {
 			attribute = new ConcurrentHashMap<String, Object>();
 		}
 		
-		attribute.put(key, value);
-		cache.put(cacheName, attribute);
-    }
+		attribute.put(dataKey, value);
+		cache.put(cacheKey, attribute);
+    }//end of setValue()
     
-	public Object getValue(String cacheName) {
-    	return cache.get(cacheName);
-    }
+	/**
+	 * <pre>
+	 * RemoteCache에서 주어진 Key에 해당하는 Data를 조회한다.
+	 * </pre>
+	 * @param cacheKey
+	 * @return
+	 */
+	public Object getValue(String cacheKey) {
+    	return cache.get(cacheKey);
+    }//end of getValue()
     
+    /**
+     * <pre>
+     * RemoteCache에서 Map 형태의 Data를 조회하기 위해 사용하며, 주어진 Cache Key / Data Key에 해당하는 Data를 조회한다. 
+     * </pre>
+     * @param cacheKey
+     * @param dataKey
+     * @return
+     */
     @SuppressWarnings("unchecked")
-	public Object getValue(String cacheName, String key) {
-    	Map<String, Object> attribute = (Map<String, Object>)cache.get(cacheName);
+	public Object getValue(String cacheKey, String dataKey) {
+    	Map<String, Object> attribute = (Map<String, Object>)cache.get(cacheKey);
 		
 		if (attribute == null) {
 			return null;
 		} else {
-			return attribute.get(key);
+			return attribute.get(dataKey);
 		}
-    }
+    }//end of getValue()
     
+    /**
+     * <pre>
+	 * RemoteCache에서 주어진 Key에 해당하는 Data를 제거한다.
+     * </pre>
+     * @param cacheKey
+     */
+	public synchronized void removeValue(String cacheKey) {
+		cache.remove(cacheKey);
+    }//end of removeValue()
+    
+    /**
+     * <pre>
+     * RemoteCache에서 Map 형태의 Data를 제거하기 위해 사용하며, 주어진 Cache Key / Data Key에 해당하는 Data를 제거한다. 
+     * </pre>
+     * @param cacheKey
+     * @param dataKey
+     */
     @SuppressWarnings("unchecked")
-	public Enumeration<String> getValueNames(String cacheName) {
-    	Map<String, Object> attribute = (Map<String, Object>)cache.get(cacheName);
+	public synchronized void removeValue(String cacheKey, String dataKey) {
+    	Map<String, Object> attribute = (Map<String, Object>)cache.get(cacheKey);
+		
+		if (attribute != null) {
+			attribute.remove(dataKey);
+		}
+    }//end of removeValue()
+    
+    /**
+     * <pre>
+     * RemoteCache에서 주어진 Cache Key에 해당하는 Data가 Map 형태일 경우 해당 Map의 키 목록을 Enumeration 형태로 조회한다.
+     * </pre>
+     * @param cacheKey
+     * @return
+     */
+    @SuppressWarnings("unchecked")
+	public Enumeration<String> getValueNames(String cacheKey) {
+    	Map<String, Object> attribute = (Map<String, Object>)cache.get(cacheKey);
 		
 		if (attribute == null) {
 			return null;
 		} else {
 			return Collections.enumeration(attribute.keySet());
 		}
-    }
+    }//end of getValueNames()
     
-    @SuppressWarnings("unchecked")
-	public synchronized void removeValue(String cacheName, String key) {
-    	Map<String, Object> attribute = (Map<String, Object>)cache.get(cacheName);
-		
-		if (attribute != null) {
-			attribute.remove(key);
-		}
-    }
-    
+	/**
+	 * <pre>
+	 * Debug용으로써 RemoteCache 내에 존재하는 Data를 출력한다.
+	 * </pre>
+	 */
 	public void printAllCache() {
 	    System.out.println("ProtocolVersion : " + cache.getProtocolVersion());
 	    System.out.println("Version : " + cache.getVersion());
@@ -154,8 +233,14 @@ public class DollyManager {
     		System.out.println("");
     		i++;  
 	    }
-    }
+    }//end of printAllCache()
 	
+	/**
+	 * <pre>
+	 * Infinispan의 속성, 통계정보 및 저장된 키 목록을 조회한다.
+	 * </pre>
+	 * @return
+	 */
 	public DollyStats getStats() {
 		DollyStats stats = new DollyStats();
 		
@@ -179,6 +264,6 @@ public class DollyManager {
 		stats.setCacheKeys(new ArrayList<String>(cache.keySet()));
 		
 		return stats;
-	}
+	}//end of getStats()
 }
 //end of DollyManager.java
