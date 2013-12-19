@@ -1,5 +1,4 @@
-Athena-Dolly는 Infinispan Data Grid를 이용한 WAS에 비종속적인 세션 클러스터링 솔루션으로
-현재 Apache Tomcat 6/7, JBoss EAP 5/6, JBoss AS 5/6/7이 지원 가능하며, 
+Athena-Dolly는 Infinispan Data Grid를 이용한 WAS에 비종속적인 세션 클러스터링 솔루션으로 현재 Apache Tomcat 6/7, JBoss EAP 5/6이 지원 가능하며
 추후 Weblogic, Jeus, WebSphere등 다양한 WAS로도 지원을 확대할 계획이다.
 
 1. Athena-Dolly의 설치
@@ -21,7 +20,6 @@ Athena-Dolly는 Infinispan Data Grid를 이용한 WAS에 비종속적인 세션 
      Infinispan Properties, Infinispan Stats, Cache Data List 조회 화면이 표시된다.
      단, WAS에 따라서 표시가 되지 않을 수 있으며 athena-dolly-0.0.1-SNAPSHOT.jar 파일 내의
      /META-INF/resources/dolly_stats.jsp 파일을 WebRoot로 복사하면 호출 가능하다.
-     
      
 +:+:+:+: WAS 별 실행 결과 +:+:+:+:
 
