@@ -37,7 +37,13 @@
 			<groupId>org.infinispan</groupId>
 			<artifactId>infinispan-client-hotrod</artifactId>
 			<version>${lib.infinispan.version}</version>
-		</dependency>
+			<!-- <exclusions>
+				<exclusion>
+					<groupId>org.jboss.logging</groupId>
+					<artifactId>jboss-logging</artifactId>
+				</exclusion>
+			</exclusions> -->
+		</dependency>	
 		<!-- for debugging -->
 		<dependency>
 			<groupId>org.apache.tomcat</groupId>

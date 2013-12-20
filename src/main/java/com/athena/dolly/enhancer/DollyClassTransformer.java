@@ -121,11 +121,15 @@ public class DollyClassTransformer implements ClassFileTransformer {
 				String body = null;
 				isEnhanced = false;
 				if (methods[i].getName().equals("setAttribute")) {
-					body =     "{" +
-							   "	com.athena.dolly.enhancer.DollyManager.getInstance().setValue(getId(), $1, $2);" +
-							   "	try { _setAttribute($1, $2); } catch (Exception e) { e.printStackTrace(); }" +
-							   "}";
-					isEnhanced = true;
+					CtClass[] params = methods[i].getParameterTypes();
+					
+					if (params.length == 2) {
+						body =     "{" +
+								   "	com.athena.dolly.enhancer.DollyManager.getInstance().setValue(getId(), $1, $2);" +
+								   "	try { _setAttribute($1, $2); } catch (Exception e) { e.printStackTrace(); }" +
+								   "}";
+						isEnhanced = true;
+					}
 				} else if (methods[i].getName().equals("getAttribute")) {
 					body =     "{" +
 							   "	java.lang.Object obj = com.athena.dolly.enhancer.DollyManager.getInstance().getValue(getId(), $1);" +
@@ -145,17 +149,25 @@ public class DollyClassTransformer implements ClassFileTransformer {
 							   "}";
 					isEnhanced = true;
 				} else if (methods[i].getName().equals("removeAttribute")) {
-					body =     "{" +
-							   "	com.athena.dolly.enhancer.DollyManager.getInstance().removeValue(getId(), $1);" +
-							   "	try { _removeAttribute($1); } catch (Exception e) { e.printStackTrace(); }" +
-							   "}";
-					isEnhanced = true;
+					CtClass[] params = methods[i].getParameterTypes();
+					
+					if (params.length == 1) {
+						body =     "{" +
+								   "	com.athena.dolly.enhancer.DollyManager.getInstance().removeValue(getId(), $1);" +
+								   "	try { _removeAttribute($1); } catch (Exception e) { e.printStackTrace(); }" +
+								   "}";
+						isEnhanced = true;
+					}
 				} else if (methods[i].getName().equals("invalidate")) {
-					body =     "{" +
-							   "	com.athena.dolly.enhancer.DollyManager.getInstance().removeValue(getId());" +
-							   "	try { _invalidate(); } catch (Exception e) { e.printStackTrace(); }" +
-							   "}";
-					isEnhanced = true;
+					CtClass[] params = methods[i].getParameterTypes();
+					
+					if (params.length == 0) {
+						body =     "{" +
+								   "	com.athena.dolly.enhancer.DollyManager.getInstance().removeValue(getId());" +
+								   "	try { _invalidate(); } catch (Exception e) { e.printStackTrace(); }" +
+								   "}";
+						isEnhanced = true;
+					}
 				}
 				
 				if (isEnhanced) {
