@@ -33,10 +33,16 @@ import java.util.List;
 import java.util.Map;
 
 import javassist.ClassPool;
+import javassist.CtBehavior;
 import javassist.CtClass;
+import javassist.CtConstructor;
 import javassist.CtMethod;
 import javassist.CtNewMethod;
 import javassist.LoaderClassPath;
+import javassist.Modifier;
+import javassist.NotFoundException;
+import javassist.bytecode.CodeAttribute;
+import javassist.bytecode.LocalVariableAttribute;
 
 /**
  * <pre>
@@ -46,8 +52,6 @@ import javassist.LoaderClassPath;
  * @version 1.0
  */
 public class DollyClassTransformer implements ClassFileTransformer {
-	
-	//private static final String[] IGNORED_PACKAGES = new String[] { "sun/", "com/sun/", "java/", "javax/", "com/apple/" };
 	
 	private List<String> classList;
 	private boolean verbose;
@@ -76,12 +80,27 @@ public class DollyClassTransformer implements ClassFileTransformer {
                 // Transform
                 cl = pool.makeClass(new ByteArrayInputStream(classfileBuffer));
                 
-                // only supports Tomcat 6/7, JBoss EAP 5/6
                 if (cl.subtypeOf(pool.get("javax.servlet.http.HttpSession"))) {
                 	return instumentHttpSession(className, cl);
-                } else if (cl.subtypeOf(pool.get("org.apache.catalina.Manager"))) {
-            		return instumentManager(className, cl);
+                } 
+                
+                // Tomcat, JBoss 외의 WAS에서는 org.apache.catalina.Manager로 타입 검사를 수행할 경우 
+                // ClassNotFound Exception이 발생하므로 문자열을 비교한다.
+                if (className.startsWith("org/apache/catalina/session/ManagerBase")) {
+                	return instumentManager(className, cl);
                 }
+                
+                // Debug 용으로써 Target Class로 지정된 클래스(위 HttpSession과 ManagerBase는 제외)의 모든 메소드의 실행 시 로깅을 수행한다.
+            	CtMethod[] methods = cl.getDeclaredMethods();
+				for (int i = 0; i < methods.length; i++) {
+					if (methods[i].isEmpty() == false) {
+						String signature = getSignature(methods[i]);
+						String returnValue = returnValue(methods[i]);
+						
+						methods[i].insertAfter("System.out.println(\"" + className.replace("/", ".") + " : " + signature + returnValue + ");");
+					}
+				}
+				return cl.toBytecode();
             }
         } catch (Exception e) {
             System.err.println("[Dolly] Warning: could not enhance class " + className + " : " + e.getMessage());
@@ -112,27 +131,31 @@ public class DollyClassTransformer implements ClassFileTransformer {
 
 		if (cl.isInterface() == false) {
 			CtMethod[] methods = cl.getDeclaredMethods();
+			CtClass[] params = null;
 			boolean isEnhanced = false;
 			for (int i = 0; i < methods.length; i++) {
 				if (methods[i].isEmpty()) {
 					continue;
 				}
+
+				params = methods[i].getParameterTypes();
+				
+				// Weblogic의 경우 sessionId는 ByhvS3mGpb5cZgn3BfmrSDN3gvQL5YVydpMdGDpCFP3xkYdM3LBS!1397924265!1387783814698 형태이며,
+				// 제일 처음 ! 앞 부분만 키로 사용한다.
 				
 				String body = null;
 				isEnhanced = false;
 				if (methods[i].getName().equals("setAttribute")) {
-					CtClass[] params = methods[i].getParameterTypes();
-					
 					if (params.length == 2) {
 						body =     "{" +
-								   "	com.athena.dolly.enhancer.DollyManager.getInstance().setValue(getId(), $1, $2);" +
+								   "	com.athena.dolly.enhancer.DollyManager.getInstance().setValue(getId().split(\"!\")[0], $1, $2);" +
 								   "	try { _setAttribute($1, $2); } catch (Exception e) { e.printStackTrace(); }" +
 								   "}";
 						isEnhanced = true;
 					}
 				} else if (methods[i].getName().equals("getAttribute")) {
 					body =     "{" +
-							   "	java.lang.Object obj = com.athena.dolly.enhancer.DollyManager.getInstance().getValue(getId(), $1);" +
+							   "	java.lang.Object obj = com.athena.dolly.enhancer.DollyManager.getInstance().getValue(getId().split(\"!\")[0], $1);" +
 							   "	if (obj == null) {" +
 							   "		try { obj = _getAttribute($1); } catch (Exception e) { e.printStackTrace(); }" +
 							   "	}" +
@@ -141,7 +164,7 @@ public class DollyClassTransformer implements ClassFileTransformer {
 					isEnhanced = true;
 				} else if (methods[i].getName().equals("getAttributeNames")) {
 					body =     "{" +
-							   "	java.util.Enumeration obj = com.athena.dolly.enhancer.DollyManager.getInstance().getValueNames(getId());" +
+							   "	java.util.Enumeration obj = com.athena.dolly.enhancer.DollyManager.getInstance().getValueNames(getId().split(\"!\")[0]);" +
 							   "	if (obj == null) {" +
 							   "		try { obj = _getAttributeNames(); } catch (Exception e) { e.printStackTrace(); }" +
 							   "	}" +
@@ -149,25 +172,26 @@ public class DollyClassTransformer implements ClassFileTransformer {
 							   "}";
 					isEnhanced = true;
 				} else if (methods[i].getName().equals("removeAttribute")) {
-					CtClass[] params = methods[i].getParameterTypes();
-					
 					if (params.length == 1) {
 						body =     "{" +
-								   "	com.athena.dolly.enhancer.DollyManager.getInstance().removeValue(getId(), $1);" +
+								   "	com.athena.dolly.enhancer.DollyManager.getInstance().removeValue(getId().split(\"!\")[0], $1);" +
 								   "	try { _removeAttribute($1); } catch (Exception e) { e.printStackTrace(); }" +
 								   "}";
 						isEnhanced = true;
 					}
 				} else if (methods[i].getName().equals("invalidate")) {
-					CtClass[] params = methods[i].getParameterTypes();
-					
 					if (params.length == 0) {
 						body =     "{" +
-								   "	com.athena.dolly.enhancer.DollyManager.getInstance().removeValue(getId());" +
+								   "	com.athena.dolly.enhancer.DollyManager.getInstance().removeValue(getId().split(\"!\")[0]);" +
 								   "	try { _invalidate(); } catch (Exception e) { e.printStackTrace(); }" +
 								   "}";
 						isEnhanced = true;
 					}
+				} else if (methods[i].getName().equals("reuseSessionId")) {
+					body =     "{" +
+							   "	return true;" +
+							   "}";
+					isEnhanced = true;
 				}
 				
 				if (isEnhanced) {
@@ -208,7 +232,6 @@ public class DollyClassTransformer implements ClassFileTransformer {
 			}
 			
 			if (methods[i].getName().equals("findSession")) {
-				
 				CtMethod method = cl.getDeclaredMethod("createSession");
 				CtClass[] params = method.getParameterTypes();
 
@@ -301,5 +324,104 @@ public class DollyClassTransformer implements ClassFileTransformer {
         
         return false;
     }//end of acceptClass()
+    
+    /**
+     * <pre>
+     * 메소드의 리턴 값을 확인한다.
+     * </pre>
+     * @param method
+     * @return
+     * @throws NotFoundException
+     */
+    private String returnValue(CtBehavior method) throws NotFoundException {
+		String returnValue = "";
+		if (methodReturnsValue(method)) {
+			returnValue = "\" returns: \" + $_ ";
+		}
+		return returnValue;
+	}//end of returnValue()
+
+	/**
+	 * <pre>
+	 * 메소드의 리턴 값을 확인한다.
+	 * </pre>
+	 * @param method
+	 * @return
+	 * @throws NotFoundException
+	 */
+	private boolean methodReturnsValue(CtBehavior method) throws NotFoundException {
+		CtClass returnType = ((CtMethod) method).getReturnType();
+		String returnTypeName = returnType.getName();
+
+		boolean isVoidMethod = (method instanceof CtMethod) && "void".equals(returnTypeName);
+		boolean isConstructor = method instanceof CtConstructor;
+
+		boolean methodReturnsValue = (isVoidMethod || isConstructor) == false;
+		return methodReturnsValue;
+	}//end of methodReturnsValue()
+
+	/**
+	 * <pre>
+	 * 
+	 * </pre>
+	 * @param method
+	 * @return
+	 * @throws NotFoundException
+	 */
+	private String getSignature(CtBehavior method) throws NotFoundException {
+		CtClass parameterTypes[] = method.getParameterTypes();
+
+		CodeAttribute codeAttribute = method.getMethodInfo().getCodeAttribute();
+
+		LocalVariableAttribute locals = (LocalVariableAttribute) codeAttribute.getAttribute("LocalVariableTable");
+		String methodName = method.getName();
+
+		StringBuffer sb = new StringBuffer(methodName + "(\" ");
+		for (int i = 0; i < parameterTypes.length; i++) {
+			if (i > 0) {
+				sb.append(" + \", \" ");
+			}
+
+			CtClass parameterType = parameterTypes[i];
+			CtClass arrayOf = parameterType.getComponentType();
+
+			sb.append(" + \"");
+			sb.append(parameterNameFor(method, locals, i));
+			sb.append("\" + \"=");
+
+			// use Arrays.asList() to render array of objects.
+			if (arrayOf != null && !arrayOf.isPrimitive()) {
+				sb.append("\"+ java.util.Arrays.asList($" + (i + 1) + ")");
+			} else {
+				sb.append("\"+ $" + (i + 1));
+			}
+		}
+		sb.append("+\")\"");
+
+		String signature = sb.toString();
+		return signature;
+	}//end of getSignature()
+
+	/**
+	 * <pre>
+	 * 
+	 * </pre>
+	 * @param method
+	 * @param locals
+	 * @param i
+	 * @return
+	 */
+	private String parameterNameFor(CtBehavior method, LocalVariableAttribute locals, int i) {
+		if (locals == null) {
+			return Integer.toString(i + 1);
+		}
+
+		if (Modifier.isStatic(method.getModifiers())) {
+			return locals.variableName(i);
+		}
+
+		// skip #0 which is reference to "this"
+		return locals.variableName(i + 1);
+	}//end of parameterNameFor()
 }
 //end of DollyClassTransformer.java

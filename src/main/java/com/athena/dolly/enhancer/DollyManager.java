@@ -118,14 +118,16 @@ public class DollyManager {
 	 */
 	@SuppressWarnings("unchecked")
 	public synchronized void setValue(String cacheKey, String dataKey, Object value) {
-    	Map<String, Object> attribute = (Map<String, Object>)cache.get(cacheKey);
-		
-		if (attribute == null) {
-			attribute = new ConcurrentHashMap<String, Object>();
+		if (dataKey != null) {
+	    	Map<String, Object> attribute = (Map<String, Object>)cache.get(cacheKey);
+			
+			if (attribute == null) {
+				attribute = new ConcurrentHashMap<String, Object>();
+			}
+			
+			attribute.put(dataKey, value);
+			cache.put(cacheKey, attribute);
 		}
-		
-		attribute.put(dataKey, value);
-		cache.put(cacheKey, attribute);
     }//end of setValue()
     
 	/**
