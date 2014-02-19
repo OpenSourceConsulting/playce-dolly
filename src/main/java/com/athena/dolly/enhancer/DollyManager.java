@@ -29,6 +29,7 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 import org.infinispan.client.hotrod.RemoteCache;
 import org.infinispan.client.hotrod.RemoteCacheManager;
@@ -105,7 +106,7 @@ public class DollyManager {
 	 * @param value
 	 */
 	public synchronized void setValue(String cacheKey, Object value) {
-		cache.put(cacheKey, value);
+		cache.put(cacheKey, value, -1, TimeUnit.SECONDS, config.getTimeout() * 60, TimeUnit.SECONDS);
     }//end of setValue()
     
 	/**
@@ -126,7 +127,7 @@ public class DollyManager {
 			}
 			
 			attribute.put(dataKey, value);
-			cache.put(cacheKey, attribute);
+			cache.put(cacheKey, attribute, -1, TimeUnit.SECONDS, config.getTimeout() * 60, TimeUnit.SECONDS);
 		}
     }//end of setValue()
     

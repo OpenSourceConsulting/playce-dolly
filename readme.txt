@@ -325,6 +325,10 @@ Athena-Dolly는 Infinispan Data Grid를 이용한 WAS에 비종속적인 세션 
    - athena-dolly-0.0.1-SNAPSHOT-bin.zip/lib/*.jar 파일을 -Xbootclasspath에 추가 시 javax.servlet.ServletException: java.lang.NoClassDefFoundError: com/athena/dolly/stats/DollyStats 발생
    
    - -Ddolly.properties, -javaagent: 옵션 외 /WEB-INF/lib/ 디렉토리에 athena-dolly-0.0.1-SNAPSHOT-bin.zip 안의 lib/*.jar 파일을 복사할 경우 정상 동작
+   - /WEB-INF/lib 에 라이브러리 추가 후 동작하지 않을 경우 -Xbootclasspath/p 옵션 추
+     export JAVA_OPTS="$JAVA_OPTS -Ddolly.properties=/opt/dolly-agent/dolly.properties"
+	 export JAVA_OPTS="$JAVA_OPTS -javaagent:/opt/dolly-agent/lib/athena-dolly-0.0.1-SNAPSHOT.jar"
+	 export JAVA_OPTS="$JAVA_OPTS -Xbootclasspath/p:/opt/dolly-agent/lib/athena-dolly-0.0.1-SNAPSHOT.jar"
    
 4. Weblogic 11R1
    - -Ddolly.properties, -javaagent: 옵션 외 -Xbootclasspath/a:/opt/dolly-agent/lib/commons-pool-1.6.jar 추가

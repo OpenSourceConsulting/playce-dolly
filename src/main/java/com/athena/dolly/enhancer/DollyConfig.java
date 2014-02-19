@@ -44,12 +44,14 @@ public class DollyConfig {
 
 	protected static final String CONFIG_FILE = "dolly.properties";
 	private static final String VERBOSE_PROPERTY = "dolly.verbose";
+	private static final String TIMEOUT_PROPERTY = "dolly.session.timeout";
     private static final String TARGET_CLASS_PROPERTY = "dolly.instrument.target.class";
     
     public static Properties properties;
     
     private List<String> classList = new ArrayList<String>();
     private boolean verbose;
+    private int timeout = 30;
     
 	/**
 	 * <pre>
@@ -109,6 +111,7 @@ public class DollyConfig {
     private void parseConfigFile(Properties config) throws ConfigurationException {
     	extractTargetClasses(config);
         extractVerbosity(config);
+        extractTimeout(config);
     }//end of parseConfigFile()
 
     /**
@@ -140,6 +143,16 @@ public class DollyConfig {
         this.verbose = Boolean.parseBoolean(config.getProperty(VERBOSE_PROPERTY, "false"));
     }//end of extractVerbosity()
 
+    /**
+     * <pre>
+     * timeout 설정 값을 확인한다.
+     * </pre>
+     * @param config
+     */
+    private void extractTimeout(Properties config) {
+    	this.timeout = Integer.parseInt(config.getProperty(TIMEOUT_PROPERTY, "30"));
+    }//end of extractTimeout()
+
 	/**
 	 * @return the classList
 	 */
@@ -152,6 +165,13 @@ public class DollyConfig {
 	 */
 	public boolean isVerbose() {
 		return verbose;
+	}
+
+	/**
+	 * @return the timeout
+	 */
+	public int getTimeout() {
+		return timeout;
 	}
 }
 //end of DollyConfig.java
