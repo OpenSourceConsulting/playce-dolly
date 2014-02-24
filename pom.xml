@@ -84,6 +84,8 @@
 						</manifest>
 						<manifestEntries>
 							<Premain-Class>com.athena.dolly.enhancer.DollyAgent</Premain-Class>
+							<!-- for test -->
+							<Main-Class>com.athena.dolly.enhancer.DollyManager</Main-Class>
 						</manifestEntries>
 					</archive>                              
                     <excludes>                                  

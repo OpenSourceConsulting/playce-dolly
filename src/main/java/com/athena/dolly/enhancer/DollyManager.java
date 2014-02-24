@@ -268,5 +268,14 @@ public class DollyManager {
 		
 		return stats;
 	}//end of getStats()
+	
+	public static void main(String[] args) {
+		DollyManager.getInstance().setValue("cachekey", "cachevalue");
+		DollyManager.getInstance().printAllCache();
+		DollyStats stat = DollyManager.getInstance().getStats();
+		System.out.println(stat);
+		
+		DollyManager.getInstance().removeValue("cachekey");
+	}
 }
 //end of DollyManager.java
