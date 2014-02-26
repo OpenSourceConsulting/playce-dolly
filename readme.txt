@@ -21,6 +21,38 @@ Athena-Dolly는 Infinispan Data Grid를 이용한 WAS에 비종속적인 세션 
      단, WAS에 따라서 표시가 되지 않을 수 있으며 athena-dolly-0.0.1-SNAPSHOT.jar 파일 내의
      /META-INF/resources/dolly_stats.jsp 파일을 WebRoot로 복사하면 호출 가능하다.
      
+4. Infinispan file-store 활성화
+   - Infinispan 서버에 Eviction과 Expiration 관련 옵션이 주어지지 않을 경우 데이터가 무한 적재되면서 OutOfMemory가 발생할 가능성이 있기 때문에
+     다음과 같이 캐시에 eviction 설정을 추가하고 evict 된 데이터를 파일로 저장할 수 있도록 file-store 설정을 추가한다.
+     
+     <distributed-cache name="default" mode="SYNC" segments="20" owners="2" remote-timeout="30000" start="EAGER">
+        <locking isolation="READ_COMMITTED" acquire-timeout="30000" concurrency-level="1000" striping="false"/>
+        <transaction mode="NONE"/>
+        <eviction strategy="LRU" max-entries="8192"/>
+        <!-- expiration은 dolly.properties 파일의 dolly.session.timeout 값으로 대체하여 설정된다.(lifespan은 -1, max-idle은 ${dolly.session.timeout}) --> 
+        <file-store passivation="true" path="dolly" purge="false" preload="true" shared="true" />
+    </distributed-cache>
+    
+    file-store에 포함될 수 있는 Attributes는 다음과 같다.
+    
+    a. max-entries :Sets the maximum number of in-memory mappings between keys and their position in the store.
+                    Normally this is unlimited, but to avoid excess memory usage, an upper bound can be configured.
+                    If this limit is exceeded, entries are removed permanently using the LRU algorithm both from
+                    the in-memory index and the underlying file based cache store. Warning: setting this value
+                    may cause data loss.
+    b. relative-to : The base directory in which to store the cache state.
+    c. path : The path within "relative-to" in which to store the cache state. If undefined, the path defaults to the cache container name.
+    d. write-behind : Configures a cache store as write-behind instead of write-through.
+    e. property : A cache store property with name and value.
+    f. name : Uniquely identifies this store.
+    g. shared : This setting should be set to true when multiple cache instances share the same cache store (e.g., multiple nodes in a cluster using a JDBC-based CacheStore pointing to the same, shared database.) Setting this to true avoids multiple cache instances writing the same modification multiple times. If enabled, only the node where the modification originated will write to the cache store. If disabled, each individual cache reacts to a potential remote update by storing the data to the cache store.
+    h. preload : If true, when the cache starts, data stored in the cache store will be pre-loaded into memory. This is particularly useful when data in the cache store will be needed immediately after startup and you want to avoid cache operations being delayed as a result of loading this data lazily. Can be used to provide a 'warm-cache' on startup, however there is a performance penalty as startup time is affected by this process.
+    i. passivation : If true, data is only written to the cache store when it is evicted from memory, a phenomenon known as 'passivation'. Next time the data is requested, it will be 'activated' which means that data will be brought back to memory and removed from the persistent store. If false, the cache store contains a copy of the contents in memory, so writes to cache result in cache store writes. This essentially gives you a 'write-through' configuration.
+    j. fetch-state : If true, fetch persistent state when joining a cluster. If multiple cache stores are chained, only one of them can have this property enabled.
+    k. purge : If true, purges this cache store when it starts up.
+    l. singleton : If true, the singleton store cache store is enabled. SingletonStore is a delegating cache store used for situations when only one instance in a cluster should interact with the underlying store.
+    m. read-only : If true, the cache store will only be used to load entries. Any modifications made to the caches will not be applied to the store.
+     
 +:+:+:+: WAS 별 실행 결과 +:+:+:+:
 
 1. Apache Tomcat 6 / 7
