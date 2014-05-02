@@ -44,13 +44,17 @@ public class DollyConfig {
 
 	protected static final String CONFIG_FILE = "dolly.properties";
 	private static final String VERBOSE_PROPERTY = "dolly.verbose";
+	private static final String ENABLE_SSO_PROPERTY = "dolly.enableSSO";
+	private static final String SSO_DOMAIN_LIST_PROPERTY = "dolly.ssoDomainList";
 	private static final String TIMEOUT_PROPERTY = "dolly.session.timeout";
     private static final String TARGET_CLASS_PROPERTY = "dolly.instrument.target.class";
     
     public static Properties properties;
-    
-    private List<String> classList = new ArrayList<String>();
+
     private boolean verbose;
+    private List<String> classList = new ArrayList<String>();
+    private boolean enableSSO;
+    private List<String> ssoDomainList = new ArrayList<String>();
     private int timeout = 30;
     
 	/**
@@ -112,6 +116,8 @@ public class DollyConfig {
     	extractTargetClasses(config);
         extractVerbosity(config);
         extractTimeout(config);
+        extractEnableSSO(config);
+        extractSsoDomainList(config);
     }//end of parseConfigFile()
 
     /**
@@ -145,6 +151,32 @@ public class DollyConfig {
 
     /**
      * <pre>
+     * enableSSO 여부를 확인한다.
+     * </pre>
+     * @param config
+     */
+    private void extractEnableSSO(Properties config) {
+        this.enableSSO = Boolean.parseBoolean(config.getProperty(ENABLE_SSO_PROPERTY, "false"));
+    }//end of extractEnableSSO()
+
+    /**
+     * <pre>
+     * SSO 대상 Domain 목록을 확인한다.
+     * </pre>
+     * @param config
+     */
+    private void extractSsoDomainList(Properties config) {
+    	String[] domainNames = config.getProperty(SSO_DOMAIN_LIST_PROPERTY, "").split(",");
+    	
+    	for (String domainName : domainNames) {
+    		if (!"".equals(domainName)) {
+    			ssoDomainList.add(domainName);
+    		}
+    	}
+    }//end of extractSsoDomainList()
+
+    /**
+     * <pre>
      * timeout 설정 값을 확인한다.
      * </pre>
      * @param config
@@ -172,6 +204,20 @@ public class DollyConfig {
 	 */
 	public int getTimeout() {
 		return timeout;
+	}
+
+	/**
+	 * @return the enableSSO
+	 */
+	public boolean isEnableSSO() {
+		return enableSSO;
+	}
+
+	/**
+	 * @return the ssoDomainList
+	 */
+	public List<String> getSsoDomainList() {
+		return ssoDomainList;
 	}
 }
 //end of DollyConfig.java

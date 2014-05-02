@@ -71,7 +71,7 @@ public class DollyAgent implements ClassFileTransformer {
         }
 
         try {
-            transformer = instanciateTransformer(TRANSFORMER_CLASS, config.getClassList(), verbose);
+            transformer = instanciateTransformer(TRANSFORMER_CLASS, verbose, config.getClassList(), config.isEnableSSO(), config.getSsoDomainList());
         } catch (Exception e) {
             System.err.println("[Dolly] Initialization error : " + e.getMessage());
             e.printStackTrace();
@@ -104,15 +104,17 @@ public class DollyAgent implements ClassFileTransformer {
      * DollyClassTransformer 클래스의 인스턴스를 생성한다.
      * </pre>
      * @param className
-     * @param classList
      * @param verbose
+     * @param classList
+     * @param enableSSO
+     * @param ssoDomainList
      * @return
      * @throws Exception
      */
-    private ClassFileTransformer instanciateTransformer(String className, List<String> classList, boolean verbose) throws Exception {
+    private ClassFileTransformer instanciateTransformer(String className, boolean verbose, List<String> classList, boolean enableSSO, List<String> ssoDomainList) throws Exception {
         Class<?> clazz = Class.forName(className);
-        Constructor<?> clazzConstructor = clazz.getConstructor(new Class[]{List.class, Boolean.TYPE});
-        return (ClassFileTransformer) clazzConstructor.newInstance(classList, verbose);
+        Constructor<?> clazzConstructor = clazz.getConstructor(new Class[]{Boolean.TYPE, List.class, Boolean.TYPE, List.class});
+        return (ClassFileTransformer) clazzConstructor.newInstance(verbose, classList, enableSSO, ssoDomainList);
     }//end of instanciateTransformer()
 }
 //end of DollyAgent.java

@@ -54,13 +54,17 @@ import javassist.bytecode.LocalVariableAttribute;
 public class DollyClassTransformer implements ClassFileTransformer {
 	
 	private List<String> classList;
+	private List<String> ssoDomainList;
 	private boolean verbose;
+	private boolean enableSSO;
 
 	private Map<ClassLoader, ClassPool> pools = new HashMap<ClassLoader, ClassPool>();
 	
-	public DollyClassTransformer(List<String> classList, boolean verbose) {
-		this.classList = classList;
+	public DollyClassTransformer(boolean verbose, List<String> classList, boolean enableSSO, List<String> ssoDomainList) {
 		this.verbose = verbose;
+		this.classList = classList;
+		this.enableSSO = enableSSO;
+		this.ssoDomainList = ssoDomainList;
 	}//end of constructor()
 
 	/* (non-Javadoc)
@@ -84,13 +88,21 @@ public class DollyClassTransformer implements ClassFileTransformer {
                 	return instumentHttpSession(className, cl);
                 } 
                 
-                // Tomcat, JBoss 외의 WAS에서는 org.apache.catalina.Manager로 타입 검사를 수행할 경우 
+                // Tomcat, JBoss 외의 WAS에서는 org.apache.catalina.session.ManagerBase로 타입 검사를 수행할 경우 
                 // ClassNotFound Exception이 발생하므로 문자열을 비교한다.
                 if (className.startsWith("org/apache/catalina/session/ManagerBase")) {
                 	return instumentManager(className, cl);
                 }
                 
-                // Debug 용으로써 Target Class로 지정된 클래스(위 HttpSession과 ManagerBase는 제외)의 모든 메소드의 실행 시 로깅을 수행한다.
+                if (enableSSO && className.startsWith("org/apache/catalina/connector/Request")) {
+                	return instumentRequest(className, cl);
+                }
+                
+                if (enableSSO && className.startsWith("weblogic/servlet/internal/ServletRequestImpl")) {
+                	return instumentRequest(className, cl);
+                }
+                
+                // Debug 용으로써 Target Class로 지정된 클래스(위 HttpSession과 ManagerBase 등은 제외)의 모든 메소드의 실행 시 로깅을 수행한다.
             	CtMethod[] methods = cl.getDeclaredMethods();
 				for (int i = 0; i < methods.length; i++) {
 					if (methods[i].isEmpty() == false) {
@@ -214,7 +226,7 @@ public class DollyClassTransformer implements ClassFileTransformer {
 	
 	/**
 	 * <pre>
-	 * org.apache.catalina.Manager 구현 클래스에 대해 findSession 메소드 호출 시 해당하는 세션이 없으면
+	 * org.apache.catalina.session.ManagerBase 클래스에 대해 findSession 메소드 호출 시 해당하는 세션이 없으면
 	 * 인자에 해당하는 세션 아이디로 새로운 세션을 만들도록 byte code를 조작한다.
 	 * </pre>
 	 * @param className
@@ -264,11 +276,242 @@ public class DollyClassTransformer implements ClassFileTransformer {
 					System.out.println(className.replace('/', '.') + "." + methods[i].getName() + "() is successfully enhanced.");
 				}
 			}
+		}
+		
+		redefinedClassfileBuffer = cl.toBytecode();
+		
+		return redefinedClassfileBuffer;
+	}//end of instumentManager()
+	
+	/**
+	 * <pre>
+	 * org.apache.catalina.connector.Request 구현 클래스에 대해 getRequestedSessionId 메소드 호출 시 
+	 * enableSSO가 true 이고, 현재 도메인이 ssoDomainList에 있으면 Data Grid에서 client IP Address 에 해당하는 session ID를 
+	 * 조회하여 반환하도록 byte code를 조작한다.
+	 * </pre>
+	 * @param className
+	 * @param cl
+	 * @return
+	 * @throws Exception
+	 */
+	private byte[] instumentRequest(String className, CtClass cl) throws Exception {
+		byte[] redefinedClassfileBuffer = null;
+		
+		CtMethod[] methods = cl.getDeclaredMethods();
+		for (int i = 0; i < methods.length; i++) {
+			if (methods[i].isEmpty()) {
+				continue;
+			}
+
+			if (className.equals("org/apache/catalina/connector/Request") && methods[i].getName().equals("doGetSession")) {
+				String body = 	"boolean ssoDomain = false;" +
+						   		"String serverName = getServerName();";
+				
+				for (int j = 0; j < ssoDomainList.size(); j++) {
+					if (j > 0) {
+						body += "else ";
+					}
+					
+					body += 	"if (serverName.endsWith(\"" + ssoDomainList.get(j) + "\")) {" +
+								"  	ssoDomain = true;" +
+								"}";
+				}
+				
+				body +=			"if (ssoDomain) {" +
+								"	String newId = getParameter(\"ATHENA_DOLLY_SESSION_ID\");" +
+								"	if (newId != null && newId.length() > 0) {" +
+								"		setRequestedSessionId(newId);" +
+								"		changeSessionId(newId);" +
+								"	}" +
+								"}";
+				
+				methods[i].insertBefore(body);
+			} else if (className.equals("weblogic/servlet/internal/ServletRequestImpl") && methods[i].getName().equals("getSession")) {
+				CtClass[] params = methods[i].getParameterTypes();
+				
+				if (params == null || params.length < 1) {
+					continue;
+				}
+				
+				String body = 	"{" +
+								"	boolean ssoDomain = false;" +
+						   		"	String serverName = getServerName();" + 
+						   		"	javax.servlet.http.HttpSession httpsession = null;" +
+								"	String requestedSessionId = getRequestedSessionId();";
+				
+				for (int j = 0; j < ssoDomainList.size(); j++) {
+					if (j > 0) {
+						body += "	else ";
+					}
+					
+					body += 	"	if (serverName.endsWith(\"" + ssoDomainList.get(j) + "\")) {" +
+								"  		ssoDomain = true;" +
+								"	}";
+				}
+				
+				body +=			"	if (ssoDomain) {" +
+								"		String newId = getParameter(\"ATHENA_DOLLY_SESSION_ID\");" +
+								"		if (newId != null && newId.length() > 0) {" +
+								"			if (requestedSessionId == null || !requestedSessionId.equals(newId)) {" +
+								"				httpsession = getContext().getSessionContext().getNewSession(newId, this, getResponse());" +
+								"				sessionHelper.setSession(httpsession);" + 
+								"				getResponse().setSessionCookie(httpsession);" + 
+								"			}" +
+								"		}" +
+								"	}" + 
+								"	if (httpsession == null) {" +
+								"		httpsession = sessionHelper.getSession($1);" + 
+								"	}" +
+								"	checkAndSetDebugSessionFlag(httpsession);" + 
+								"	return httpsession;" +
+								"}";
+				
+				CtMethod newMethod = CtNewMethod.copy(methods[i], cl, null);
+				methods[i].setName("_" + methods[i].getName());
+				newMethod.setBody(body);				
+				cl.addMethod(newMethod);
+				
+				if (verbose) {
+					System.out.println(className.replace('/', '.') + "." + methods[i].getName() + "() is successfully enhanced.");
+				}
+			}
+			
 			/*
-			else if (methods[i].getName().equals("createSession")) {
-				methods[i].insertBefore("System.out.println(\"=========== createSession() ===========\");");
-			} else if (methods[i].getName().equals("add")) {
-				methods[i].insertBefore("System.out.println(\"=========== add(\" + $1 + \") ===========\");");
+			if (methods[i].getName().equals("getSession")) {
+				CtClass[] params = methods[i].getParameterTypes();
+				
+				if (params == null || params.length < 1) {
+					continue;
+				}
+				
+				String body = 	"javax.servlet.http.HttpSession httpsession = null;" +
+								"String requestedSessionId = getRequestedSessionId();" + 
+								"boolean ssoDomain = false;" +
+						   		"String serverName = getServerName();";
+				
+				for (int j = 0; j < ssoDomainList.size(); j++) {
+					if (j > 0) {
+						body += "else ";
+					}
+					
+					body += 	"if (serverName.endsWith(\"" + ssoDomainList.get(j) + "\")) {" +
+								"  	ssoDomain = true;" +
+								"}";
+				}
+				
+				body +=			"if (ssoDomain) {" +
+								"	String newId = getParameter(\"ATHENA_DOLLY_SESSION_ID\");" +
+								"	System.out.println(\"ATHENA_DOLLY_SESSION_ID => \" + newId);" +
+								"	if (newId != null && newId.length() > 0) {" +
+								"		if (requestedSessionId == null || !requestedSessionId.equals(newId)) {" +
+								"			httpsession = sessionHelper.getNewSession(newId);" +
+								"		}" +
+								"	}" +
+								//"	System.out.println(serverName + \"'s requestedSessionId_after => \" + requestedSessionId);" +
+								"}" + 
+								"if (httpsession == null) {" +
+								"	httpsession = sessionHelper.getSession($1);" + 
+								"}" +
+								"checkAndSetDebugSessionFlag(httpsession);" + 
+								"return httpsession;";
+				
+				methods[i].insertBefore(body);
+			}*/
+
+
+			/*
+			if (methods[i].getName().equals("getRequestedSessionId")) {
+				String body = 	"boolean ssoDomain = false;" +
+						   		"String serverName = getServerName();";
+				
+				for (int j = 0; j < ssoDomainList.size(); j++) {
+					if (j > 0) {
+						body += "else ";
+					}
+					
+					body += 	"if (serverName.endsWith(\"" + ssoDomainList.get(j) + "\")) {" +
+								"  	ssoDomain = true;" +
+								"}";
+				}
+				
+				body +=			"if (ssoDomain) {" +
+								"	String newId = getParameter(\"ATHENA_DOLLY_SESSION_ID\");" +
+								"	System.out.println(\"ATHENA_DOLLY_SESSION_ID => \" + newId);" +
+								"	if (newId != null && newId.length() > 0) {" +
+								"		System.out.println(serverName + \"'s requestedSessionId_before => \" + requestedSessionId);" +
+								//"		if (session != null) { session.expire(); }" +
+								"		requestedSessionId = newId;" +
+								//"		session = doGetSession(true);" +
+								"		changeSessionId(newId);" +
+								"	}" +
+								//"	System.out.println(serverName + \"'s requestedSessionId_after => \" + requestedSessionId);" +
+								"}";
+				
+				methods[i].insertBefore(body);
+				
+				if (verbose) {
+					System.out.println(className.replace('/', '.') + "." + methods[i].getName() + "() is successfully enhanced.");
+				}
+			} else if (methods[i].getName().equals("changeSessionId")) {
+				String body = 	"String serverName = getServerName();" +
+						   		"System.out.println(serverName + \"'s requestedSessionId_after => \" + requestedSessionId);";
+				
+				methods[i].insertAfter(body);
+				
+				if (verbose) {
+					System.out.println(className.replace('/', '.') + "." + methods[i].getName() + "() is successfully enhanced.");
+				}
+			} 
+			*/
+			
+			/*
+			if (methods[i].getName().equals("getRequestedSessionId")) {
+				String body = 	"{" +
+								"	boolean ssoDomain = false;" +
+						   		"	String serverName = getServerName();";
+				
+				for (int j = 0; j < ssoDomainList.size(); j++) {
+					if (j > 0) {
+						body += " else ";
+					}
+					
+					body += 	"   if (serverName.endsWith(\"" + ssoDomainList.get(j) + "\")) {" +
+								"   	ssoDomain = true;" +
+								"   }";
+				}
+				
+				body +=			"   if (ssoDomain) {" +
+								"		String remoteAddr = getHeader(\"X-FORWARDED-FOR\");" +
+								"		if (remoteAddr == null) {" +
+								"			remoteAddr = getRemoteAddr();" +
+								"		}" +
+								"		requestedSessionId = (java.lang.String)com.athena.dolly.enhancer.DollyManager.getInstance().getValue(remoteAddr);" +
+								"	}" +
+								"	return requestedSessionId;" +
+								"}";
+
+				CtMethod newMethod = CtNewMethod.copy(methods[i], cl, null);
+				methods[i].setName("_" + methods[i].getName());
+				newMethod.setBody(body);				
+				cl.addMethod(newMethod);
+				
+				if (verbose) {
+					System.out.println(className.replace('/', '.') + "." + methods[i].getName() + "() is successfully enhanced.");
+				}
+			} else if (methods[i].getName().equals("doGetSession")) {
+				String body =	"String remoteAddr = getHeader(\"X-FORWARDED-FOR\");" +
+								"if (remoteAddr == null) {" +
+								"	remoteAddr = getRemoteAddr();" +
+								"}" +
+								"if (session != null) {" + 
+								"	com.athena.dolly.enhancer.DollyManager.getInstance().setValue(remoteAddr, session.getId());" +
+								"}";
+				
+				methods[i].insertAfter(body);
+				
+				if (verbose) {
+					System.out.println(className.replace('/', '.') + "." + methods[i].getName() + "() is successfully enhanced.");
+				}
 			}
 			*/
 		}
@@ -276,7 +519,7 @@ public class DollyClassTransformer implements ClassFileTransformer {
 		redefinedClassfileBuffer = cl.toBytecode();
 		
 		return redefinedClassfileBuffer;
-	}//end of instumentManager()
+	}//end of instumentRequest()
 
 	/**
 	 * <pre>
