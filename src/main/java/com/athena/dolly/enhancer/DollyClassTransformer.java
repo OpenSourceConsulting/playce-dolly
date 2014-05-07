@@ -57,14 +57,16 @@ public class DollyClassTransformer implements ClassFileTransformer {
 	private List<String> ssoDomainList;
 	private boolean verbose;
 	private boolean enableSSO;
+    private String ssoParamKey;
 
 	private Map<ClassLoader, ClassPool> pools = new HashMap<ClassLoader, ClassPool>();
 	
-	public DollyClassTransformer(boolean verbose, List<String> classList, boolean enableSSO, List<String> ssoDomainList) {
+	public DollyClassTransformer(boolean verbose, List<String> classList, boolean enableSSO, List<String> ssoDomainList, String ssoParamKey) {
 		this.verbose = verbose;
 		this.classList = classList;
 		this.enableSSO = enableSSO;
 		this.ssoDomainList = ssoDomainList;
+		this.ssoParamKey = ssoParamKey;
 	}//end of constructor()
 
 	/* (non-Javadoc)
@@ -88,18 +90,15 @@ public class DollyClassTransformer implements ClassFileTransformer {
                 	return instumentHttpSession(className, cl);
                 } 
                 
+                // SSO 활성화 시 주어진 SessionID 값을 JSESSIONID로 사용하도록 변환 
+				if (enableSSO && cl.subtypeOf(pool.get("javax.servlet.http.HttpServletRequest"))) {
+					return instumentRequest(className, cl);
+				}
+                
                 // Tomcat, JBoss 외의 WAS에서는 org.apache.catalina.session.ManagerBase로 타입 검사를 수행할 경우 
                 // ClassNotFound Exception이 발생하므로 문자열을 비교한다.
                 if (className.startsWith("org/apache/catalina/session/ManagerBase")) {
                 	return instumentManager(className, cl);
-                }
-                
-                if (enableSSO && className.startsWith("org/apache/catalina/connector/Request")) {
-                	return instumentRequest(className, cl);
-                }
-                
-                if (enableSSO && className.startsWith("weblogic/servlet/internal/ServletRequestImpl")) {
-                	return instumentRequest(className, cl);
                 }
                 
                 // Debug 용으로써 Target Class로 지정된 클래스(위 HttpSession과 ManagerBase 등은 제외)의 모든 메소드의 실행 시 로깅을 수행한다.
@@ -318,7 +317,7 @@ public class DollyClassTransformer implements ClassFileTransformer {
 				}
 				
 				body +=			"if (ssoDomain) {" +
-								"	String newId = getParameter(\"ATHENA_DOLLY_SESSION_ID\");" +
+								"	String newId = getParameter(\"" + ssoParamKey + "\");" +
 								"	if (newId != null && newId.length() > 0) {" +
 								"		setRequestedSessionId(newId);" +
 								"		changeSessionId(newId);" +
@@ -350,7 +349,7 @@ public class DollyClassTransformer implements ClassFileTransformer {
 				}
 				
 				body +=			"	if (ssoDomain) {" +
-								"		String newId = getParameter(\"ATHENA_DOLLY_SESSION_ID\");" +
+								"		String newId = getParameter(\"" + ssoParamKey + "\");" +
 								"		if (newId != null && newId.length() > 0) {" +
 								"			if (requestedSessionId == null || !requestedSessionId.equals(newId)) {" +
 								"				httpsession = getContext().getSessionContext().getNewSession(newId, this, getResponse());" +

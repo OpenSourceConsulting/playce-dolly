@@ -45,7 +45,8 @@ public class DollyConfig {
 	protected static final String CONFIG_FILE = "dolly.properties";
 	private static final String VERBOSE_PROPERTY = "dolly.verbose";
 	private static final String ENABLE_SSO_PROPERTY = "dolly.enableSSO";
-	private static final String SSO_DOMAIN_LIST_PROPERTY = "dolly.ssoDomainList";
+	private static final String SSO_DOMAIN_LIST_PROPERTY = "dolly.sso.domain.list";
+	private static final String SSO_PARAMETER_KEY = "dolly.sso.parameter.key";
 	private static final String TIMEOUT_PROPERTY = "dolly.session.timeout";
     private static final String TARGET_CLASS_PROPERTY = "dolly.instrument.target.class";
     
@@ -55,6 +56,7 @@ public class DollyConfig {
     private List<String> classList = new ArrayList<String>();
     private boolean enableSSO;
     private List<String> ssoDomainList = new ArrayList<String>();
+    private String ssoParamKey;
     private int timeout = 30;
     
 	/**
@@ -118,9 +120,10 @@ public class DollyConfig {
         extractTimeout(config);
         extractEnableSSO(config);
         extractSsoDomainList(config);
+        extractSsoParameterKey(config);
     }//end of parseConfigFile()
 
-    /**
+	/**
      * <pre>
      * BCI 대상 target class 들을 확인한다.
      * </pre>
@@ -176,6 +179,16 @@ public class DollyConfig {
     }//end of extractSsoDomainList()
 
     /**
+	 * <pre>
+	 * 명시적으로 사용될 JSESSIONID 값을 넘겨줄 KEY를 확인한다.
+	 * </pre>
+	 * @param config
+	 */
+	private void extractSsoParameterKey(Properties config) {
+		this.ssoParamKey = config.getProperty(SSO_PARAMETER_KEY, null);
+	}//end of extractSsoParameterKey()
+
+    /**
      * <pre>
      * timeout 설정 값을 확인한다.
      * </pre>
@@ -218,6 +231,13 @@ public class DollyConfig {
 	 */
 	public List<String> getSsoDomainList() {
 		return ssoDomainList;
+	}
+
+	/**
+	 * @return the ssoParamKey
+	 */
+	public String getSsoParamKey() {
+		return ssoParamKey;
 	}
 }
 //end of DollyConfig.java
