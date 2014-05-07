@@ -67,7 +67,7 @@ Athena-Dolly는 Infinispan Data Grid를 이용한 WAS에 비종속적인 세션 
 A. SSO 처리를 위한 jsp 페이지 추가 / 수정
    1. 웹사이트 웰컴 페이지를 index.jsp, 로그인 처리 후 리턴 페이지를 login_result.jsp 라고 했을 때, login_result.jsp 에서 SSO 대상 각각의 도메인으로 초기 1회 요청을 수행해야 한다.
       - 요청 시 현재 생성된 JSESSIONID를 파라메타로 넘겨야 하며, 요청 방법은 iframe, Ajax 중 선택하여 호출한다.  
-      - iframe 사용
+* iframe 사용
 ```
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -81,7 +81,8 @@ A. SSO 처리를 위한 jsp 페이지 추가 / 수정
 	</body>
 </html>
 ```
-      - Ajax 사용
+
+* Ajax 사용
 ```
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
