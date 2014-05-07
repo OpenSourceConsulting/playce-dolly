@@ -68,12 +68,12 @@ A. SSO 처리를 위한 jsp 페이지 추가 / 수정
    1. 웹사이트 웰컴 페이지를 index.jsp, 로그인 처리 후 리턴 페이지를 login_result.jsp 라고 했을 때, login_result.jsp 에서 SSO 대상 각각의 도메인으로 초기 1회 요청을 수행해야 한다.
       - 요청 시 현재 생성된 JSESSIONID를 파라메타로 넘겨야 하며, 요청 방법은 iframe, Ajax 중 선택하여 호출한다.  
       - iframe 사용
-		```
-		<iframe src="http://www.domain1.com/index.jsp?ATHENA_DOLLY_SESSION_ID=<%= request.getSession().getId() %>" style="visibility:hidden;display:none"></iframe>
-		<iframe src="http://www.domain2.com/index.jsp?ATHENA_DOLLY_SESSION_ID=<%= request.getSession().getId() %>" style="visibility:hidden;display:none"></iframe>
-		<iframe src="http://www.domain3.com/index.jsp?ATHENA_DOLLY_SESSION_ID=<%= request.getSession().getId() %>" style="visibility:hidden;display:none"></iframe>
-		<iframe src="http://www.domain4.com/index.jsp?ATHENA_DOLLY_SESSION_ID=<%= request.getSession().getId() %>" style="visibility:hidden;display:none"></iframe>
-		```
+```
+<iframe src="http://www.domain1.com/index.jsp?ATHENA_DOLLY_SESSION_ID=<%= request.getSession().getId() %>" style="visibility:hidden;display:none"></iframe>
+<iframe src="http://www.domain2.com/index.jsp?ATHENA_DOLLY_SESSION_ID=<%= request.getSession().getId() %>" style="visibility:hidden;display:none"></iframe>
+<iframe src="http://www.domain3.com/index.jsp?ATHENA_DOLLY_SESSION_ID=<%= request.getSession().getId() %>" style="visibility:hidden;display:none"></iframe>
+<iframe src="http://www.domain4.com/index.jsp?ATHENA_DOLLY_SESSION_ID=<%= request.getSession().getId() %>" style="visibility:hidden;display:none"></iframe>
+```
       - Ajax 사용
 
 B. SSO 사용 시 Internet Explorer 설정 : IE는 기본적으로 개인정보취급방침(P3P)이 없는 타 도메인에 대한 쿠키를 허용하지 않는다. 따라서 브라우저 설정으로 통해 SSO 대상 도메인에 대한 쿠키를 허용하도록 다음과 같이 설정한다.
