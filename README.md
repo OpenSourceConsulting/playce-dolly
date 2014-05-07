@@ -46,19 +46,19 @@ Athena-Dolly는 Infinispan Data Grid를 이용한 WAS에 비종속적인 세션 
 
 * file-store에 포함될 수 있는 Attributes는 다음과 같다.
     
-    - max-entries :Sets the maximum number of in-memory mappings between keys and their position in the store. Normally this is unlimited, but to avoid excess memory usage, an upper bound can be configured. If this limit is exceeded, entries are removed permanently using the LRU algorithm both from the in-memory index and the underlying file based cache store. Warning: setting this value may cause data loss.
-    - relative-to : The base directory in which to store the cache state.
-    - path : The path within "relative-to" in which to store the cache state. If undefined, the path defaults to the cache container name.
-    - write-behind : Configures a cache store as write-behind instead of write-through.
-    - property : A cache store property with name and value.
-    - name : Uniquely identifies this store.
-    - shared : This setting should be set to true when multiple cache instances share the same cache store (e.g., multiple nodes in a cluster using a JDBC-based CacheStore pointing to the same, shared database.) Setting this to true avoids multiple cache instances writing the same modification multiple times. If enabled, only the node where the modification originated will write to the cache store. If disabled, each individual cache reacts to a potential remote update by storing the data to the cache store.
-    - preload : If true, when the cache starts, data stored in the cache store will be pre-loaded into memory. This is particularly useful when data in the cache store will be needed immediately after startup and you want to avoid cache operations being delayed as a result of loading this data lazily. Can be used to provide a 'warm-cache' on startup, however there is a performance penalty as startup time is affected by this process.
-    - passivation : If true, data is only written to the cache store when it is evicted from memory, a phenomenon known as 'passivation'. Next time the data is requested, it will be 'activated' which means that data will be brought back to memory and removed from the persistent store. If false, the cache store contains a copy of the contents in memory, so writes to cache result in cache store writes. This essentially gives you a 'write-through' configuration.
-    - fetch-state : If true, fetch persistent state when joining a cluster. If multiple cache stores are chained, only one of them can have this property enabled.
-    - purge : If true, purges this cache store when it starts up.
-    - singleton : If true, the singleton store cache store is enabled. SingletonStore is a delegating cache store used for situations when only one instance in a cluster should interact with the underlying store.
-    - read-only : If true, the cache store will only be used to load entries. Any modifications made to the caches will not be applied to the store.
+    - **max-entries** :Sets the maximum number of in-memory mappings between keys and their position in the store. Normally this is unlimited, but to avoid excess memory usage, an upper bound can be configured. If this limit is exceeded, entries are removed permanently using the LRU algorithm both from the in-memory index and the underlying file based cache store. Warning: setting this value may cause data loss.
+    - **relative-to** : The base directory in which to store the cache state.
+    - **path** : The path within "relative-to" in which to store the cache state. If undefined, the path defaults to the cache container name.
+    - **write-behind** : Configures a cache store as write-behind instead of write-through.
+    - **property** : A cache store property with name and value.
+    - **name** : Uniquely identifies this store.
+    - **shared** : This setting should be set to true when multiple cache instances share the same cache store (e.g., multiple nodes in a cluster using a JDBC-based CacheStore pointing to the same, shared database.) Setting this to true avoids multiple cache instances writing the same modification multiple times. If enabled, only the node where the modification originated will write to the cache store. If disabled, each individual cache reacts to a potential remote update by storing the data to the cache store.
+    - **preload** : If true, when the cache starts, data stored in the cache store will be pre-loaded into memory. This is particularly useful when data in the cache store will be needed immediately after startup and you want to avoid cache operations being delayed as a result of loading this data lazily. Can be used to provide a 'warm-cache' on startup, however there is a performance penalty as startup time is affected by this process.
+    - **passivation** : If true, data is only written to the cache store when it is evicted from memory, a phenomenon known as 'passivation'. Next time the data is requested, it will be 'activated' which means that data will be brought back to memory and removed from the persistent store. If false, the cache store contains a copy of the contents in memory, so writes to cache result in cache store writes. This essentially gives you a 'write-through' configuration.
+    - **fetch-state** : If true, fetch persistent state when joining a cluster. If multiple cache stores are chained, only one of them can have this property enabled.
+    - **purge** : If true, purges this cache store when it starts up.
+    - **singleton** : If true, the singleton store cache store is enabled. SingletonStore is a delegating cache store used for situations when only one instance in a cluster should interact with the underlying store.
+    - **read-only** : If true, the cache store will only be used to load entries. Any modifications made to the caches will not be applied to the store.
     
 +:+:+:+: Appendix +:+:+:+:
 
