@@ -60,7 +60,7 @@ Athena-Dolly는 Infinispan Data Grid를 이용한 WAS에 비종속적인 세션 
     - _**singleton**_ : If true, the singleton store cache store is enabled. SingletonStore is a delegating cache store used for situations when only one instance in a cluster should interact with the underlying store.
     - _**read-only**_ : If true, the cache store will only be used to load entries. Any modifications made to the caches will not be applied to the store.
     
-+:+:+:+: Appendix +:+:+:+:
+# +:+:+:+: Appendix +:+:+:+:
 
 A. SSO 처리를 위한 jsp 페이지 추가 / 수정
    1. 웹사이트 웰컴 페이지를 index.jsp, 로그인 처리 후 리턴 페이지를 login_result.jsp 라고 했을 때, login_result.jsp 에서 SSO 대상 각각의 도메인으로 초기 1회 요청을 수행해야 한다.
