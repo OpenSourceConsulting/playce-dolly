@@ -70,9 +70,9 @@ B. SSO 사용 시 Internet Explorer 설정 : IE는 기본적으로 개인정보�
    1. 도구 - 인터넷 옵션을 선택한다.
    2. 개인정보 탭을 선택한다.
    3. 설정 필드의 사이트 버튼을 클릭한다.
-   ![ScreenShot](http://https://raw.githubusercontent.com/OpenSourceConsulting/athena-dolly/master/img/ie1.png)
+   ![ScreenShot](https://raw.githubusercontent.com/OpenSourceConsulting/athena-dolly/master/img/ie1.png)
    4. SSO 대상 각각의 도메인을 입력하고 허용 버튼을 클릭한다.
-   ![ScreenShot](http://https://raw.githubusercontent.com/OpenSourceConsulting/athena-dolly/master/img/ie2.png)
+   ![ScreenShot](https://raw.githubusercontent.com/OpenSourceConsulting/athena-dolly/master/img/ie2.png)
       - 주의 : 포트 번호는 입력하지 않는다.
    5. 확인 버튼을 클릭한다.
    
@@ -80,4 +80,4 @@ C. SSO 사용 시 Safari 설정 : IE와 마찬가지로 타 도메인에 대한 
    1. Safari - 환경설정을 선택한다.
    2. 개인 정보 탭을 선택한다.
    3. 쿠키 및 웹사이트 데이터 차단 항목을 "안함"으로 선택한다.
-   ![ScreenShot](http://https://raw.githubusercontent.com/OpenSourceConsulting/athena-dolly/master/img/safari.png)
+   ![ScreenShot](https://raw.githubusercontent.com/OpenSourceConsulting/athena-dolly/master/img/safari.png)
