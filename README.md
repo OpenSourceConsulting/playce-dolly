@@ -33,16 +33,18 @@ Athena-Dolly는 Infinispan Data Grid를 이용한 WAS에 비종속적인 세션 
      
 5. Infinispan file-store 활성화
    - Infinispan 서버에 Eviction과 Expiration 관련 옵션이 주어지지 않을 경우 데이터가 무한 적재되면서 OutOfMemory가 발생할 가능성이 있기 때문에 다음과 같이 캐시에 eviction 설정을 추가하고 evict 된 데이터를 파일로 저장할 수 있도록 file-store 설정을 추가한다.
-     
-     <distributed-cache name="default" mode="SYNC" segments="20" owners="2" remote-timeout="30000" start="EAGER">
-        <locking isolation="READ_COMMITTED" acquire-timeout="30000" concurrency-level="1000" striping="false"/>
-        <transaction mode="NONE"/>
-        <eviction strategy="LRU" max-entries="8192"/>
-        <!-- expiration은 dolly.properties 파일의 dolly.session.timeout 값으로 대체하여 설정된다.(lifespan은 -1, max-idle은 ${dolly.session.timeout}) --> 
-        <file-store passivation="true" path="dolly" purge="false" preload="true" shared="true" />
-    </distributed-cache>
-    
-    file-store에 포함될 수 있는 Attributes는 다음과 같다.
+
+```     
+ <distributed-cache name="default" mode="SYNC" segments="20" owners="2" remote-timeout="30000" start="EAGER">
+    <locking isolation="READ_COMMITTED" acquire-timeout="30000" concurrency-level="1000" striping="false"/>
+    <transaction mode="NONE"/>
+    <eviction strategy="LRU" max-entries="8192"/>
+    <!-- expiration은 dolly.properties 파일의 dolly.session.timeout 값으로 대체하여 설정된다.(lifespan은 -1, max-idle은 ${dolly.session.timeout}) --> 
+    <file-store passivation="true" path="dolly" purge="false" preload="true" shared="true" />
+</distributed-cache>
+```
+
+    * file-store에 포함될 수 있는 Attributes는 다음과 같다.
     
     - max-entries :Sets the maximum number of in-memory mappings between keys and their position in the store. Normally this is unlimited, but to avoid excess memory usage, an upper bound can be configured. If this limit is exceeded, entries are removed permanently using the LRU algorithm both from the in-memory index and the underlying file based cache store. Warning: setting this value may cause data loss.
     - relative-to : The base directory in which to store the cache state.
