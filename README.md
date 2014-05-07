@@ -8,15 +8,15 @@ Athena-Dolly는 Infinispan Data Grid를 이용한 WAS에 비종속적인 세션 
    - dolly.properties 파일에는 BCI를 위한 타깃 클래스 목록 및 Infinispan 관련 설정이 포함되며, infinispan.client.hotrod.server_list 항목은 ";" 구분자를 이용하여 현재 동작하고 있는 Infinispan hotrod 서버 목록으로 수정해야 한다.
      
 2. dolly.properties 수정
-   - dolly.verbose : Verbosity 여부
-   - dolly.session.timeout : 세션 만료 시간 설정(분)
-   - dolly.enableSSO : SSO 사용 여부
-   - dolly.sso.domain.list : SSO 사용 대상 도메인 목록
-   - dolly.sso.parameter.key : SSO 사용 시 다른 도메인에 Session ID를 넘겨줄 때 사용하는 Query Parameter Key
-   - dolly.instrument.target.class : WAS 및 SSO 사용 여부에 따라 선택하여 주석 해제
-   - infinispan.client.hotrod.* : Infinispan Hotrod Client 설정(기본 값으로 사용 권고)
-   - infinispan.client.hotrod.server_list : Infinispan Hotrod Server 목록
-   - maxActive, maxTotal, maxIdle, testOnBorrow : Infinispan Connection Pool 관련 설정(기본 값으로 사용 권고)
+   - _**dolly.verbose**_ : Verbosity 여부
+   - _**dolly.session.timeout**_ : 세션 만료 시간 설정(분)
+   - _**dolly.enableSSO**_ : SSO 사용 여부
+   - _**dolly.sso.domain.list**_ : SSO 사용 대상 도메인 목록
+   - _**dolly.sso.parameter.key**_ : SSO 사용 시 다른 도메인에 Session ID를 넘겨줄 때 사용하는 Query Parameter Key
+   - _**dolly.instrument.target.class**_ : WAS 및 SSO 사용 여부에 따라 선택하여 주석 해제
+   - _**infinispan.client.hotrod.xxx**_ : Infinispan Hotrod Client 설정(기본 값으로 사용 권고)
+   - _**infinispan.client.hotrod.server_list**_ : Infinispan Hotrod Server 목록
+   - _**maxActive, maxTotal, maxIdle, testOnBorrow**_ : Infinispan Connection Pool 관련 설정(기본 값으로 사용 권고)
      
 3. Athena-Dolly 실행을 위한 WAS 구동 옵션 추가
    - Athena-Dolly 실행을 위해서 dolly.properties에 해당하는 System Property 및 javaagent 옵션이 필요하다.
