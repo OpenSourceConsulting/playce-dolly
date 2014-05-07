@@ -69,12 +69,47 @@ A. SSO 처리를 위한 jsp 페이지 추가 / 수정
       - 요청 시 현재 생성된 JSESSIONID를 파라메타로 넘겨야 하며, 요청 방법은 iframe, Ajax 중 선택하여 호출한다.  
       - iframe 사용
 ```
-<iframe src="http://www.domain1.com/index.jsp?ATHENA_DOLLY_SESSION_ID=<%= request.getSession().getId() %>" style="visibility:hidden;display:none"></iframe>
-<iframe src="http://www.domain2.com/index.jsp?ATHENA_DOLLY_SESSION_ID=<%= request.getSession().getId() %>" style="visibility:hidden;display:none"></iframe>
-<iframe src="http://www.domain3.com/index.jsp?ATHENA_DOLLY_SESSION_ID=<%= request.getSession().getId() %>" style="visibility:hidden;display:none"></iframe>
-<iframe src="http://www.domain4.com/index.jsp?ATHENA_DOLLY_SESSION_ID=<%= request.getSession().getId() %>" style="visibility:hidden;display:none"></iframe>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+	<head></head>
+	<body>
+		<iframe src="http://www.domain1.com/index.jsp?ATHENA_DOLLY_SESSION_ID=<%= request.getSession().getId() %>" style="visibility:hidden;display:none"></iframe>
+		<iframe src="http://www.domain2.com/index.jsp?ATHENA_DOLLY_SESSION_ID=<%= request.getSession().getId() %>" style="visibility:hidden;display:none"></iframe>
+		<iframe src="http://www.domain3.com/index.jsp?ATHENA_DOLLY_SESSION_ID=<%= request.getSession().getId() %>" style="visibility:hidden;display:none"></iframe>
+		<iframe src="http://www.domain4.com/index.jsp?ATHENA_DOLLY_SESSION_ID=<%= request.getSession().getId() %>" style="visibility:hidden;display:none"></iframe>
+	</body>
+</html>
 ```
       - Ajax 사용
+```
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+	<head>
+		<script type="text/javascript" src="http://code.jquery.com/jquery-1.8.0.min.js"></script>
+	    <script>
+			$(document).ready(function() {
+				var sessionId = "<%= request.getSession().getId() %>";
+	
+				var urls = ["http://www.domain1.com/index.jsp?ATHENA_DOLLY_SESSION_ID=", 
+							"http://www.domain2.com/index.jsp?ATHENA_DOLLY_SESSION_ID=", 
+							"http://www.domain3.com/index.jsp?ATHENA_DOLLY_SESSION_ID=", 
+							"http://www.domain4.com/index.jsp?ATHENA_DOLLY_SESSION_ID="];
+				
+				for (var i = 0; i < urls.length; i++) {
+					$.ajax({
+					      type: 'GET',
+					      dataType: 'jsonp',
+					      url: urls[i] + sessionId
+					 });
+				}
+			});
+		</script>
+	</head>
+	<body></body>
+</html>
+```
 
 B. SSO 사용 시 Internet Explorer 설정 : IE는 기본적으로 개인정보취급방침(P3P)이 없는 타 도메인에 대한 쿠키를 허용하지 않는다. 따라서 브라우저 설정으로 통해 SSO 대상 도메인에 대한 쿠키를 허용하도록 다음과 같이 설정한다.
    1. 도구 - 인터넷 옵션을 선택한다.
