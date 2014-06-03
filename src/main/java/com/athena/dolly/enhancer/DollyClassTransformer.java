@@ -159,14 +159,15 @@ public class DollyClassTransformer implements ClassFileTransformer {
 				if (methods[i].getName().equals("setAttribute")) {
 					if (params.length == 2) {
 						body =     "{" +
-								   "	com.athena.dolly.enhancer.DollyManager.getInstance().setValue(getId().split(\"!\")[0], $1, $2);" +
+								   "	try { com.athena.dolly.enhancer.DollyManager.getInstance().setValue(getId().split(\"!\")[0], $1, $2); } catch (Exception e) { e.printStackTrace(); }" +
 								   "	try { _setAttribute($1, $2); } catch (Exception e) { e.printStackTrace(); }" +
 								   "}";
 						isEnhanced = true;
 					}
 				} else if (methods[i].getName().equals("getAttribute")) {
 					body =     "{" +
-							   "	java.lang.Object obj = com.athena.dolly.enhancer.DollyManager.getInstance().getValue(getId().split(\"!\")[0], $1);" +
+							   "	java.lang.Object obj = null;" +
+							   "	try { obj = com.athena.dolly.enhancer.DollyManager.getInstance().getValue(getId().split(\"!\")[0], $1); } catch (Exception e) { e.printStackTrace(); }" +
 							   "	if (obj == null) {" +
 							   "		try { obj = _getAttribute($1); } catch (Exception e) { e.printStackTrace(); }" +
 							   "	}" +
@@ -175,7 +176,8 @@ public class DollyClassTransformer implements ClassFileTransformer {
 					isEnhanced = true;
 				} else if (methods[i].getName().equals("getAttributeNames")) {
 					body =     "{" +
-							   "	java.util.Enumeration obj = com.athena.dolly.enhancer.DollyManager.getInstance().getValueNames(getId().split(\"!\")[0]);" +
+							   "	java.util.Enumeration obj = null;" +
+							   "	try { obj = com.athena.dolly.enhancer.DollyManager.getInstance().getValueNames(getId().split(\"!\")[0]); } catch (Exception e) { e.printStackTrace(); }" +
 							   "	if (obj == null) {" +
 							   "		try { obj = _getAttributeNames(); } catch (Exception e) { e.printStackTrace(); }" +
 							   "	}" +
@@ -185,7 +187,7 @@ public class DollyClassTransformer implements ClassFileTransformer {
 				} else if (methods[i].getName().equals("removeAttribute")) {
 					if (params.length == 1) {
 						body =     "{" +
-								   "	com.athena.dolly.enhancer.DollyManager.getInstance().removeValue(getId().split(\"!\")[0], $1);" +
+								   "	try { com.athena.dolly.enhancer.DollyManager.getInstance().removeValue(getId().split(\"!\")[0], $1); } catch (Exception e) { e.printStackTrace(); }" +
 								   "	try { _removeAttribute($1); } catch (Exception e) { e.printStackTrace(); }" +
 								   "}";
 						isEnhanced = true;
@@ -193,7 +195,7 @@ public class DollyClassTransformer implements ClassFileTransformer {
 				} else if (methods[i].getName().equals("invalidate")) {
 					if (params.length == 0) {
 						body =     "{" +
-								   "	com.athena.dolly.enhancer.DollyManager.getInstance().removeValue(getId().split(\"!\")[0]);" +
+								   "	try { com.athena.dolly.enhancer.DollyManager.getInstance().removeValue(getId().split(\"!\")[0]); } catch (Exception e) { e.printStackTrace(); }" +
 								   "	try { _invalidate(); } catch (Exception e) { e.printStackTrace(); }" +
 								   "}";
 						isEnhanced = true;
