@@ -45,12 +45,14 @@
 			</exclusions> -->
 		</dependency>	
 		<!-- for debugging -->
+		<!-- 
 		<dependency>
 			<groupId>org.apache.tomcat</groupId>
 			<artifactId>tomcat-catalina</artifactId>
 			<version>7.0.47</version>
 			<scope>provided</scope>
 		</dependency>
+		-->
 		
 		<!-- junit -->
 		<dependency>

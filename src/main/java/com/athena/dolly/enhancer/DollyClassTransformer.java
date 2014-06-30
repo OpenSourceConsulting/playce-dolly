@@ -157,26 +157,52 @@ public class DollyClassTransformer implements ClassFileTransformer {
 				String body = null;
 				isEnhanced = false;
 				if (methods[i].getName().equals("setAttribute")) {
-					if (params.length == 2) {
-						body =     "{" +
-								   "	try { com.athena.dolly.enhancer.DollyManager.getInstance().setValue(getId().split(\"!\")[0], $1, $2); } catch (Exception e) { e.printStackTrace(); }" +
-								   "	try { _setAttribute($1, $2); } catch (Exception e) { e.printStackTrace(); }" +
+					if (params.length == 2) {		                
+						body =     "{";
+
+		                if (verbose) {
+							body += "	System.out.println(\"[Dolly] Session(\" + getId() + \") setAttribute(\" + $1 + \", \" + $2 + \") has called.\");";
+		                }
+		                
+						body +=	   "	try { com.athena.dolly.enhancer.DollyManager.getInstance().setValue(getId().split(\"!\")[0], $1, $2); } catch (Exception e) { e.printStackTrace(); }" +
+								   "	try { _setAttribute($1, $2); } catch (Exception e) { e.printStackTrace(); }" + 
 								   "}";
 						isEnhanced = true;
 					}
 				} else if (methods[i].getName().equals("getAttribute")) {
-					body =     "{" +
-							   "	java.lang.Object obj = null;" +
-							   "	try { obj = com.athena.dolly.enhancer.DollyManager.getInstance().getValue(getId().split(\"!\")[0], $1); } catch (Exception e) { e.printStackTrace(); }" +
-							   "	if (obj == null) {" +
+					body =     "{";
+
+	                if (verbose) {
+						body += "	System.out.println(\"[Dolly] Session(\" + getId() + \") getAttribute(\" + $1 + \") has called.\");";
+	                }
+	                
+					body +=	   "	java.lang.Object obj = null;" +
+							   "	try { obj = com.athena.dolly.enhancer.DollyManager.getInstance().getValue(getId().split(\"!\")[0], $1); } catch (Exception e) { e.printStackTrace(); }";
+
+	                if (verbose) {
+						body += "	if (obj == null) { System.out.println(\"[Dolly] Attribute is NULL in DataGrid.\"); }";
+						body += "	else { System.out.println(\"[Dolly] Attribute is NOT NULL in DataGrid.\"); }";
+	                }
+	                
+					body +=	   "	if (obj == null) {" +
 							   "		try { obj = _getAttribute($1); } catch (Exception e) { e.printStackTrace(); }" +
-							   "	}" +
-							   "	return obj;" +
+							   "	}";
+							   
+					if (verbose) {
+						body += "	System.out.println(\"[Dolly] Session(\" + getId() + \") getAttribute()'s result => \" + obj);";
+					}
+							   
+					body +=    "	return obj;" +
 							   "}";
 					isEnhanced = true;
 				} else if (methods[i].getName().equals("getAttributeNames")) {
-					body =     "{" +
-							   "	java.util.Enumeration obj = null;" +
+					body =     "{";
+
+	                if (verbose) {
+						body += "	System.out.println(\"[Dolly] Session(\" + getId() + \") getAttributeNames() has called.\");";
+	                }
+	                
+					body +=	   "	java.util.Enumeration obj = null;" +
 							   "	try { obj = com.athena.dolly.enhancer.DollyManager.getInstance().getValueNames(getId().split(\"!\")[0]); } catch (Exception e) { e.printStackTrace(); }" +
 							   "	if (obj == null) {" +
 							   "		try { obj = _getAttributeNames(); } catch (Exception e) { e.printStackTrace(); }" +
@@ -186,16 +212,26 @@ public class DollyClassTransformer implements ClassFileTransformer {
 					isEnhanced = true;
 				} else if (methods[i].getName().equals("removeAttribute")) {
 					if (params.length == 1) {
-						body =     "{" +
-								   "	try { com.athena.dolly.enhancer.DollyManager.getInstance().removeValue(getId().split(\"!\")[0], $1); } catch (Exception e) { e.printStackTrace(); }" +
+						body =     "{";
+
+		                if (verbose) {
+							body += "	System.out.println(\"[Dolly] Session(\" + getId() + \") removeAttribute(\" + $1 + \") has called.\");";
+		                }
+		                
+						body +=	   "	try { com.athena.dolly.enhancer.DollyManager.getInstance().removeValue(getId().split(\"!\")[0], $1); } catch (Exception e) { e.printStackTrace(); }" +
 								   "	try { _removeAttribute($1); } catch (Exception e) { e.printStackTrace(); }" +
 								   "}";
 						isEnhanced = true;
 					}
 				} else if (methods[i].getName().equals("invalidate")) {
 					if (params.length == 0) {
-						body =     "{" +
-								   "	try { com.athena.dolly.enhancer.DollyManager.getInstance().removeValue(getId().split(\"!\")[0]); } catch (Exception e) { e.printStackTrace(); }" +
+						body =     "{";
+
+		                if (verbose) {
+							body += "	System.out.println(\"[Dolly] Session(\" + getId() + \") invalidate() has called.\");";
+		                }
+		                
+						body +=	   "	try { com.athena.dolly.enhancer.DollyManager.getInstance().removeValue(getId().split(\"!\")[0]); } catch (Exception e) { e.printStackTrace(); }" +
 								   "	try { _invalidate(); } catch (Exception e) { e.printStackTrace(); }" +
 								   "}";
 						isEnhanced = true;
