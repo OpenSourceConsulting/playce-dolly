@@ -31,6 +31,16 @@ import java.lang.reflect.Constructor;
 import java.security.ProtectionDomain;
 import java.util.List;
 
+import org.infinispan.configuration.cache.CacheMode;
+import org.infinispan.configuration.cache.Configuration;
+import org.infinispan.configuration.cache.ConfigurationBuilder;
+import org.infinispan.configuration.global.GlobalConfiguration;
+import org.infinispan.configuration.global.GlobalConfigurationBuilder;
+import org.infinispan.eviction.EvictionStrategy;
+import org.infinispan.manager.DefaultCacheManager;
+import org.infinispan.server.hotrod.HotRodServer;
+import org.infinispan.server.hotrod.configuration.HotRodServerConfigurationBuilder;
+
 /**
  * <pre>
  * premain() 메소드를 갖는 javaagent 클래스
@@ -61,6 +71,74 @@ public class DollyAgent implements ClassFileTransformer {
         }
 
         boolean verbose = config.isVerbose();
+        
+        if (config.isUseEmbedded()) {
+        	System.out.println("[Dolly] Embedded infinispan hotrod cache server will be start.");
+        	
+            if (verbose) {
+            	System.out.println("[Dolly] hotrod host : " + config.getHotrodHost());
+            	System.out.println("[Dolly] hotrod port : " + config.getHotrodPort());
+            	System.out.println("[Dolly] jgroups stack : " + config.getJgroupsStack());
+            	System.out.println("[Dolly] jgroups bind address : " + config.getJgroupsBindAddress());
+            	System.out.println("[Dolly] jgroups bind port : " + config.getJgroupsBindPort());
+            	System.out.println("[Dolly] jgroups initial hosts : " + config.getJgroupsInitialHosts());
+            	System.out.println("[Dolly] jgroups multicast port : " + config.getJgroupsMulticastPort());
+            }
+
+    		System.setProperty("java.net.preferIPv4Stack", "true");
+    		
+    		String configurationFile = null;
+    		
+    		if (config.getJgroupsStack().toLowerCase().equals("tcp")) {
+	    		System.setProperty("jgroups.tcp.address", config.getJgroupsBindAddress());
+	    		System.setProperty("jgroups.tcp.port", config.getJgroupsBindPort());
+	    		System.setProperty("jgroups.tcpping.initial_hosts", config.getJgroupsInitialHosts());
+	    		configurationFile = this.getClass().getResource("jgroups-tcp.xml").getFile();
+    		} else {
+	    		System.setProperty("jgroups.udp.mcast_port", config.getJgroupsMulticastPort());
+	    		configurationFile = this.getClass().getResource("jgroups-udp.xml").getFile();
+    		}
+    		
+			if (verbose) {
+				System.out.println("[Dolly] hotrod configurationFile : " + configurationFile);
+			}
+    		
+        	GlobalConfiguration globalConfig = new GlobalConfigurationBuilder().transport().defaultTransport()
+        	        .clusterName("dolly-cluster")
+        	        .addProperty("configurationFile", configurationFile)
+        	        //.machineId("dolly-machine-1").rackId("dolly-rack-1").siteId("dolly-site-1")
+        	        .globalJmxStatistics().enable()
+        	        .build();
+        	
+        	Configuration conf = new ConfigurationBuilder()
+    	    	  	.clustering()
+    	    	  		.cacheMode(CacheMode.DIST_SYNC)
+    	    	    //.sync()
+    	    	    .hash()
+    	    	    	.numOwners(2)
+    	    	    .jmxStatistics()
+    	    	    	.enable()
+    	    	    .compatibility()
+    	    	    	.enable()
+    	    	    .eviction()
+    	    	    	.strategy(EvictionStrategy.LRU)
+    	    	    	.maxEntries(8192)
+    	    	    //.expiration().lifespan(60L, TimeUnit.SECONDS)
+    	    	    .persistence()
+    	    	    	.passivation(true)
+    	    	    	.addSingleFileStore()
+    	    	    		.preload(true)
+    	    	    		.shared(true)
+    	    	    		.fetchPersistentState(true)
+    	    	    		.ignoreModifications(false)
+    	    	    		.purgeOnStartup(false)
+    	    	    		.location(System.getProperty("java.io.tmpdir"))
+    	    	    .build();
+        	
+        	new HotRodServer().start(new HotRodServerConfigurationBuilder().host(config.getHotrodHost()).port(config.getHotrodPort()).workerThreads(2).build(), 
+        			new DefaultCacheManager(globalConfig, conf));
+        }
+        
         if (verbose) {
             System.out.println("[Dolly] Target classes :");
             

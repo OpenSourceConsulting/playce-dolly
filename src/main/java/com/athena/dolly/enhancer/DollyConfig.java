@@ -42,22 +42,40 @@ import java.util.Properties;
  */
 public class DollyConfig {
 
-	protected static final String CONFIG_FILE = "dolly.properties";
-	private static final String VERBOSE_PROPERTY = "dolly.verbose";
-	private static final String ENABLE_SSO_PROPERTY = "dolly.enableSSO";
-	private static final String SSO_DOMAIN_LIST_PROPERTY = "dolly.sso.domain.list";
-	private static final String SSO_PARAMETER_KEY = "dolly.sso.parameter.key";
-	private static final String TIMEOUT_PROPERTY = "dolly.session.timeout";
-    private static final String TARGET_CLASS_PROPERTY = "dolly.instrument.target.class";
+	protected static final String CONFIG_FILE 				= "dolly.properties";
+	private static final String VERBOSE_PROPERTY 			= "dolly.verbose";
+	private static final String ENABLE_SSO_PROPERTY 		= "dolly.enableSSO";
+	private static final String SSO_DOMAIN_LIST_PROPERTY 	= "dolly.sso.domain.list";
+	private static final String SSO_PARAMETER_KEY 			= "dolly.sso.parameter.key";
+	private static final String TIMEOUT_PROPERTY 			= "dolly.session.timeout";
+    private static final String TARGET_CLASS_PROPERTY 		= "dolly.instrument.target.class";
+    
+    private static final String USE_EMBEDDED 				= "dolly.use.infinispan.embedded";
+    private static final String HOTROD_HOST 				= "dolly.hotrod.host";
+    private static final String HOTROD_PORT 				= "dolly.hotrod.port";
+    private static final String JGROUPS_STACK 				= "dolly.jgroups.stack";
+    private static final String JGROUPS_BIND_ADDR 			= "dolly.jgroups.tcp.bind.address";
+    private static final String JGROUPS_BIND_PORT 			= "dolly.jgroups.tcp.bind.port";
+    private static final String JGROUPS_INIT_HOSTS 			= "dolly.jgroups.tcp.initial.hosts";
+    private static final String JGROUPS_MULTICAST_PORT		= "dolly.jgroups.udp.multicast.port";
     
     public static Properties properties;
 
     private boolean verbose;
     private List<String> classList = new ArrayList<String>();
-    private boolean enableSSO;
     private List<String> ssoDomainList = new ArrayList<String>();
+    private boolean enableSSO;
     private String ssoParamKey;
     private int timeout = 30;
+    
+    private boolean useEmbedded;
+    private String hotrodHost;
+    private int hotrodPort;
+    private String jgroupsStack;
+    private String jgroupsBindAddress;
+    private String jgroupsBindPort;
+    private String jgroupsInitialHosts;
+    private String jgroupsMulticastPort;
     
 	/**
 	 * <pre>
@@ -116,11 +134,8 @@ public class DollyConfig {
      */
     private void parseConfigFile(Properties config) throws ConfigurationException {
     	extractTargetClasses(config);
-        extractVerbosity(config);
-        extractTimeout(config);
-        extractEnableSSO(config);
         extractSsoDomainList(config);
-        extractSsoParameterKey(config);
+        extractOthers(config);
     }//end of parseConfigFile()
 
 	/**
@@ -144,26 +159,6 @@ public class DollyConfig {
 
     /**
      * <pre>
-     * verbose 여부를 확인한다.
-     * </pre>
-     * @param config
-     */
-    private void extractVerbosity(Properties config) {
-        this.verbose = Boolean.parseBoolean(config.getProperty(VERBOSE_PROPERTY, "false"));
-    }//end of extractVerbosity()
-
-    /**
-     * <pre>
-     * enableSSO 여부를 확인한다.
-     * </pre>
-     * @param config
-     */
-    private void extractEnableSSO(Properties config) {
-        this.enableSSO = Boolean.parseBoolean(config.getProperty(ENABLE_SSO_PROPERTY, "false"));
-    }//end of extractEnableSSO()
-
-    /**
-     * <pre>
      * SSO 대상 Domain 목록을 확인한다.
      * </pre>
      * @param config
@@ -179,24 +174,26 @@ public class DollyConfig {
     }//end of extractSsoDomainList()
 
     /**
-	 * <pre>
-	 * 명시적으로 사용될 JSESSIONID 값을 넘겨줄 KEY를 확인한다.
-	 * </pre>
-	 * @param config
-	 */
-	private void extractSsoParameterKey(Properties config) {
-		this.ssoParamKey = config.getProperty(SSO_PARAMETER_KEY, null);
-	}//end of extractSsoParameterKey()
-
-    /**
      * <pre>
-     * timeout 설정 값을 확인한다.
+     * 기타 항목을 확인한다.
      * </pre>
      * @param config
      */
-    private void extractTimeout(Properties config) {
+    private void extractOthers(Properties config) {
+        this.verbose = Boolean.parseBoolean(config.getProperty(VERBOSE_PROPERTY, "false"));
+        this.enableSSO = Boolean.parseBoolean(config.getProperty(ENABLE_SSO_PROPERTY, "false"));
+		this.ssoParamKey = config.getProperty(SSO_PARAMETER_KEY, null);
     	this.timeout = Integer.parseInt(config.getProperty(TIMEOUT_PROPERTY, "30"));
-    }//end of extractTimeout()
+    	
+    	this.useEmbedded = Boolean.parseBoolean(config.getProperty(USE_EMBEDDED, "false"));
+    	this.hotrodHost = config.getProperty(HOTROD_HOST, "0.0.0.0");
+    	this.hotrodPort = Integer.parseInt(config.getProperty(HOTROD_PORT, "11222"));
+    	this.jgroupsStack = config.getProperty(JGROUPS_STACK, "udp");
+    	this.jgroupsBindAddress = config.getProperty(JGROUPS_BIND_ADDR, "127.0.0.1");
+    	this.jgroupsBindPort = config.getProperty(JGROUPS_BIND_PORT, "7800");
+    	this.jgroupsInitialHosts = config.getProperty(JGROUPS_INIT_HOSTS, "localhost[7800],localhost[7801]");
+    	this.jgroupsMulticastPort = config.getProperty(JGROUPS_MULTICAST_PORT, "45588");
+    }//end of extractOthers()
 
 	/**
 	 * @return the classList
@@ -238,6 +235,62 @@ public class DollyConfig {
 	 */
 	public String getSsoParamKey() {
 		return ssoParamKey;
+	}
+
+	/**
+	 * @return the useEmbedded
+	 */
+	public boolean isUseEmbedded() {
+		return useEmbedded;
+	}
+
+	/**
+	 * @return the hotrodHost
+	 */
+	public String getHotrodHost() {
+		return hotrodHost;
+	}
+
+	/**
+	 * @return the hotrodPort
+	 */
+	public int getHotrodPort() {
+		return hotrodPort;
+	}
+
+	/**
+	 * @return the jgroupsStack
+	 */
+	public String getJgroupsStack() {
+		return jgroupsStack;
+	}
+
+	/**
+	 * @return the jgroupsBindAddress
+	 */
+	public String getJgroupsBindAddress() {
+		return jgroupsBindAddress;
+	}
+
+	/**
+	 * @return the jgroupsBindPort
+	 */
+	public String getJgroupsBindPort() {
+		return jgroupsBindPort;
+	}
+
+	/**
+	 * @return the jgroupsInitialHosts
+	 */
+	public String getJgroupsInitialHosts() {
+		return jgroupsInitialHosts;
+	}
+
+	/**
+	 * @return the jgroupsMulticastPort
+	 */
+	public String getJgroupsMulticastPort() {
+		return jgroupsMulticastPort;
 	}
 }
 //end of DollyConfig.java

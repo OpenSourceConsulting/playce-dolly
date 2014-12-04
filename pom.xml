@@ -23,7 +23,7 @@
         <project.build.source.version>1.6</project.build.source.version>
         <project.build.target.version>1.6</project.build.target.version>
         <lib.javassist.version>3.12.1.GA</lib.javassist.version>
-        <lib.infinispan.version>6.0.0.Final</lib.infinispan.version>
+        <lib.infinispan.version>6.0.2.Final</lib.infinispan.version>
 		<skipTests>true</skipTests>
 	</properties>
 	
@@ -44,6 +44,21 @@
 				</exclusion>
 			</exclusions> -->
 		</dependency>	
+		<dependency>
+			<groupId>org.infinispan</groupId>
+			<artifactId>infinispan-core</artifactId>
+			<version>${lib.infinispan.version}</version>
+		</dependency>	
+		<dependency>
+			<groupId>org.infinispan</groupId>
+			<artifactId>infinispan-server-core</artifactId>
+			<version>${lib.infinispan.version}</version>
+		</dependency>	
+		<dependency>
+			<groupId>org.infinispan</groupId>
+			<artifactId>infinispan-server-hotrod</artifactId>
+			<version>${lib.infinispan.version}</version>
+		</dependency>
 		<!-- for debugging -->
 		<!-- 
 		<dependency>
