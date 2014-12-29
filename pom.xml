@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>athena-dolly</groupId>
 	<artifactId>athena-dolly</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>6.0.0-SNAPSHOT</version>
 	
 	<scm>
 		<connection>scm:git:git://github.com/OpenSourceConsulting/athena-dolly.git</connection>
@@ -23,26 +23,35 @@
         <project.build.source.version>1.6</project.build.source.version>
         <project.build.target.version>1.6</project.build.target.version>
         <lib.javassist.version>3.12.1.GA</lib.javassist.version>
-        <lib.infinispan.version>6.0.2.Final</lib.infinispan.version>
+        <lib.infinispan.version>6.0.0.Final</lib.infinispan.version>
 		<skipTests>true</skipTests>
 	</properties>
+
+	<repositories>
+		<repository>
+			<id>couchbase</id>
+			<name>Couchbase Maven Repository</name>
+			<layout>default</layout>
+			<url>http://files.couchbase.com/maven2/</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
 	
 	<dependencies>
+		<!-- javassist(BCI) -->
 		<dependency>
 			<groupId>javassist</groupId>
 			<artifactId>javassist</artifactId>
 			<version>${lib.javassist.version}</version>
 		</dependency>
+		
+		<!-- infinispan -->
 		<dependency>
 			<groupId>org.infinispan</groupId>
 			<artifactId>infinispan-client-hotrod</artifactId>
 			<version>${lib.infinispan.version}</version>
-			<!-- <exclusions>
-				<exclusion>
-					<groupId>org.jboss.logging</groupId>
-					<artifactId>jboss-logging</artifactId>
-				</exclusion>
-			</exclusions> -->
 		</dependency>	
 		<dependency>
 			<groupId>org.infinispan</groupId>
@@ -59,6 +68,26 @@
 			<artifactId>infinispan-server-hotrod</artifactId>
 			<version>${lib.infinispan.version}</version>
 		</dependency>
+		
+		<!-- couchbase -->
+        <dependency>
+            <groupId>com.couchbase.client</groupId>
+            <artifactId>couchbase-client</artifactId>
+            <version>1.4.6</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.2.2</version>
+        </dependency>
+		
+		<!-- junit -->
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.11</version>
+		</dependency>
+		
 		<!-- for debugging -->
 		<!-- 
 		<dependency>
@@ -68,13 +97,6 @@
 			<scope>provided</scope>
 		</dependency>
 		-->
-		
-		<!-- junit -->
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>4.11</version>
-		</dependency>
     </dependencies>
 
 	<build>
@@ -106,7 +128,9 @@
 						</manifestEntries>
 					</archive>                              
                     <excludes>                                  
-                        <exclude>**/dolly.properties</exclude>      
+                        <exclude>**/dolly.properties</exclude>     
+                        <exclude>**/jgroups-tcp.xml</exclude>    
+                        <exclude>**/jgroups-udp.xml</exclude>        
                         <exclude>**/.gitignore</exclude>        
                     </excludes>  
 				</configuration>
@@ -138,6 +162,9 @@
                         <phase>install</phase>
                         <configuration>
                             <descriptor>/src/main/assembly/src.xml</descriptor>
+                            <archiverConfig>
+	                    		<defaultDirectoryMode>0755</defaultDirectoryMode>
+                            </archiverConfig>
                         </configuration>
                         <goals>
                             <goal>assembly</goal>

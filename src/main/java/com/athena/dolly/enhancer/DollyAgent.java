@@ -31,6 +31,7 @@ import java.lang.reflect.Constructor;
 import java.security.ProtectionDomain;
 import java.util.List;
 
+import org.infinispan.commons.equivalence.ByteArrayEquivalence;
 import org.infinispan.configuration.cache.CacheMode;
 import org.infinispan.configuration.cache.Configuration;
 import org.infinispan.configuration.cache.ConfigurationBuilder;
@@ -39,6 +40,7 @@ import org.infinispan.configuration.global.GlobalConfigurationBuilder;
 import org.infinispan.eviction.EvictionStrategy;
 import org.infinispan.manager.DefaultCacheManager;
 import org.infinispan.server.hotrod.HotRodServer;
+import org.infinispan.server.hotrod.configuration.HotRodServerConfiguration;
 import org.infinispan.server.hotrod.configuration.HotRodServerConfigurationBuilder;
 
 /**
@@ -93,15 +95,28 @@ public class DollyAgent implements ClassFileTransformer {
 	    		System.setProperty("jgroups.tcp.address", config.getJgroupsBindAddress());
 	    		System.setProperty("jgroups.tcp.port", config.getJgroupsBindPort());
 	    		System.setProperty("jgroups.tcpping.initial_hosts", config.getJgroupsInitialHosts());
-	    		configurationFile = this.getClass().getResource("jgroups-tcp.xml").getFile();
+	    		//configurationFile = Thread.currentThread().getContextClassLoader().getResource("jgroups-tcp.xml").getFile();
+	    		//configurationFile = this.getClass().getResource("jgroups-tcp.xml").getFile();
+	    		configurationFile = this.getClass().getResource("").getFile();
+	    		configurationFile = configurationFile.substring(5, configurationFile.indexOf("lib/athena-dolly")) + "jgroups-tcp.xml";
     		} else {
 	    		System.setProperty("jgroups.udp.mcast_port", config.getJgroupsMulticastPort());
-	    		configurationFile = this.getClass().getResource("jgroups-udp.xml").getFile();
+	    		//configurationFile = Thread.currentThread().getContextClassLoader().getResource("jgroups-udp.xml").getFile();
+	    		//configurationFile = this.getClass().getResource("jgroups-udp.xml").getFile();
+	    		configurationFile = this.getClass().getResource("").getFile();
+	    		configurationFile = configurationFile.substring(5, configurationFile.indexOf("lib/athena-dolly")) + "jgroups-udp.xml";
     		}
     		
 			if (verbose) {
 				System.out.println("[Dolly] hotrod configurationFile : " + configurationFile);
 			}
+
+			HotRodServerConfiguration hotrodConfig = new HotRodServerConfigurationBuilder()
+					.host(config.getHotrodHost())
+					.port(config.getHotrodPort())
+					.workerThreads(160)
+					.topologyStateTransfer(true).topologyReplTimeout(5000L).topologyLockTimeout(1000L)
+					.build();
     		
         	GlobalConfiguration globalConfig = new GlobalConfigurationBuilder().transport().defaultTransport()
         	        .clusterName("dolly-cluster")
@@ -113,17 +128,13 @@ public class DollyAgent implements ClassFileTransformer {
         	Configuration conf = new ConfigurationBuilder()
     	    	  	.clustering()
     	    	  		.cacheMode(CacheMode.DIST_SYNC)
-    	    	    //.sync()
-    	    	    .hash()
-    	    	    	.numOwners(2)
-    	    	    .jmxStatistics()
-    	    	    	.enable()
-    	    	    .compatibility()
-    	    	    	.enable()
+    	    	    .sync()
+    		    	.l1().lifespan(60000L)
+    	    	    .hash().numOwners(5)
+    	    	    .jmxStatistics().enable()
     	    	    .eviction()
     	    	    	.strategy(EvictionStrategy.LRU)
     	    	    	.maxEntries(8192)
-    	    	    //.expiration().lifespan(60L, TimeUnit.SECONDS)
     	    	    .persistence()
     	    	    	.passivation(true)
     	    	    	.addSingleFileStore()
@@ -133,10 +144,12 @@ public class DollyAgent implements ClassFileTransformer {
     	    	    		.ignoreModifications(false)
     	    	    		.purgeOnStartup(false)
     	    	    		.location(System.getProperty("java.io.tmpdir"))
+    	    	    .dataContainer().keyEquivalence(ByteArrayEquivalence.INSTANCE).valueEquivalence(ByteArrayEquivalence.INSTANCE)
+    	    	    //.expiration().lifespan(60L, TimeUnit.SECONDS)
+    	    	    //.compatibility().enable()
     	    	    .build();
         	
-        	new HotRodServer().start(new HotRodServerConfigurationBuilder().host(config.getHotrodHost()).port(config.getHotrodPort()).workerThreads(2).build(), 
-        			new DefaultCacheManager(globalConfig, conf));
+        	new HotRodServer().start(hotrodConfig, new DefaultCacheManager(globalConfig, conf));
         }
         
         if (verbose) {

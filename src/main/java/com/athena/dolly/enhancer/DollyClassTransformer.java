@@ -164,7 +164,7 @@ public class DollyClassTransformer implements ClassFileTransformer {
 							body += "	System.out.println(\"[Dolly] Session(\" + getId() + \") setAttribute(\" + $1 + \", \" + $2 + \") has called.\");";
 		                }
 		                
-						body +=	   "	try { com.athena.dolly.enhancer.DollyManager.getInstance().setValue(getId().split(\"!\")[0], $1, $2); } catch (Exception e) { e.printStackTrace(); }" +
+						body +=	   "	try { com.athena.dolly.enhancer.DollyManager.getClient().put(getId().split(\"!\")[0], $1, $2); } catch (Exception e) { e.printStackTrace(); }" +
 								   "	try { _setAttribute($1, $2); } catch (Exception e) { e.printStackTrace(); }" + 
 								   "}";
 						isEnhanced = true;
@@ -177,7 +177,7 @@ public class DollyClassTransformer implements ClassFileTransformer {
 	                }
 	                
 					body +=	   "	java.lang.Object obj = null;" +
-							   "	try { obj = com.athena.dolly.enhancer.DollyManager.getInstance().getValue(getId().split(\"!\")[0], $1); } catch (Exception e) { e.printStackTrace(); }";
+							   "	try { obj = com.athena.dolly.enhancer.DollyManager.getClient().get(getId().split(\"!\")[0], $1); } catch (Exception e) { e.printStackTrace(); }";
 
 	                if (verbose) {
 						body += "	if (obj == null) { System.out.println(\"[Dolly] Attribute is NULL in DataGrid.\"); }";
@@ -203,7 +203,7 @@ public class DollyClassTransformer implements ClassFileTransformer {
 	                }
 	                
 					body +=	   "	java.util.Enumeration obj = null;" +
-							   "	try { obj = com.athena.dolly.enhancer.DollyManager.getInstance().getValueNames(getId().split(\"!\")[0]); } catch (Exception e) { e.printStackTrace(); }" +
+							   "	try { obj = com.athena.dolly.enhancer.DollyManager.getClient().getValueNames(getId().split(\"!\")[0]); } catch (Exception e) { e.printStackTrace(); }" +
 							   "	if (obj == null) {" +
 							   "		try { obj = _getAttributeNames(); } catch (Exception e) { e.printStackTrace(); }" +
 							   "	}" +
@@ -218,7 +218,7 @@ public class DollyClassTransformer implements ClassFileTransformer {
 							body += "	System.out.println(\"[Dolly] Session(\" + getId() + \") removeAttribute(\" + $1 + \") has called.\");";
 		                }
 		                
-						body +=	   "	try { com.athena.dolly.enhancer.DollyManager.getInstance().removeValue(getId().split(\"!\")[0], $1); } catch (Exception e) { e.printStackTrace(); }" +
+						body +=	   "	try { com.athena.dolly.enhancer.DollyManager.getClient().remove(getId().split(\"!\")[0], $1); } catch (Exception e) { e.printStackTrace(); }" +
 								   "	try { _removeAttribute($1); } catch (Exception e) { e.printStackTrace(); }" +
 								   "}";
 						isEnhanced = true;
@@ -231,7 +231,7 @@ public class DollyClassTransformer implements ClassFileTransformer {
 							body += "	System.out.println(\"[Dolly] Session(\" + getId() + \") invalidate() has called.\");";
 		                }
 		                
-						body +=	   "	try { com.athena.dolly.enhancer.DollyManager.getInstance().removeValue(getId().split(\"!\")[0]); } catch (Exception e) { e.printStackTrace(); }" +
+						body +=	   "	try { com.athena.dolly.enhancer.DollyManager.getClient().remove(getId().split(\"!\")[0]); } catch (Exception e) { e.printStackTrace(); }" +
 								   "	try { _invalidate(); } catch (Exception e) { e.printStackTrace(); }" +
 								   "}";
 						isEnhanced = true;
@@ -522,7 +522,7 @@ public class DollyClassTransformer implements ClassFileTransformer {
 								"		if (remoteAddr == null) {" +
 								"			remoteAddr = getRemoteAddr();" +
 								"		}" +
-								"		requestedSessionId = (java.lang.String)com.athena.dolly.enhancer.DollyManager.getInstance().getValue(remoteAddr);" +
+								"		requestedSessionId = (java.lang.String)com.athena.dolly.enhancer.DollyManager.getClient().get(remoteAddr);" +
 								"	}" +
 								"	return requestedSessionId;" +
 								"}";
@@ -541,7 +541,7 @@ public class DollyClassTransformer implements ClassFileTransformer {
 								"	remoteAddr = getRemoteAddr();" +
 								"}" +
 								"if (session != null) {" + 
-								"	com.athena.dolly.enhancer.DollyManager.getInstance().setValue(remoteAddr, session.getId());" +
+								"	com.athena.dolly.enhancer.DollyManager.getClient().put(remoteAddr, session.getId());" +
 								"}";
 				
 				methods[i].insertAfter(body);

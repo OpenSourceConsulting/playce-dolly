@@ -43,12 +43,13 @@ import java.util.Properties;
 public class DollyConfig {
 
 	protected static final String CONFIG_FILE 				= "dolly.properties";
+	private static final String CLIENT_TYPE		 			= "dolly.client.type";
 	private static final String VERBOSE_PROPERTY 			= "dolly.verbose";
 	private static final String ENABLE_SSO_PROPERTY 		= "dolly.enableSSO";
 	private static final String SSO_DOMAIN_LIST_PROPERTY 	= "dolly.sso.domain.list";
 	private static final String SSO_PARAMETER_KEY 			= "dolly.sso.parameter.key";
 	private static final String TIMEOUT_PROPERTY 			= "dolly.session.timeout";
-    private static final String TARGET_CLASS_PROPERTY 		= "dolly.instrument.target.class";
+    //private static final String TARGET_CLASS_PROPERTY 		= "dolly.instrument.target.class";
     
     private static final String USE_EMBEDDED 				= "dolly.use.infinispan.embedded";
     private static final String HOTROD_HOST 				= "dolly.hotrod.host";
@@ -59,9 +60,14 @@ public class DollyConfig {
     private static final String JGROUPS_INIT_HOSTS 			= "dolly.jgroups.tcp.initial.hosts";
     private static final String JGROUPS_MULTICAST_PORT		= "dolly.jgroups.udp.multicast.port";
     
+    private static final String COUCHBASE_URIS 				= "couchbase.cluter.uri.list";
+    private static final String COUCHBASE_BUCKET_NAME 		= "couchbase.bucket.name";
+    private static final String COUCHBASE_BUCKET_PASSWD		= "couchbase.bucket.passwd";
+    
     public static Properties properties;
 
     private boolean verbose;
+    private String clientType;
     private List<String> classList = new ArrayList<String>();
     private List<String> ssoDomainList = new ArrayList<String>();
     private boolean enableSSO;
@@ -76,6 +82,10 @@ public class DollyConfig {
     private String jgroupsBindPort;
     private String jgroupsInitialHosts;
     private String jgroupsMulticastPort;
+    
+    private String couchbaseUris;
+    private String couchbaseBucketName;
+    private String couchbaseBucketPasswd;
     
 	/**
 	 * <pre>
@@ -145,7 +155,15 @@ public class DollyConfig {
      * @param config
      */
     private void extractTargetClasses(Properties config) {
-    	String[] classNames = config.getProperty(TARGET_CLASS_PROPERTY, "").split(",");
+    	String[] classNames = new String[]{
+    		"org.apache.catalina.session.StandardSessionFacade",
+    		"org.apache.catalina.session.ManagerBase",
+    		"org.apache.catalina.connector.Request",
+    		"weblogic.servlet.internal.session.SessionData",
+    		"weblogic.servlet.internal.ServletRequestImpl",
+    	};
+    	
+    	//String[] classNames = config.getProperty(TARGET_CLASS_PROPERTY, "").split(",");
     	
     	for (String clazzName : classNames) {
     		if (!"".equals(clazzName)) {
@@ -181,6 +199,7 @@ public class DollyConfig {
      */
     private void extractOthers(Properties config) {
         this.verbose = Boolean.parseBoolean(config.getProperty(VERBOSE_PROPERTY, "false"));
+        this.clientType = config.getProperty(CLIENT_TYPE, "infinispan");
         this.enableSSO = Boolean.parseBoolean(config.getProperty(ENABLE_SSO_PROPERTY, "false"));
 		this.ssoParamKey = config.getProperty(SSO_PARAMETER_KEY, null);
     	this.timeout = Integer.parseInt(config.getProperty(TIMEOUT_PROPERTY, "30"));
@@ -193,6 +212,10 @@ public class DollyConfig {
     	this.jgroupsBindPort = config.getProperty(JGROUPS_BIND_PORT, "7800");
     	this.jgroupsInitialHosts = config.getProperty(JGROUPS_INIT_HOSTS, "localhost[7800],localhost[7801]");
     	this.jgroupsMulticastPort = config.getProperty(JGROUPS_MULTICAST_PORT, "45588");
+    	
+    	this.couchbaseUris = config.getProperty(COUCHBASE_URIS, "");
+    	this.couchbaseBucketName = config.getProperty(COUCHBASE_BUCKET_NAME, "");
+    	this.couchbaseBucketPasswd = config.getProperty(COUCHBASE_BUCKET_PASSWD, "");
     }//end of extractOthers()
 
 	/**
@@ -207,6 +230,13 @@ public class DollyConfig {
 	 */
 	public boolean isVerbose() {
 		return verbose;
+	}
+
+	/**
+	 * @return the clientType
+	 */
+	public String getClientType() {
+		return clientType;
 	}
 
 	/**
@@ -291,6 +321,27 @@ public class DollyConfig {
 	 */
 	public String getJgroupsMulticastPort() {
 		return jgroupsMulticastPort;
+	}
+
+	/**
+	 * @return the couchbaseUris
+	 */
+	public String getCouchbaseUris() {
+		return couchbaseUris;
+	}
+
+	/**
+	 * @return the couchbaseBucketName
+	 */
+	public String getCouchbaseBucketName() {
+		return couchbaseBucketName;
+	}
+
+	/**
+	 * @return the couchbaseBucketPasswd
+	 */
+	public String getCouchbaseBucketPasswd() {
+		return couchbaseBucketPasswd;
 	}
 }
 //end of DollyConfig.java
