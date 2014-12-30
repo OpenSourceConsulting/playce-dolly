@@ -71,6 +71,7 @@ public class EmbeddedServer {
 		        .build();
 		
 		Configuration config = new org.infinispan.configuration.cache.ConfigurationBuilder()
+				//.indexing().enable()
 			  	.clustering().cacheMode(CacheMode.LOCAL)
 			  	.sync()
 			    .jmxStatistics().enable()

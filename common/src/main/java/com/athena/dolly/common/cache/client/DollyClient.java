@@ -62,8 +62,9 @@ public interface DollyClient {
 	 * </pre>
 	 * @param cacheKey
 	 * @param value
+	 * @throws Exception
 	 */
-	public void put(String cacheKey, Object value);
+	public void put(String cacheKey, Object value) throws Exception;
 	
 	/**
 	 * <pre>
@@ -72,17 +73,18 @@ public interface DollyClient {
 	 * @param cacheKey
 	 * @param dataKey
 	 * @param value
+	 * @throws Exception
 	 */
-	public void put(String cacheKey, String dataKey, Object value);
+	public void put(String cacheKey, String dataKey, Object value) throws Exception;
 	
 	/**
 	 * <pre>
 	 * Cache에서 주어진 Key에 해당하는 Data를 제거한다.
 	 * </pre>
 	 * @param cacheKey
-	 * @return
+	 * @throws Exception
 	 */
-	public Object remove(String cacheKey);
+	public void remove(String cacheKey) throws Exception;
 	
 	/**
 	 * <pre>
@@ -90,8 +92,9 @@ public interface DollyClient {
 	 * </pre>
 	 * @param cacheKey
 	 * @param dataKey
+	 * @throws Exception
 	 */
-	public void remove(String cacheKey, String dataKey);
+	public void remove(String cacheKey, String dataKey) throws Exception;
 	
 	/**
 	 * <pre>

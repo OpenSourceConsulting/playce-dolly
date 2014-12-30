@@ -397,7 +397,11 @@ Ext.define('webapp.view.MyViewport', {
                                                                     },
                                                                     success: function(response, opts){
                                                                         sessionDataGrid.setLoading(false);
-                                                                        Ext.getCmp('refreshTool').fireEvent('click');
+
+                                                                        var store = Ext.data.StoreManager.lookup('sessionDataStore');
+                                                                        store.removeAt(rowIndex);
+
+                                                                        //Ext.getCmp('refreshTool').fireEvent('click');
                                                                     },
                                                                     failure: function(response, opts) {
                                                                         sessionDataGrid.setLoading(false);

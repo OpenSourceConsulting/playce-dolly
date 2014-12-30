@@ -149,7 +149,7 @@ Ext.define('webapp.controller.sessionDataController', {
             url: GlobalData.urlPrefix + 'getSessionKeyList',
             params: {
             },
-            success: function(response, opts){
+            success: function(response, opts) {
                 sessionDataGrid.setLoading(false);
                 var obj = Ext.decode(response.responseText);
                 var store = Ext.data.StoreManager.lookup('sessionDataStore');

@@ -94,7 +94,7 @@ public class HotRodClient implements DollyClient {
 	/* (non-Javadoc)
 	 * @see com.athena.dolly.enhancer.client.DollyClient#put(java.lang.String, java.lang.Object)
 	 */
-	public synchronized void put(String cacheKey, Object value) {
+	public synchronized void put(String cacheKey, Object value) throws Exception {
 		cache.put(cacheKey, value, -1, TimeUnit.SECONDS, config.getTimeout() * 60, TimeUnit.SECONDS);
 	}//end of put()
 
@@ -102,7 +102,7 @@ public class HotRodClient implements DollyClient {
 	 * @see com.athena.dolly.enhancer.client.DollyClient#put(java.lang.String, java.lang.String, java.lang.Object)
 	 */
 	@SuppressWarnings("unchecked")
-	public synchronized void put(String cacheKey, String dataKey, Object value) {
+	public synchronized void put(String cacheKey, String dataKey, Object value) throws Exception {
 		if (dataKey != null) {
 	    	Map<String, Object> attribute = (Map<String, Object>)cache.get(cacheKey);
 			
@@ -118,15 +118,15 @@ public class HotRodClient implements DollyClient {
 	/* (non-Javadoc)
 	 * @see com.athena.dolly.enhancer.client.DollyClient#remove(java.lang.String)
 	 */
-	public synchronized Object remove(String cacheKey) {
-		return cache.remove(cacheKey);
+	public synchronized void remove(String cacheKey) throws Exception {
+		cache.remove(cacheKey);
 	}//end of remove()
 
     /* (non-Javadoc)
      * @see com.athena.dolly.enhancer.client.DollyClient#remove(java.lang.String, java.lang.String)
      */
     @SuppressWarnings("unchecked")
-	public synchronized void remove(String cacheKey, String dataKey) {
+	public synchronized void remove(String cacheKey, String dataKey) throws Exception {
     	Map<String, Object> attribute = (Map<String, Object>)cache.get(cacheKey);
 		
 		if (attribute != null) {

@@ -105,7 +105,7 @@ public class ConsoleController {
     @RequestMapping(value="/deleteSessionData", method=RequestMethod.GET)
     @ResponseStatus(value=HttpStatus.OK)
     @ResponseBody
-    public String deleteSessionData(HttpServletRequest request, @QueryParam("key") String key) {
+    public String deleteSessionData(HttpServletRequest request, @QueryParam("key") String key) throws Exception {
     	
     	if (key == null) {
     		throw new ResourceNotFoundException("Resource Not Found at [" + request.getRequestURI() + "]");

@@ -21,7 +21,7 @@
 		<filter-name>encodingFilter</filter-name>
 		<url-pattern>*</url-pattern>
 	</filter-mapping>
-	<!--
+	<!---->
 	<filter>
 		<filter-name>CorsFilter</filter-name>
 		<filter-class>org.apache.catalina.filters.CorsFilter</filter-class>
@@ -54,7 +54,7 @@
 		<filter-name>CorsFilter</filter-name>
 		<url-pattern>*</url-pattern>
 	</filter-mapping>
-	-->
+	
 	
 	<!-- spring configuration files location -->
  	<context-param>

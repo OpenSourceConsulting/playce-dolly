@@ -41,6 +41,7 @@ import com.athena.dolly.common.exception.ConfigurationException;
 import com.athena.dolly.common.stats.DollyStats;
 import com.couchbase.client.protocol.views.DesignDocument;
 import com.couchbase.client.protocol.views.Query;
+import com.couchbase.client.protocol.views.Stale;
 import com.couchbase.client.protocol.views.View;
 import com.couchbase.client.protocol.views.ViewDesign;
 import com.couchbase.client.protocol.views.ViewResponse;
@@ -123,15 +124,15 @@ public class CouchbaseClient implements DollyClient {
 	/* (non-Javadoc)
 	 * @see com.athena.dolly.enhancer.client.DollyClient#put(java.lang.String, java.lang.Object)
 	 */
-	public synchronized void put(String cacheKey, Object value) {
-		client.set(cacheKey, config.getTimeout() * 60, gson.toJson(value));
+	public synchronized void put(String cacheKey, Object value) throws Exception {
+		client.set(cacheKey, config.getTimeout() * 60, gson.toJson(value)).get();
 	}//end of put()
 
 	/* (non-Javadoc)
 	 * @see com.athena.dolly.enhancer.client.DollyClient#put(java.lang.String, java.lang.String, java.lang.Object)
 	 */
 	@SuppressWarnings("unchecked")
-	public synchronized void put(String cacheKey, String dataKey, Object value) {
+	public synchronized void put(String cacheKey, String dataKey, Object value) throws Exception {
 		if (dataKey != null) {
 	    	Map<String, Object> attribute = (Map<String, Object>)get(cacheKey);
 			
@@ -140,22 +141,22 @@ public class CouchbaseClient implements DollyClient {
 			}
 			
 			attribute.put(dataKey, value);
-			client.set(cacheKey, config.getTimeout() * 60, gson.toJson(attribute));
+			client.set(cacheKey, config.getTimeout() * 60, gson.toJson(attribute)).get();
 		}
 	}//end of put()
 
 	/* (non-Javadoc)
 	 * @see com.athena.dolly.enhancer.client.DollyClient#remove(java.lang.String)
 	 */
-	public synchronized Object remove(String cacheKey) {
-		return client.delete(cacheKey);
+	public synchronized void remove(String cacheKey) throws Exception {
+		client.delete(cacheKey).get();
 	}//end of remove()
 
 	/* (non-Javadoc)
 	 * @see com.athena.dolly.enhancer.client.DollyClient#remove(java.lang.String, java.lang.String)
 	 */
 	@SuppressWarnings("unchecked")
-	public synchronized void remove(String cacheKey, String dataKey) {
+	public synchronized void remove(String cacheKey, String dataKey) throws Exception {
 		if (dataKey != null) {
 	    	Map<String, Object> attribute = (Map<String, Object>)get(cacheKey);
 			
@@ -164,7 +165,7 @@ public class CouchbaseClient implements DollyClient {
 			}
 			
 			attribute.remove(dataKey);
-			client.set(cacheKey, config.getTimeout() * 60, gson.toJson(attribute));
+			client.set(cacheKey, config.getTimeout() * 60, gson.toJson(attribute)).get();
 		}
 	}//end of remove()
     
@@ -205,7 +206,7 @@ public class CouchbaseClient implements DollyClient {
         }
         
 		View view = client.getView(config.getCouchbaseBucketName(), "get_all");
-		Query query = new Query().setReduce(false).setIncludeDocs(false);
+		Query query = new Query().setStale(Stale.FALSE).setReduce(false).setIncludeDocs(false);
 		
 		ViewResponse response = client.query(view, query);
 
@@ -215,6 +216,8 @@ public class CouchbaseClient implements DollyClient {
 			key = new SessionKey();
 			key.setKey(row.getKey());
 			keyList.add(key);
+			
+			System.out.println(row.getKey());
 		}
 		
 		return keyList;
@@ -268,7 +271,7 @@ public class CouchbaseClient implements DollyClient {
         }
         
 		View view = client.getView(config.getCouchbaseBucketName(), "get_all");
-		Query query = new Query().setReduce(false).setIncludeDocs(true).setLimit(20);
+		Query query = new Query().setStale(Stale.FALSE).setReduce(false).setIncludeDocs(true).setLimit(20);
 		//int docsPerPage = 25;
 		
 		ViewResponse response = client.query(view, query);

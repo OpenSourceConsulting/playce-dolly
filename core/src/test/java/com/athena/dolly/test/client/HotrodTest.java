@@ -24,7 +24,10 @@ package com.athena.dolly.test.client;
 
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.Map;
 import java.util.Properties;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.infinispan.client.hotrod.RemoteCache;
 import org.infinispan.client.hotrod.RemoteCacheManager;
@@ -46,20 +49,16 @@ public class HotrodTest {
 		ConfigurationBuilder builder = new ConfigurationBuilder();
 		Properties properties = new Properties();
 
-		// infinispan-server-7.0.2.Final
-		//properties.put("infinispan.client.hotrod.server_list", "121.138.109.61:11222");
-		
 		// startServer_standalone()
-		//properties.put("infinispan.client.hotrod.server_list", "127.0.0.1:11222");
+		properties.put("infinispan.client.hotrod.server_list", "127.0.0.1:11222");
 		
 		// startServer_cluster1(), startServer_cluster2()
 		//properties.put("infinispan.client.hotrod.server_list", "127.0.0.1:11222;127.0.0.1:11322;");
-		properties.put("infinispan.client.hotrod.server_list", "192.168.0.11:11222;192.168.0.77:11222;");
 		
 		//properties.put("infinispan.client.hotrod.transport_factory", "org.infinispan.client.hotrod.impl.transport.tcp.TcpTransportFactory");
 		//properties.put("infinispan.client.hotrod.marshaller", "org.infinispan.commons.marshall.jboss.GenericJBossMarshaller");
 		//properties.put("infinispan.client.hotrod.async_executor_factory", "org.infinispan.client.hotrod.impl.async.DefaultAsyncExecutorFactory");
-
+		
 		RemoteCacheManager manager = new RemoteCacheManager(builder.withProperties(properties).build());
 		
 		cache = manager.getCache();
@@ -73,6 +72,20 @@ public class HotrodTest {
 		//cache.put(cacheKey, value, -1, TimeUnit.SECONDS, 5 * 60, TimeUnit.SECONDS); // no expiration & do evict after 5 minutes later.
     }
 	
+	@SuppressWarnings("unchecked")
+	public synchronized void setValue(String cacheKey, String dataKey, Object value) {
+		if (dataKey != null) {
+	    	Map<String, Object> attribute = (Map<String, Object>)cache.get(cacheKey);
+			
+			if (attribute == null) {
+				attribute = new ConcurrentHashMap<String, Object>();
+			}
+			
+			attribute.put(dataKey, value);
+			cache.put(cacheKey, attribute);
+		}
+	}
+	
 	public synchronized void replaceValue(String cacheKey, Object value) {
 		cache.replace(cacheKey, value);
     }
@@ -81,8 +94,30 @@ public class HotrodTest {
     	return cache.get(cacheKey);
     }
 	
+	@SuppressWarnings("unchecked")
+	public Object getValue(String cacheKey, String dataKey) {
+    	Map<String, Object> attribute = (Map<String, Object>)cache.get(cacheKey);
+		
+		if (attribute == null) {
+			return null;
+		} else {
+			return attribute.get(dataKey);
+		}
+	}
+	
 	public synchronized void removeValue(String cacheKey) {
 		cache.remove(cacheKey);
+    }
+	
+    @SuppressWarnings("unchecked")
+	public synchronized void removeValue(String cacheKey, String dataKey) {
+    	Map<String, Object> attribute = (Map<String, Object>)cache.get(cacheKey);
+		
+		if (attribute != null) {
+			attribute.remove(dataKey);
+		}
+		
+		cache.put(cacheKey, attribute);
     }
 	
 	public synchronized void clear() {
@@ -139,33 +174,39 @@ public class HotrodTest {
 	public static void main(String[] args) {
 		HotrodTest test = new HotrodTest();
 		
-		test.setValue("test-key1", "test-value11");
-		test.setValue("test-key2", "test-value22");
-		test.setValue("test-key3", "test-value33");
+		String cacheKey = UUID.randomUUID().toString();
+		
+		test.setValue(cacheKey, "test-key1", "test-value11");
+		test.setValue(cacheKey, "test-key2", "test-value22");
+		test.setValue(cacheKey, "test-key3", "test-value33");
 
 		test.printStats();
 		test.printAllCache();
 
 		System.out.println("\n========================================================\n");
 		
-		test.setValue("test-key1", "111111111111");
-		test.setValue("test-key2", "222222222222");
-		test.setValue("test-key3", "333333333333");
+		test.setValue(cacheKey, "test-key1", "111111111111");
+		test.setValue(cacheKey, "test-key2", "222222222222");
+		test.setValue(cacheKey, "test-key3", "333333333333");
 		
 		try {
 			SampleDto1 sample1 = null;
 			for (int i = 0; i < 2; i++) {
 				sample1 = new SampleDto1();
-				sample1.setUserId("osci_" + i);
-				sample1.setEmail("support" + i + "@osck.kr");
-				test.setValue("sampleDto1-" + i, sample1);
+				sample1.setAddress1("Address1_" + i);
+				sample1.setAddress2("Address2_" + i);
+				sample1.setAge(25 + (i % 20));
+				sample1.setEmail("support_" + i + "@osci.kr");
+				sample1.setFirstName("Firstname-" + i);
+				sample1.setLastName("Lastname-" + i);
+				sample1.setUserId("user_" + i);
+				test.setValue(cacheKey, "sampleDto1-" + i, sample1);
 			}
 	
 			test.printStats();
 			test.printAllCache();
 
-			
-			sample1 = (SampleDto1) test.getValue("sampleDto1-1");
+			sample1 = (SampleDto1) test.getValue(cacheKey, "sampleDto1-1");
 			System.out.println(sample1.toString());
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -173,29 +214,34 @@ public class HotrodTest {
 		
 		System.out.println("\n========================================================\n");
 
-		//test.removeValue("test-key1");
-		//test.removeValue("test-key2");
-		//test.removeValue("test-key3");
+		test.removeValue(cacheKey, "test-key1");
+		test.removeValue(cacheKey, "test-key2");
+		test.removeValue(cacheKey, "test-key3");
 
 		try {
 			SampleDto2 sample2 = null;
-			for (int i = 0; i < 2; i++) {
+			for (int i = 1; i < 11; i++) {
 				sample2 = new SampleDto2();
-				sample2.setUserId("osci_" + i);
-				sample2.setEmail("support" + i + "@osck.kr");
-				test.setValue("sampleDto2-" + i, sample2);
+				sample2.setAddress1("Address1_" + i);
+				sample2.setAddress2("Address2_" + i);
+				sample2.setAge(25 + (i % 20));
+				sample2.setEmail("support_" + i + "@osci.kr");
+				sample2.setFirstName("Firstname-" + i);
+				sample2.setLastName("Lastname-" + i);
+				sample2.setUserId("user_" + i);
+				test.setValue(cacheKey, "sampleDto2-" + i, sample2);
 			}
 	
 			test.printStats();
 			test.printAllCache();
 			
-			sample2 = (SampleDto2) test.getValue("sampleDto2-1");
+			sample2 = (SampleDto2) test.getValue(cacheKey, "sampleDto2-1");
 			System.out.println(sample2.toString());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		
-		//test.clear();
+		test.clear();
 	}
 
 }
