@@ -65,13 +65,13 @@
                     },
                     "codeClass": null,
                     "userConfig": {
-                        "height": 60,
+                        "height": null,
                         "itemId": "dollyImg",
                         "layout|flex": null,
-                        "layout|margins": "0 0 0 8",
-                        "src": "resources/images/logo/athena_dolly_2.png",
+                        "layout|margins": "3 3 3 8",
+                        "src": "resources/images/logo/athena_dolly.png",
                         "title": "Athena Dolly",
-                        "width": 60
+                        "width": null
                     },
                     "designerId": "9a4ba715-a388-4d6c-a9d2-8872cf821d21"
                 },
@@ -790,6 +790,20 @@
                                             ]
                                         }
                                     ]
+                                },
+                                {
+                                    "type": "Ext.panel.Tool",
+                                    "reference": {
+                                        "name": "tools",
+                                        "type": "array"
+                                    },
+                                    "codeClass": null,
+                                    "userConfig": {
+                                        "id": "searchTool",
+                                        "itemId": "searchTool",
+                                        "type": "search"
+                                    },
+                                    "designerId": "21d039c1-94e6-43c5-a454-505691a25a17"
                                 },
                                 {
                                     "type": "Ext.panel.Tool",

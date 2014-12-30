@@ -65,11 +65,9 @@ Ext.define('webapp.view.MyViewport', {
                         },
                         {
                             xtype: 'image',
-                            margins: '0 0 0 8',
-                            height: 60,
+                            margins: '3 3 3 8',
                             itemId: 'dollyImg',
-                            width: 60,
-                            src: 'resources/images/logo/athena_dolly_2.png',
+                            src: 'resources/images/logo/athena_dolly.png',
                             title: 'Athena Dolly'
                         },
                         {
@@ -416,6 +414,12 @@ Ext.define('webapp.view.MyViewport', {
                                         }
                                     ],
                                     tools: [
+                                        {
+                                            xtype: 'tool',
+                                            id: 'searchTool',
+                                            itemId: 'searchTool',
+                                            type: 'search'
+                                        },
                                         {
                                             xtype: 'tool',
                                             id: 'refreshTool',
