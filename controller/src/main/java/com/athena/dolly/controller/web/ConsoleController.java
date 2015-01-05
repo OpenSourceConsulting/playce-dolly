@@ -29,9 +29,6 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,6 +38,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
@@ -93,7 +91,7 @@ public class ConsoleController {
     @RequestMapping(value="/getSessionData", method=RequestMethod.GET)
     @ResponseStatus(value=HttpStatus.OK)
     @ResponseBody
-    public Object getSessionData(HttpServletRequest request, @QueryParam("key") String key) {
+    public Object getSessionData(HttpServletRequest request, @RequestParam("key") String key) {
     	
     	if (key == null) {
     		throw new ResourceNotFoundException("Resource Not Found at [" + request.getRequestURI() + "]");
@@ -105,7 +103,7 @@ public class ConsoleController {
     @RequestMapping(value="/deleteSessionData", method=RequestMethod.GET)
     @ResponseStatus(value=HttpStatus.OK)
     @ResponseBody
-    public String deleteSessionData(HttpServletRequest request, @QueryParam("key") String key) throws Exception {
+    public String deleteSessionData(HttpServletRequest request, @RequestParam("key") String key) throws Exception {
     	
     	if (key == null) {
     		throw new ResourceNotFoundException("Resource Not Found at [" + request.getRequestURI() + "]");
@@ -192,9 +190,10 @@ public class ConsoleController {
     
     @ResponseStatus(value=HttpStatus.NOT_FOUND)
     @ExceptionHandler(ResourceNotFoundException.class)
-	public Response handleCustomException(ResourceNotFoundException ex) {
+	public String handleCustomException(ResourceNotFoundException ex) {
     	logger.error("ResourceNotFoundException has occurred. : ", ex);
-		return Response.status(Status.NOT_FOUND).build();
+		//return Response.status(Status.NOT_FOUND).build();
+    	return ex.toString();
 	}
 }
 //end of ConsoleController.java
