@@ -41,7 +41,16 @@ import org.infinispan.server.hotrod.configuration.HotRodServerConfigurationBuild
  * @author Sang-cheon Park
  * @version 1.0
  */
+@SuppressWarnings("restriction")
 public class EmbeddedServer {
+	
+	static {
+		// Set VM Arguments to enable JMX
+		// -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=9999 -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.authenticate=false
+		
+		enableJmx("9999");
+		sun.management.jmxremote.ConnectorBootstrap.initialize();
+	}
 	
 	public EmbeddedServer() {
 		//*
@@ -57,6 +66,7 @@ public class EmbeddedServer {
 //		System.setProperty("jboss.modules.system.pkgs", "org.jboss.byteman");
 //		System.setProperty("java.awt.headless", "true");
 		
+		// -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=9999 -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.authenticate=false
 		HotRodServerConfiguration hotrodConfig = new HotRodServerConfigurationBuilder()
 				.host("127.0.0.1")
 				.port(11222)
@@ -187,6 +197,13 @@ public class EmbeddedServer {
 	    	    .build();
 		
 		new HotRodServer().start(hotrodConfig, new DefaultCacheManager(globalConfig, config));
+	}
+	
+	private static void enableJmx(String port) {
+		System.setProperty("com.sun.management.jmxremote", "true");
+		System.setProperty("com.sun.management.jmxremote.port", port);
+		System.setProperty("com.sun.management.jmxremote.ssl", "false");
+		System.setProperty("com.sun.management.jmxremote.authenticate", "false");
 	}
 
 	public static void main(String[] args) {
