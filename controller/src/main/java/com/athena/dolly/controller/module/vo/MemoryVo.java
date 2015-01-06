@@ -20,7 +20,7 @@
  * ---------------	----------------	------------
  * Sang-cheon Park	2014. 3. 31.		First Draft.
  */
-package com.athena.dolly.controller.module.jmx.vo;
+package com.athena.dolly.controller.module.vo;
 
 import java.io.Serializable;
 
