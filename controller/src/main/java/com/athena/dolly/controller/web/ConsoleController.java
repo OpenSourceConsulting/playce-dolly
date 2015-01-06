@@ -45,6 +45,7 @@ import com.athena.dolly.common.cache.SessionKey;
 import com.athena.dolly.common.stats.DollyStats;
 import com.athena.dolly.controller.module.ClientManager;
 import com.athena.dolly.controller.module.vo.MemoryVo;
+import com.athena.dolly.controller.web.exception.ErrorInfo;
 
 /**
  * <pre>
@@ -189,10 +190,11 @@ public class ConsoleController {
     
     @ResponseStatus(value=HttpStatus.NOT_FOUND)
     @ExceptionHandler(ResourceNotFoundException.class)
-	public String handleCustomException(ResourceNotFoundException ex) {
+    @ResponseBody ErrorInfo handleCustomException(HttpServletRequest req, ResourceNotFoundException ex) {
     	logger.error("ResourceNotFoundException has occurred. : ", ex);
 		//return Response.status(Status.NOT_FOUND).build();
-    	return ex.toString();
+    	//return ex.toString();
+    	return new ErrorInfo(req.getRequestURL().toString(), ex);
 	}
 }
 //end of ConsoleController.java
