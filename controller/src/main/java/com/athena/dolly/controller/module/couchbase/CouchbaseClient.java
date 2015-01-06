@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
@@ -36,7 +35,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.Assert;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
@@ -141,8 +139,6 @@ public class CouchbaseClient extends DollyClient {
 	 */
 	@SuppressWarnings("unchecked")
 	private Map<String, Object> submit(String api, String body, HttpMethod method) throws RestClientException, Exception {
-		Assert.isTrue(StringUtils.isNotEmpty(api), "api must not be null");
-
 		try {
 			RestTemplate rt = new RestTemplate();
 			ResponseEntity<?> response = rt.exchange(api, method, setHTTPEntity(body), Map.class);
