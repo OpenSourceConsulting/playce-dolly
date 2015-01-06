@@ -1,7 +1,5 @@
 /* 
- * Athena Peacock Dolly - DataGrid based Clustering 
- * 
- * Copyright (C) 2013 Open Source Consulting, Inc. All rights reserved by Open Source Consulting, Inc.
+ * Copyright (C) 2012-2015 Open Source Consulting, Inc. All rights reserved by Open Source Consulting, Inc.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -20,23 +18,14 @@
  * Revision History
  * Author			Date				Description
  * ---------------	----------------	------------
- * Sang-cheon Park	2014. 3. 31.		First Draft.
+ * Sang-cheon Park	2015. 1. 6.		First Draft.
  */
-package com.athena.dolly.controller.module.jmx;
+package com.athena.dolly.controller.module;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
-import java.util.TreeSet;
-
-import javax.management.MBeanAttributeInfo;
-import javax.management.MBeanInfo;
-import javax.management.MBeanServerConnection;
-import javax.management.ObjectName;
-import javax.management.openmbean.CompositeDataSupport;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,23 +34,24 @@ import org.springframework.stereotype.Component;
 
 import com.athena.dolly.common.cache.DollyConfig;
 import com.athena.dolly.common.exception.ConfigurationException;
-import com.athena.dolly.controller.module.jmx.vo.MemoryVo;
-import com.athena.dolly.controller.module.jmx.vo.OperationgSystemVo;
+import com.athena.dolly.controller.module.infinispan.InfinispanClient;
+import com.athena.dolly.controller.module.couchbase.CouchbaseClient;
+import com.athena.dolly.controller.module.vo.MemoryVo;
 
 /**
  * <pre>
  * 
  * </pre>
- * @author Man-Woong Choi
+ * @author Sang-cheon Park
  * @version 1.0
  */
 @Component
-public class JmxClientManager implements InitializingBean {
-	
-    private static final Logger logger = LoggerFactory.getLogger(JmxClientManager.class);
+public class ClientManager implements InitializingBean {
+
+    private static final Logger logger = LoggerFactory.getLogger(ClientManager.class);
 
 	private DollyConfig config;
-	private static Map<String, JmxClient> jmxClientMap;
+	private static Map<String, DollyClient> dollyClientMap;
 	
 	@Override
 	public void afterPropertiesSet() throws Exception {
@@ -72,28 +62,39 @@ public class JmxClientManager implements InitializingBean {
 				logger.error("[Dolly] Configuration error : ", e);
 			}
     	}
+
+		dollyClientMap = new TreeMap<String, DollyClient>();
+		DollyClient client = null;
 		
 		String clientType = config.getClientType();
-		boolean embedded = config.isEmbedded();
-		String[] jmxServers = config.getJmxServers();
-		String[] users = config.getUsers();
-		String[] passwds = config.getPasswds();
-		
-		jmxClientMap = new TreeMap<String, JmxClient>();
 		
 		if (clientType.equals("infinispan")) {
-			JmxClient jmxClient = null;
+			boolean embedded = config.isEmbedded();
+			String[] jmxServers = config.getJmxServers();
+			String[] users = config.getUsers();
+			String[] passwds = config.getPasswds();
+			
 			for (int i = 0; i < jmxServers.length; i++) {
 				if (users != null && users.length == jmxServers.length &&
 						passwds != null && passwds.length == jmxServers.length) {
-					jmxClient = new JmxClient(jmxServers[i], users[i], passwds[i], embedded);
+					client = new InfinispanClient(jmxServers[i], users[i], passwds[i], embedded);
 				} else {
-					jmxClient = new JmxClient(jmxServers[i], null, null, embedded);
+					client = new InfinispanClient(jmxServers[i], null, null, embedded);
 				}
-				jmxClientMap.put(i + "", jmxClient);
+				dollyClientMap.put(i + "", client);
 			}
 			
-			logger.debug("JMX Client Info : [{}]" + jmxClientMap);
+			logger.debug("JMX Client Info : [{}]" + dollyClientMap);
+		} else if (clientType.equals("couchbase")) {
+			String[] urls = config.getCouchbaseUris().split(";");
+			String name = config.getCouchbaseBucketName();
+			String passwd = config.getCouchbaseBucketPasswd();
+			
+			for (int i = 0; i < urls.length; i++) {
+				client = new CouchbaseClient(urls[i], name, passwd);
+				
+				dollyClientMap.put(i + "", client);
+			}
 		}
 	}
 
@@ -104,9 +105,9 @@ public class JmxClientManager implements InitializingBean {
 	 * @param nodeName
 	 * @return
 	 */
-	public static JmxClient getJmxClient(String nodeName) {
-		return jmxClientMap.get(nodeName);
-	}//end of getJmxClient()
+	public static DollyClient getClient(String nodeName) {
+		return dollyClientMap.get(nodeName);
+	}//end of getClient()
 	
 	/**
 	 * <pre>
@@ -115,7 +116,7 @@ public class JmxClientManager implements InitializingBean {
 	 * @return
 	 */
 	public static List<String> getServerList() {
-		return new ArrayList<String>(jmxClientMap.keySet());
+		return new ArrayList<String>(dollyClientMap.keySet());
 	}//end of getServerList()
 	
 	/**
@@ -126,44 +127,88 @@ public class JmxClientManager implements InitializingBean {
 	 * @return
 	 */
 	public static boolean isValidNodeName(String nodeName) {
-		return jmxClientMap.containsKey(nodeName);
+		return dollyClientMap.containsKey(nodeName);
 	}//end of isValidNodeName()
 	
+	/**
+	 * <pre>
+	 * 
+	 * </pre>
+	 * @param nodeName
+	 * @return
+	 */
 	public static MemoryVo getMemoryUsage(String nodeName) {
-        MemoryVo memory = null;
-		
-		JmxClient jmxClient = jmxClientMap.get(nodeName);
-		if (jmxClient != null) {
-			try {
-				ObjectName objectName=new ObjectName("java.lang:type=Memory");			
-				
-				MBeanServerConnection connection = jmxClient.getJmxConnector().getMBeanServerConnection();
-				CompositeDataSupport heapMemoryUsage = (CompositeDataSupport)connection.getAttribute(objectName, "HeapMemoryUsage");
-				
-				memory = new MemoryVo();
-		        memory.setCommitted((Long)heapMemoryUsage.get("committed"));
-		        memory.setInit((Long)heapMemoryUsage.get("init"));
-		        memory.setMax((Long)heapMemoryUsage.get("max"));
-		        memory.setUsed((Long)heapMemoryUsage.get("used"));
-		        
-	        	logger.debug("nodeName: [{}], memoryUsage: [committed: {}, init:{}, max:{}, used:{}]", new Object[]{nodeName, memory.getCommitted(), memory.getInit(), memory.getMax(), memory.getUsed()});
-			} catch (Exception e) {
-				logger.error("unhandled exception has errored : ", e);
-			}
-		}
-        
-        return memory;
-	}
+        return dollyClientMap.get(nodeName).getMemoryUsage();
+	}//end of getMemoryUsage()
 	
+	/**
+	 * <pre>
+	 * 
+	 * </pre>
+	 * @param nodeName
+	 * @return
+	 */
+	public static String getCpuUsage(String nodeName) {
+		return dollyClientMap.get(nodeName).getCpuUsage();
+	}//end of getCpuUsage()
+
+	/**
+	 * <pre>
+	 * 
+	 * </pre>
+	 * @return
+	 */
+	public static List<MemoryVo> getMemoryUsageList() {
+		List<MemoryVo> memoryList = new ArrayList<MemoryVo>();
+		List<String> nodeList = getServerList();
+		
+		MemoryVo memory = null;
+		for (String nodeName : nodeList) {
+			memory = getMemoryUsage(nodeName);
+			memoryList.add(memory);
+		}
+		
+		return memoryList;
+	}//end of getMemoryUsageList()
+
+	/**
+	 * <pre>
+	 * 
+	 * </pre>
+	 * @return
+	 */
+	public static List<String> getCpuUsageList() {
+		Map<String, String> cpuMap = new TreeMap<String, String>();
+		List<String> cpuList = new ArrayList<String>();
+		List<String> nodeList = getServerList();
+		
+		for (String nodeName : nodeList) {
+			new CpuInfo(nodeName, cpuMap).start();
+		}
+
+		try {
+			Thread.sleep(1500);
+		} catch (Exception e) {
+			//ignore
+		}
+		
+		for (String nodeName : nodeList) {
+			cpuList.add(cpuMap.get(nodeName));
+		}
+		
+		return cpuList;
+	}//end of getCpuUsageList()
+	
+	/*
 	public static OperationgSystemVo getOperatingSystemUsage(String nodeName) {
 		OperationgSystemVo osVo = null;
 		
-		JmxClient jmxClient = jmxClientMap.get(nodeName);
-		if (jmxClient != null) {
+		InfinispanClient client = (InfinispanClient)dollyClientMap.get(nodeName);
+		if (client != null) {
 			try {
 				ObjectName objectName=new ObjectName("java.lang:type=OperatingSystem");			
 				
-				MBeanServerConnection connection = jmxClient.getJmxConnector().getMBeanServerConnection();
+				MBeanServerConnection connection = client.getJmxConnector().getMBeanServerConnection();
 				
 				osVo = new OperationgSystemVo();
 	
@@ -188,51 +233,11 @@ public class JmxClientManager implements InitializingBean {
         return osVo;
 	}
 	
-	public static String getCpuUsage(String nodeName) {
-		String cpuUsageStr = null;
-		
-		JmxClient jmxClient = jmxClientMap.get(nodeName);
-		if (jmxClient != null) {
-			try {
-				MBeanServerConnection connection = jmxClient.getJmxConnector().getMBeanServerConnection();
-		    	
-				ObjectName osObjectName = new ObjectName("java.lang:type=OperatingSystem");			
-				ObjectName runTimeObjectName = new ObjectName("java.lang:type=Runtime");			
-	
-				//before Cpu
-				int availableProcessors = (Integer)connection.getAttribute(osObjectName, "AvailableProcessors");
-			    long prevUpTime = (Long) connection.getAttribute(runTimeObjectName, "Uptime");
-			    long prevProcessCpuTime = (Long) connection.getAttribute(osObjectName, "ProcessCpuTime");
-			    
-			    try  {
-			        Thread.sleep(1000);
-			    } catch (Exception ignored) { 
-			    	// ignore
-			    }
-			    
-				//after Cpu
-			    long upTime = (Long) connection.getAttribute(runTimeObjectName, "Uptime");
-			    long processCpuTime = (Long) connection.getAttribute(osObjectName, "ProcessCpuTime");
-	
-			    long elapsedCpu = processCpuTime - prevProcessCpuTime;
-			    long elapsedTime = upTime - prevUpTime;		    
-			    
-			    double cpuUsage = Math.min(99F, elapsedCpu / (elapsedTime * 10000F * availableProcessors));
-			    cpuUsageStr = String.format("%.2f", cpuUsage);
-	        	logger.debug("nodeName: [{}], cpuUsage: [{}]", nodeName, cpuUsageStr);
-			} catch (Exception e) {
-				logger.error("unhandled exception has errored : ", e);
-			}
-		}
-		
-		return cpuUsageStr;
-	}
-	
 	public static HashMap<String,Object> getObjectNameInfo(ObjectName objName, String nodeName) {
-		JmxClient jmxClient = jmxClientMap.get(nodeName);
-		if (jmxClient != null) {
+		InfinispanClient client = (InfinispanClient)dollyClientMap.get(nodeName);
+		if (client != null) {
 			try {
-				MBeanServerConnection connection = jmxClient.getJmxConnector().getMBeanServerConnection();
+				MBeanServerConnection connection = client.getJmxConnector().getMBeanServerConnection();
 			    HashMap<String, Object> infoMap = new HashMap<String,Object>();
 				Set<ObjectName> names = new TreeSet<ObjectName>(connection.queryNames(objName, null));
 					
@@ -285,55 +290,9 @@ public class JmxClientManager implements InitializingBean {
 		
 		return null;
 	}
-
-	/**
-	 * <pre>
-	 * 
-	 * </pre>
-	 * @return
-	 */
-	public static List<MemoryVo> getMemoryUsageList() {
-		List<MemoryVo> memoryList = new ArrayList<MemoryVo>();
-		List<String> nodeList = getServerList();
-		
-		MemoryVo memory = null;
-		for (String nodeName : nodeList) {
-			memory = getMemoryUsage(nodeName);
-			memoryList.add(memory);
-		}
-		
-		return memoryList;
-	}
-
-	/**
-	 * <pre>
-	 * 
-	 * </pre>
-	 * @return
-	 */
-	public static List<String> getCpuUsageList() {
-		Map<String, String> cpuMap = new TreeMap<String, String>();
-		List<String> cpuList = new ArrayList<String>();
-		List<String> nodeList = getServerList();
-		
-		for (String nodeName : nodeList) {
-			new CpuInfo(nodeName, cpuMap).start();
-		}
-
-		try {
-			Thread.sleep(1500);
-		} catch (Exception e) {
-			//ignore
-		}
-		
-		for (String nodeName : nodeList) {
-			cpuList.add(cpuMap.get(nodeName));
-		}
-		
-		return cpuList;
-	}
+	*/
 }
-//end of JmxClientManager.java
+//end of ClientManager.java
 
 class CpuInfo extends Thread {
 	
@@ -355,7 +314,7 @@ class CpuInfo extends Thread {
 	 */
 	@Override
 	public void run() {
-		cpuMap.put(nodeName, JmxClientManager.getCpuUsage(nodeName));
+		cpuMap.put(nodeName, ClientManager.getCpuUsage(nodeName));
 	}
 	
 }
