@@ -239,13 +239,29 @@ public class CouchbaseClient implements DollyClient {
 		List<SocketAddress> socketList = new ArrayList<SocketAddress>(statMap.keySet());
 		
 		Map<String, String> stat = null;
+		stat = statMap.get(socketList.get(0));
+		DollyStats dollyStat = new DollyStats();
+		
+		dollyStat.setSize(Integer.parseInt(stat.get("curr_items")));
+		dollyStat.setCurrentNumberOfEntries(stat.get("curr_items"));
+		dollyStat.setTimeSinceStart(stat.get("uptime"));
+		dollyStat.setStores(stat.get("ep_total_new_items"));
+		dollyStat.setMisses(stat.get("get_misses"));
+		dollyStat.setTotalNumberOfEntries(stat.get("ep_total_new_items"));
+		dollyStat.setRetrievals(stat.get("cmd_get"));
+		dollyStat.setRemoveHits(stat.get("delete_hits"));
+		dollyStat.setHits(stat.get("get_hits"));
+		dollyStat.setRemoveMisses(stat.get("delete_misses"));
+		
+		/*
 		for (SocketAddress addr : socketList) {
 			stat = statMap.get(addr);
 			
 			System.out.println(addr + " : " + stat);
 		}
+		*/
 		
-		return new DollyStats();
+		return dollyStat;
 	}//end of getStats()
 
 	/* (non-Javadoc)
