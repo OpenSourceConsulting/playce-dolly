@@ -127,8 +127,8 @@
                     "/**",
                     " * Dashboard Panel이 활성화(초기 로딩) 될 경우 모니터링 정보와 통계 정보를 조회한다.",
                     " */",
-                    "this.monitor();",
-                    "this.getStat();"
+                    "//this.monitor();",
+                    "//this.getStat();"
                 ]
             },
             "designerId": "24a37b8f-02f2-4b2e-8e84-f0a1b4be28d8"

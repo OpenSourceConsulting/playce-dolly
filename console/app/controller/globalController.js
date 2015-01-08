@@ -20,6 +20,9 @@ Ext.define('webapp.controller.globalController', {
         /**
          * Global Variables를 정의
          */
+
+        var me = this;
+
         // Memory Chart, CPU Chart 용 Store 정의
         var memoryStore, cpuStore;
 
@@ -80,7 +83,52 @@ Ext.define('webapp.controller.globalController', {
             urlPrefix: urlPrefix,
             memoryStore: memoryStore,
             cpuStore: cpuStore,
-            serverSize: serverSize
+            serverSize: serverSize,
+            isLogined: false
+        });
+
+        me.initExtAjax();
+    },
+
+    initExtAjax: function() {
+        /*
+         * Global Ajax Config
+         */
+
+        Ext.Ajax.timeout = 20000;// default is 30000.
+        Ext.Ajax.on("requestexception", function(conn, response, options, eOpts){
+
+            if(response.timedout){
+
+                Ext.Msg.show({
+                    title:'Request Timeout',
+                    msg: options.url +' request is timeout.',
+                    buttons: Ext.Msg.OK,
+                    icon: Ext.Msg.ERROR
+                });
+
+            }else if(response.status == 403){
+
+                if(options.url.indexOf("user/onAfterLogin") > -1){
+                    return;
+                }
+
+                Ext.Msg.show({
+                    title:'Access Deny',
+                    msg: options.url + ": " + Ext.JSON.decode(response.responseText).msg,
+                    buttons: Ext.Msg.OK,
+                    icon: Ext.Msg.ERROR
+                });
+
+            }else{
+
+                Ext.Msg.show({
+                    title:'Server Error',
+                    msg: 'server-side failure with status code ' + response.status,
+                    buttons: Ext.Msg.OK,
+                    icon: Ext.Msg.ERROR
+                });
+            }
         });
     }
 

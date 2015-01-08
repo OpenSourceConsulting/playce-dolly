@@ -75,8 +75,8 @@ Ext.define('webapp.controller.dashboardController', {
         /**
          * Dashboard Panel이 활성화(초기 로딩) 될 경우 모니터링 정보와 통계 정보를 조회한다.
          */
-        this.monitor();
-        this.getStat();
+        //this.monitor();
+        //this.getStat();
     },
 
     getStat: function() {

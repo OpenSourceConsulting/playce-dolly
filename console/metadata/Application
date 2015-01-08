@@ -12,7 +12,8 @@
             "dashboardController",
             "sessionDataController",
             "globalController",
-            "LoginController"
+            "LoginController",
+            "MenuController"
         ],
         "models": [
             "SessionKeyData",
@@ -23,11 +24,15 @@
             "Ext.window.MessageBox"
         ],
         "stores": [
-            "sessionDataStore"
+            "sessionDataStore",
+            "MenuTreeStore"
         ],
         "views": [
             "dollyViewport",
-            "loginWindow"
+            "loginWindow",
+            "dashboardPanel",
+            "TomcatMngContainer",
+            "sessionDataPanel"
         ]
     },
     "designerId": "application"

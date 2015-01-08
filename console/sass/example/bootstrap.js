@@ -868,6 +868,7 @@ Ext.ClassManager.addNameAlternateMappings({
   "console.view.Main": [],
   "console.view.Viewport": [],
   "webapp.controller.LoginController": [],
+  "webapp.controller.MenuController": [],
   "webapp.controller.dashboardController": [],
   "webapp.controller.footerController": [],
   "webapp.controller.globalController": [],
@@ -875,9 +876,13 @@ Ext.ClassManager.addNameAlternateMappings({
   "webapp.controller.sessionDataController": [],
   "webapp.model.SessionKeyData": [],
   "webapp.model.UserModel": [],
+  "webapp.store.MenuTreeStore": [],
   "webapp.store.sessionDataStore": [],
+  "webapp.view.TomcatMngContainer": [],
+  "webapp.view.dashboardPanel": [],
   "webapp.view.dollyViewport": [],
-  "webapp.view.loginWindow": []
+  "webapp.view.loginWindow": [],
+  "webapp.view.sessionDataPanel": []
 });
 Ext.ClassManager.addNameAliasMappings({
   "Ext.AbstractComponent": [],
@@ -1889,6 +1894,7 @@ Ext.ClassManager.addNameAliasMappings({
   ],
   "console.view.Viewport": [],
   "webapp.controller.LoginController": [],
+  "webapp.controller.MenuController": [],
   "webapp.controller.dashboardController": [],
   "webapp.controller.footerController": [],
   "webapp.controller.globalController": [],
@@ -1898,12 +1904,22 @@ Ext.ClassManager.addNameAliasMappings({
   "webapp.model.UserModel": [
     "model.UserModel"
   ],
+  "webapp.store.MenuTreeStore": [],
   "webapp.store.sessionDataStore": [],
+  "webapp.view.TomcatMngContainer": [
+    "widget.tomcatmngcontainer"
+  ],
+  "webapp.view.dashboardPanel": [
+    "widget.dashboardpanel"
+  ],
   "webapp.view.dollyViewport": [
     "widget.dollyViewport"
   ],
   "webapp.view.loginWindow": [
     "widget.loginWindow"
+  ],
+  "webapp.view.sessionDataPanel": [
+    "widget.sessiondatapanel"
   ]
 });
 Ext.setVersion("ext-theme-base", "4.2.1");

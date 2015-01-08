@@ -77,6 +77,7 @@ public class DollyBoot extends WebMvcConfigurerAdapter {
 		    		  "/app.js",
 		    		  "/resources/**",
 		    		  
+		    		  "/getServerList", 
 		    		  "/user/notLogin*", 
 		    		  "/user/loginFail*",
 		    		  "/user/accessDenied*",

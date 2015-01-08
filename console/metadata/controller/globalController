@@ -26,6 +26,9 @@
                     "/**",
                     " * Global Variables를 정의",
                     " */",
+                    "",
+                    "var me = this;",
+                    "",
                     "// Memory Chart, CPU Chart 용 Store 정의",
                     "var memoryStore, cpuStore;",
                     "",
@@ -86,11 +89,67 @@
                     "    urlPrefix: urlPrefix,",
                     "    memoryStore: memoryStore,",
                     "    cpuStore: cpuStore,",
-                    "    serverSize: serverSize",
-                    "});"
+                    "    serverSize: serverSize,",
+                    "    isLogined: false",
+                    "});",
+                    "",
+                    "me.initExtAjax();"
                 ]
             },
             "designerId": "bc5d01e1-27de-43d1-83ce-f5326d476a40"
+        },
+        {
+            "type": "basicfunction",
+            "reference": {
+                "name": "items",
+                "type": "array"
+            },
+            "codeClass": null,
+            "userConfig": {
+                "fn": "initExtAjax",
+                "implHandler": [
+                    "/*",
+                    " * Global Ajax Config",
+                    " */",
+                    "",
+                    "Ext.Ajax.timeout = 20000;// default is 30000.",
+                    "Ext.Ajax.on(\"requestexception\", function(conn, response, options, eOpts){",
+                    "",
+                    "    if(response.timedout){",
+                    "",
+                    "        Ext.Msg.show({",
+                    "            title:'Request Timeout',",
+                    "            msg: options.url +' request is timeout.',",
+                    "            buttons: Ext.Msg.OK,",
+                    "            icon: Ext.Msg.ERROR",
+                    "        });",
+                    "",
+                    "    }else if(response.status == 403){",
+                    "",
+                    "        if(options.url.indexOf(\"user/onAfterLogin\") > -1){",
+                    "            return;",
+                    "        }",
+                    "        ",
+                    "        Ext.Msg.show({",
+                    "            title:'Access Deny',",
+                    "            msg: options.url + \": \" + Ext.JSON.decode(response.responseText).msg,",
+                    "            buttons: Ext.Msg.OK,",
+                    "            icon: Ext.Msg.ERROR",
+                    "        });",
+                    "",
+                    "    }else{",
+                    "",
+                    "        Ext.Msg.show({",
+                    "            title:'Server Error',",
+                    "            msg: 'server-side failure with status code ' + response.status,",
+                    "            buttons: Ext.Msg.OK,",
+                    "            icon: Ext.Msg.ERROR",
+                    "        });",
+                    "    }",
+                    "});"
+                ]
+            },
+            "designerId": "50d1b4fd-67c3-478c-97fc-dd4b3f189861"
         }
     ]
 }

@@ -29,11 +29,15 @@ Ext.application({
         'UserModel'
     ],
     stores: [
-        'sessionDataStore'
+        'sessionDataStore',
+        'MenuTreeStore'
     ],
     views: [
         'dollyViewport',
-        'loginWindow'
+        'loginWindow',
+        'dashboardPanel',
+        'TomcatMngContainer',
+        'sessionDataPanel'
     ],
     controllers: [
         'headerController',
@@ -41,7 +45,8 @@ Ext.application({
         'dashboardController',
         'sessionDataController',
         'globalController',
-        'LoginController'
+        'LoginController',
+        'MenuController'
     ],
     name: 'webapp',
 
