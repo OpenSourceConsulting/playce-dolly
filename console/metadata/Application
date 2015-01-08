@@ -11,10 +11,12 @@
             "footerController",
             "dashboardController",
             "sessionDataController",
-            "globalController"
+            "globalController",
+            "LoginController"
         ],
         "models": [
-            "SessionKeyData"
+            "SessionKeyData",
+            "UserModel"
         ],
         "name": "webapp",
         "requires": [
@@ -24,7 +26,8 @@
             "sessionDataStore"
         ],
         "views": [
-            "MyViewport"
+            "dollyViewport",
+            "loginWindow"
         ]
     },
     "designerId": "application"

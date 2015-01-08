@@ -24,11 +24,18 @@
  */
 package com.athena.dolly.controller.web;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.core.annotation.Order;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 /**
  * Main class with Spring Boot
@@ -38,15 +45,72 @@ import org.springframework.web.bind.annotation.RestController;
  * @author BongJin Kwon
  *
  */
-@Configuration
-@RestController
 @EnableAutoConfiguration
 @ComponentScan(basePackages={"com.athena.dolly.controller"})
 //@PropertySource(value={"classpath:dolly.properties","classpath:dolly-${spring.profiles.active:local}.properties"})
-public class DollyBoot {
+public class DollyBoot extends WebMvcConfigurerAdapter {
 
 	public static void main(String[] args) {
 		SpringApplication.run(DollyBoot.class, args);
+	}
+	
+	/**
+	 * <pre>
+	 * Spring Security Java Config
+	 * </pre>
+	 * @author Bong-Jin Kwon
+	 * @version 2.0
+	 */
+	@Configuration
+	@Order(SecurityProperties.ACCESS_OVERRIDE_ORDER)
+	protected static class ApplicationSecurity extends WebSecurityConfigurerAdapter {
+
+		@Autowired
+		private SecurityProperties security;
+		
+		@Override
+		public void configure(WebSecurity web) throws Exception {
+		    web
+		      .ignoring().antMatchers(
+		    		  "/",
+		    		  "/index.html",
+		    		  "/app.js",
+		    		  "/resources/**",
+		    		  
+		    		  "/user/notLogin*", 
+		    		  "/user/loginFail*",
+		    		  "/user/accessDenied*",
+		    		  "/user/onAfterLogout*"
+		    		  );
+		}
+
+		@Override
+		protected void configure(HttpSecurity http) throws Exception {
+			http
+				.anonymous().disable()
+				.authorizeRequests()
+					.anyRequest().fullyAuthenticated()
+				.and()
+					.exceptionHandling().accessDeniedPage("/user/accessDenied")
+				.and()
+					.formLogin()
+						.loginPage("/user/notLogin")
+						.loginProcessingUrl("/user/login")
+						.defaultSuccessUrl("/user/onAfterLogin", true)
+						.failureUrl("/user/loginFail")
+				.and()
+					.logout()
+						.logoutUrl("/user/logout")
+						.logoutSuccessUrl("/user/onAfterLogout")
+				.and()
+					.csrf().disable();
+		}
+		
+		@Override
+		public void configure(AuthenticationManagerBuilder auth) throws Exception {
+			auth.inMemoryAuthentication().withUser("dolly").password("dolly").roles("ADMIN");
+		}
+
 	}
 
 }

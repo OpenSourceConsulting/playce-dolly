@@ -25,25 +25,28 @@ Ext.application({
         'Ext.window.MessageBox'
     ],
     models: [
-        'SessionKeyData'
+        'SessionKeyData',
+        'UserModel'
     ],
     stores: [
         'sessionDataStore'
     ],
     views: [
-        'MyViewport'
+        'dollyViewport',
+        'loginWindow'
     ],
     controllers: [
         'headerController',
         'footerController',
         'dashboardController',
         'sessionDataController',
-        'globalController'
+        'globalController',
+        'LoginController'
     ],
     name: 'webapp',
 
     launch: function() {
-        Ext.create('webapp.view.MyViewport');
+        Ext.create('webapp.view.dollyViewport');
     }
 
 });

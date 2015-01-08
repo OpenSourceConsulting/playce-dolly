@@ -35,7 +35,8 @@
     "framework": "ext42",
     "viewOrderMap": {
         "view": [
-            "10c76f16-b3f5-4059-acd2-183f46682e75"
+            "10c76f16-b3f5-4059-acd2-183f46682e75",
+            "54f58b3c-6578-4856-bab3-c3e49daeb87b"
         ],
         "store": [
             "e679f6ac-0018-409e-b163-b13106f333ee"
@@ -45,10 +46,12 @@
             "9e66322b-7e6a-4a12-90f3-4b1e834694c9",
             "ad74de95-6c32-44a5-a1bd-5ca0403e3c04",
             "a2905f36-d82e-419f-971b-4c4529192b08",
-            "76fe1a40-eb84-4408-b4f9-78bac020609c"
+            "76fe1a40-eb84-4408-b4f9-78bac020609c",
+            "624c285a-6564-44ca-a2de-257abf79e851"
         ],
         "model": [
-            "2d2a2337-a4c3-4714-a3f4-4537c7d2e918"
+            "2d2a2337-a4c3-4714-a3f4-4537c7d2e918",
+            "bda15b04-b8fd-4af4-927b-d9a98a685bc3"
         ],
         "resource": [
             "a5b947ef-eecb-40af-baed-8ee5558b74d1",

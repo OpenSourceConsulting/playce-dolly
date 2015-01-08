@@ -430,6 +430,7 @@ Ext.ClassManager.addNameAlternateMappings({
   ],
   "Ext.grid.RowEditor": [],
   "Ext.grid.RowEditorButtons": [],
+  "Ext.grid.Scroller": [],
   "Ext.grid.View": [],
   "Ext.grid.ViewDropZone": [],
   "Ext.grid.column.Action": [
@@ -866,14 +867,17 @@ Ext.ClassManager.addNameAlternateMappings({
   "console.controller.Main": [],
   "console.view.Main": [],
   "console.view.Viewport": [],
+  "webapp.controller.LoginController": [],
   "webapp.controller.dashboardController": [],
   "webapp.controller.footerController": [],
   "webapp.controller.globalController": [],
   "webapp.controller.headerController": [],
   "webapp.controller.sessionDataController": [],
   "webapp.model.SessionKeyData": [],
+  "webapp.model.UserModel": [],
   "webapp.store.sessionDataStore": [],
-  "webapp.view.MyViewport": []
+  "webapp.view.dollyViewport": [],
+  "webapp.view.loginWindow": []
 });
 Ext.ClassManager.addNameAliasMappings({
   "Ext.AbstractComponent": [],
@@ -1311,6 +1315,7 @@ Ext.ClassManager.addNameAliasMappings({
   "Ext.grid.RowEditorButtons": [
     "widget.roweditorbuttons"
   ],
+  "Ext.grid.Scroller": [],
   "Ext.grid.View": [
     "widget.gridview"
   ],
@@ -1883,14 +1888,23 @@ Ext.ClassManager.addNameAliasMappings({
     "widget.app-main"
   ],
   "console.view.Viewport": [],
+  "webapp.controller.LoginController": [],
   "webapp.controller.dashboardController": [],
   "webapp.controller.footerController": [],
   "webapp.controller.globalController": [],
   "webapp.controller.headerController": [],
   "webapp.controller.sessionDataController": [],
   "webapp.model.SessionKeyData": [],
+  "webapp.model.UserModel": [
+    "model.UserModel"
+  ],
   "webapp.store.sessionDataStore": [],
-  "webapp.view.MyViewport": []
+  "webapp.view.dollyViewport": [
+    "widget.dollyViewport"
+  ],
+  "webapp.view.loginWindow": [
+    "widget.loginWindow"
+  ]
 });
 Ext.setVersion("ext-theme-base", "4.2.1");
 Ext.setVersion("ext-theme-neptune", "4.2.1");
