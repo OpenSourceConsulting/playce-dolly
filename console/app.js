@@ -26,18 +26,21 @@ Ext.application({
     ],
     models: [
         'SessionKeyData',
-        'UserModel'
+        'UserModel',
+        'TomcatInstanceModel'
     ],
     stores: [
         'sessionDataStore',
-        'MenuTreeStore'
+        'MenuTreeStore',
+        'TomcatInstanceListStore'
     ],
     views: [
         'dollyViewport',
         'loginWindow',
         'dashboardPanel',
         'TomcatMngContainer',
-        'sessionDataPanel'
+        'sessionDataPanel',
+        'TomcatInstanceFormWindow'
     ],
     controllers: [
         'headerController',

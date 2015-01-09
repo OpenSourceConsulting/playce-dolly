@@ -176,7 +176,7 @@ Ext.define('webapp.controller.LoginController', {
 
         // Close window
         var loginWindow = Ext.getCmp('loginWindow');
-        if(loginWindow !== null) {
+        if(loginWindow !== undefined) {
             loginWindow.destroy();
         }
 

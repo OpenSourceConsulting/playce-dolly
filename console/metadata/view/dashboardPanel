@@ -1,0 +1,390 @@
+{
+    "type": "Ext.panel.Panel",
+    "reference": {
+        "name": "items",
+        "type": "array"
+    },
+    "codeClass": null,
+    "userConfig": {
+        "designer|userAlias": "dashboardpanel",
+        "designer|userClassName": "dashboardPanel",
+        "itemId": "dashboardPanel",
+        "layout": "border",
+        "title": null
+    },
+    "designerId": "62028c73-84f4-4081-b79f-26f01b095e35",
+    "cn": [
+        {
+            "type": "Ext.panel.Panel",
+            "reference": {
+                "name": "items",
+                "type": "array"
+            },
+            "codeClass": null,
+            "userConfig": {
+                "container|align": "stretch",
+                "id": "monitoringPanel",
+                "itemId": "monitoringPanel",
+                "layout": "hbox",
+                "layout|flex": 1,
+                "layout|margins": null,
+                "layout|region": "center",
+                "title": "System Monitoring"
+            },
+            "designerId": "dc319194-197c-4849-b849-d0307610c391",
+            "cn": [
+                {
+                    "type": "Ext.panel.Panel",
+                    "reference": {
+                        "name": "items",
+                        "type": "array"
+                    },
+                    "codeClass": null,
+                    "userConfig": {
+                        "id": "memoryPanel",
+                        "itemId": "memoryPanel",
+                        "layout": "fit",
+                        "layout|flex": 1,
+                        "layout|margins": null,
+                        "title": null
+                    },
+                    "designerId": "e2fcd69d-c464-4e05-b8d5-ef391bd37cb6"
+                },
+                {
+                    "type": "Ext.panel.Panel",
+                    "reference": {
+                        "name": "items",
+                        "type": "array"
+                    },
+                    "codeClass": null,
+                    "userConfig": {
+                        "id": "cpuPanel",
+                        "itemId": "cpuPanel",
+                        "layout": "fit",
+                        "layout|flex": 1,
+                        "layout|margins": null,
+                        "title": null
+                    },
+                    "designerId": "78da8afe-567f-4e30-ac44-1b851d99a009"
+                }
+            ]
+        },
+        {
+            "type": "Ext.panel.Panel",
+            "reference": {
+                "name": "items",
+                "type": "array"
+            },
+            "codeClass": null,
+            "userConfig": {
+                "collapsible": true,
+                "container|align": "stretch",
+                "height": 150,
+                "id": "statPanel",
+                "itemId": "statPanel",
+                "layout": "vbox",
+                "layout|flex": 1,
+                "layout|region": "south",
+                "layout|split": true,
+                "title": "Infinispan Statistics"
+            },
+            "designerId": "5fa73c69-c38b-41f6-9d4d-48efc1ee8d9a",
+            "cn": [
+                {
+                    "type": "Ext.panel.Panel",
+                    "reference": {
+                        "name": "items",
+                        "type": "array"
+                    },
+                    "codeClass": null,
+                    "userConfig": {
+                        "container|align": "stretch",
+                        "layout": "vbox",
+                        "layout|flex": null,
+                        "layout|margins": "5 5 5 5",
+                        "title": null
+                    },
+                    "designerId": "09192164-6efc-4317-a321-dfdf2431d72f",
+                    "cn": [
+                        {
+                            "type": "Ext.toolbar.Toolbar",
+                            "reference": {
+                                "name": "dockedItems",
+                                "type": "array"
+                            },
+                            "codeClass": null,
+                            "userConfig": {
+                                "dock": "top",
+                                "layout|flex": 1
+                            },
+                            "designerId": "0af599c3-7ae9-439e-b583-719981717a6c",
+                            "cn": [
+                                {
+                                    "type": "Ext.Img",
+                                    "reference": {
+                                        "name": "items",
+                                        "type": "array"
+                                    },
+                                    "codeClass": null,
+                                    "userConfig": {
+                                        "height": 32,
+                                        "layout|flex": null,
+                                        "src": "resources/images/icon/session.png",
+                                        "width": 32
+                                    },
+                                    "designerId": "154adb85-e139-443f-862c-061c6efdfd0d"
+                                },
+                                {
+                                    "type": "Ext.form.Label",
+                                    "reference": {
+                                        "name": "items",
+                                        "type": "array"
+                                    },
+                                    "codeClass": null,
+                                    "userConfig": {
+                                        "id": "totalField",
+                                        "itemId": "totalField",
+                                        "layout|flex": null,
+                                        "style": "{text-align: center;font-size: 15pt;}",
+                                        "text": "Totally 0 Session Data Saved in Cache"
+                                    },
+                                    "configAlternates": {
+                                        "style": "string"
+                                    },
+                                    "designerId": "ae8e577f-b67e-4d27-a155-45f7f8255f08"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "type": "Ext.container.Container",
+                    "reference": {
+                        "name": "items",
+                        "type": "array"
+                    },
+                    "codeClass": null,
+                    "userConfig": {
+                        "container|align": "stretch",
+                        "itemId": "statContainer",
+                        "layout": "hbox",
+                        "layout|flex": 2,
+                        "layout|margins": "5 5 5 5"
+                    },
+                    "designerId": "cb5913ed-aef5-488f-b09e-e1dfbaa91643",
+                    "cn": [
+                        {
+                            "type": "Ext.form.FieldContainer",
+                            "reference": {
+                                "name": "items",
+                                "type": "array"
+                            },
+                            "codeClass": null,
+                            "userConfig": {
+                                "fieldLabel": null,
+                                "height": 120,
+                                "layout|flex": 1,
+                                "layout|margins": null,
+                                "width": 400
+                            },
+                            "designerId": "bace051a-9e46-40df-9046-de9fe10a85c1",
+                            "cn": [
+                                {
+                                    "type": "Ext.form.field.Display",
+                                    "reference": {
+                                        "name": "items",
+                                        "type": "array"
+                                    },
+                                    "codeClass": null,
+                                    "userConfig": {
+                                        "fieldLabel": "Time Since Start(sec)",
+                                        "id": "statField1",
+                                        "itemId": "statField1",
+                                        "labelWidth": 170,
+                                        "value": null
+                                    },
+                                    "designerId": "22f0f226-971f-4564-9123-0d9221064475"
+                                },
+                                {
+                                    "type": "Ext.form.field.Display",
+                                    "reference": {
+                                        "name": "items",
+                                        "type": "array"
+                                    },
+                                    "codeClass": null,
+                                    "userConfig": {
+                                        "fieldLabel": "Total Number of Entries",
+                                        "id": "statField2",
+                                        "itemId": "statField2",
+                                        "labelWidth": 170,
+                                        "value": null
+                                    },
+                                    "designerId": "d17298e9-8540-4966-9a9e-fdc7bf1374e0"
+                                },
+                                {
+                                    "type": "Ext.form.field.Display",
+                                    "reference": {
+                                        "name": "items",
+                                        "type": "array"
+                                    },
+                                    "codeClass": null,
+                                    "userConfig": {
+                                        "fieldLabel": "Current Number of Entries",
+                                        "id": "statField3",
+                                        "itemId": "statField3",
+                                        "labelWidth": 170,
+                                        "value": null
+                                    },
+                                    "designerId": "6ae59079-edfd-47e8-ae85-4151c8fad564"
+                                }
+                            ]
+                        },
+                        {
+                            "type": "Ext.form.FieldContainer",
+                            "reference": {
+                                "name": "items",
+                                "type": "array"
+                            },
+                            "codeClass": null,
+                            "userConfig": {
+                                "fieldLabel": null,
+                                "height": 120,
+                                "layout|flex": 1,
+                                "layout|margins": null,
+                                "width": 400
+                            },
+                            "designerId": "93cc8eb0-4a4c-4ae2-b6fc-1d2ff2978ca9",
+                            "cn": [
+                                {
+                                    "type": "Ext.form.field.Display",
+                                    "reference": {
+                                        "name": "items",
+                                        "type": "array"
+                                    },
+                                    "codeClass": null,
+                                    "userConfig": {
+                                        "fieldLabel": "Stores",
+                                        "id": "statField4",
+                                        "itemId": "statField4",
+                                        "value": null
+                                    },
+                                    "designerId": "ce1626e6-5413-4539-9687-0a54ef36b5be"
+                                },
+                                {
+                                    "type": "Ext.form.field.Display",
+                                    "reference": {
+                                        "name": "items",
+                                        "type": "array"
+                                    },
+                                    "codeClass": null,
+                                    "userConfig": {
+                                        "fieldLabel": "Retrivals",
+                                        "id": "statField5",
+                                        "itemId": "statField5",
+                                        "value": null
+                                    },
+                                    "designerId": "a1a2918b-3d29-4d29-a55d-cab5917dc2dd"
+                                },
+                                {
+                                    "type": "Ext.form.field.Display",
+                                    "reference": {
+                                        "name": "items",
+                                        "type": "array"
+                                    },
+                                    "codeClass": null,
+                                    "userConfig": {
+                                        "fieldLabel": "Hits",
+                                        "id": "statField6",
+                                        "itemId": "statField6",
+                                        "value": null
+                                    },
+                                    "designerId": "6c126833-fc0f-446f-b54a-b7f3c53dc851"
+                                }
+                            ]
+                        },
+                        {
+                            "type": "Ext.form.FieldContainer",
+                            "reference": {
+                                "name": "items",
+                                "type": "array"
+                            },
+                            "codeClass": null,
+                            "userConfig": {
+                                "fieldLabel": null,
+                                "height": 120,
+                                "layout|flex": 1,
+                                "layout|margins": null,
+                                "width": 400
+                            },
+                            "designerId": "c6f5ce36-408c-463b-9a3e-1a1ce933b85d",
+                            "cn": [
+                                {
+                                    "type": "Ext.form.field.Display",
+                                    "reference": {
+                                        "name": "items",
+                                        "type": "array"
+                                    },
+                                    "codeClass": null,
+                                    "userConfig": {
+                                        "fieldLabel": "Misses",
+                                        "id": "statField7",
+                                        "itemId": "statField7",
+                                        "labelWidth": 130,
+                                        "value": null
+                                    },
+                                    "designerId": "b7e20e4b-251f-4415-9604-b32eed16a0b7"
+                                },
+                                {
+                                    "type": "Ext.form.field.Display",
+                                    "reference": {
+                                        "name": "items",
+                                        "type": "array"
+                                    },
+                                    "codeClass": null,
+                                    "userConfig": {
+                                        "fieldLabel": "Remove Hits",
+                                        "id": "statField8",
+                                        "itemId": "statField8",
+                                        "labelWidth": 130,
+                                        "value": null
+                                    },
+                                    "designerId": "16b413e9-4d22-409d-94a3-c249d7a6c478"
+                                },
+                                {
+                                    "type": "Ext.form.field.Display",
+                                    "reference": {
+                                        "name": "items",
+                                        "type": "array"
+                                    },
+                                    "codeClass": null,
+                                    "userConfig": {
+                                        "fieldLabel": "Remove Misses",
+                                        "id": "statField9",
+                                        "itemId": "statField9",
+                                        "labelWidth": 130,
+                                        "value": null
+                                    },
+                                    "designerId": "746f99ac-7024-4d0e-a387-f5509e3beea8"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "type": "Ext.panel.Tool",
+                    "reference": {
+                        "name": "tools",
+                        "type": "array"
+                    },
+                    "codeClass": null,
+                    "userConfig": {
+                        "id": "statRefreshTool",
+                        "itemId": "statRefreshTool",
+                        "type": "refresh"
+                    },
+                    "designerId": "0098c1c9-96b7-44f0-8729-f8dad5d76fec"
+                }
+            ]
+        }
+    ]
+}

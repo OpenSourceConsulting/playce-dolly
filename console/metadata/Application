@@ -17,7 +17,8 @@
         ],
         "models": [
             "SessionKeyData",
-            "UserModel"
+            "UserModel",
+            "TomcatInstanceModel"
         ],
         "name": "webapp",
         "requires": [
@@ -25,14 +26,16 @@
         ],
         "stores": [
             "sessionDataStore",
-            "MenuTreeStore"
+            "MenuTreeStore",
+            "TomcatInstanceListStore"
         ],
         "views": [
             "dollyViewport",
             "loginWindow",
             "dashboardPanel",
             "TomcatMngContainer",
-            "sessionDataPanel"
+            "sessionDataPanel",
+            "TomcatInstanceFormWindow"
         ]
     },
     "designerId": "application"

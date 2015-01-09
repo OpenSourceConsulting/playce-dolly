@@ -1,0 +1,58 @@
+{
+    "type": "Ext.data.TreeStore",
+    "reference": {
+        "name": "items",
+        "type": "array"
+    },
+    "codeClass": null,
+    "userConfig": {
+        "designer|userClassName": "MenuTreeStore",
+        "root": [
+            "{",
+            "        expanded: true,",
+            "        children: [",
+            "            { text: \"Dashboard\", menuId: \"dashboard\", leaf: true },",
+            "            { text: \"Tomcat Management\",  menuId: \"tomcatMng\",expanded: true, children: [",
+            "                { text: \"Tomcat Instances\", menuId: \"tomcatInsts\", leaf: true },",
+            "                { text: \"DataSource 설정\", menuId: \"dbcp\", leaf: true}",
+            "            ] },",
+            "            { text: \"Session Clustering\", menuId: \"ssncluster\", leaf: true },",
+            "            { text: \"성능 모니터링\",  menuId: \"apm\",expanded: true, children: [",
+            "                { text: \"성능 Dashboard\", menuId: \"apmDash\", leaf: true },",
+            "                { text: \"성능 분석\", menuId: \"apmAnaly\", leaf: true}",
+            "            ] }",
+            "        ]",
+            "}"
+        ],
+        "storeId": "MenuTreeStore"
+    },
+    "designerId": "9ddfd8df-9cef-4b2d-944b-7df99f14646b",
+    "cn": [
+        {
+            "type": "Ext.data.Field",
+            "reference": {
+                "name": "fields",
+                "type": "array"
+            },
+            "codeClass": null,
+            "userConfig": {
+                "name": "text",
+                "type": "string"
+            },
+            "designerId": "33b36f28-723e-47ce-95f3-354c58e53dbf"
+        },
+        {
+            "type": "Ext.data.Field",
+            "reference": {
+                "name": "fields",
+                "type": "array"
+            },
+            "codeClass": null,
+            "userConfig": {
+                "name": "menuId",
+                "type": "string"
+            },
+            "designerId": "df041d3c-cd54-4b5e-8741-0a86054ce8f9"
+        }
+    ]
+}

@@ -1,0 +1,83 @@
+{
+    "type": "Ext.app.Controller",
+    "reference": {
+        "name": "items",
+        "type": "array"
+    },
+    "codeClass": null,
+    "userConfig": {
+        "designer|userClassName": "MenuController"
+    },
+    "designerId": "d2236b26-eb12-4176-a1b5-bb8c1625da65",
+    "cn": [
+        {
+            "type": "controlleraction",
+            "reference": {
+                "name": "listeners",
+                "type": "array"
+            },
+            "codeClass": null,
+            "userConfig": {
+                "designer|controlQuery": "#menuTreePanel",
+                "designer|targetType": "Ext.tree.Panel",
+                "fn": "onTreepanelItemClick",
+                "implHandler": [
+                    "//alert(record.get(\"text\"));",
+                    "var menuId = record.get(\"menuId\");",
+                    "",
+                    "if(menuId !== undefined){",
+                    "    this.showMenu(menuId);",
+                    "}",
+                    ""
+                ],
+                "name": "itemclick",
+                "scope": "me"
+            },
+            "designerId": "3b6e898b-82dc-42e7-8927-782cf196db05"
+        },
+        {
+            "type": "basicfunction",
+            "reference": {
+                "name": "items",
+                "type": "array"
+            },
+            "codeClass": null,
+            "userConfig": {
+                "designer|params": [
+                    "menuId"
+                ],
+                "fn": "showMenu",
+                "implHandler": [
+                    "var activeItem = -1;",
+                    "",
+                    "if(menuId === \"dashboard\"){",
+                    "    activeItem = 0;",
+                    "",
+                    "}else if(menuId === \"tomcatInsts\"){",
+                    "    activeItem = 1;",
+                    "",
+                    "}else if(menuId === \"dbcp\"){",
+                    "    activeItem = 2;",
+                    "",
+                    "}else if(menuId === \"templet\"){",
+                    "    activeItem = 3;",
+                    "",
+                    "}else if(menuId === \"ssncluster\"){",
+                    "    activeItem = 4;",
+                    "",
+                    "}else if(menuId === \"apmDash\"){",
+                    "    activeItem = 5;",
+                    "",
+                    "}else if(menuId === \"apmAnaly\"){",
+                    "    activeItem = 6;",
+                    "}",
+                    "",
+                    "if(activeItem > -1){",
+                    "    Ext.getCmp(\"centerContainer\").layout.setActiveItem(activeItem);",
+                    "}"
+                ]
+            },
+            "designerId": "7c23fd4f-dd42-4a7b-b855-bc28255615ba"
+        }
+    ]
+}

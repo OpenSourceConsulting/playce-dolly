@@ -19,8 +19,8 @@ Ext.define('webapp.view.dollyViewport', {
 
     requires: [
         'webapp.view.dashboardPanel',
-        'webapp.view.sessionDataPanel',
         'webapp.view.TomcatMngContainer',
+        'webapp.view.sessionDataPanel',
         'Ext.Img',
         'Ext.toolbar.Spacer',
         'Ext.toolbar.Toolbar',
@@ -63,8 +63,8 @@ Ext.define('webapp.view.dollyViewport', {
                         {
                             xtype: 'container',
                             region: 'center',
-                            activeItem: 1,
                             frame: false,
+                            id: 'centerContainer',
                             itemId: 'centerContainer',
                             layout: 'card',
                             items: [
@@ -72,10 +72,10 @@ Ext.define('webapp.view.dollyViewport', {
                                     xtype: 'dashboardpanel'
                                 },
                                 {
-                                    xtype: 'sessiondatapanel'
+                                    xtype: 'tomcatmngcontainer'
                                 },
                                 {
-                                    xtype: 'tomcatmngcontainer'
+                                    xtype: 'sessiondatapanel'
                                 }
                             ]
                         },

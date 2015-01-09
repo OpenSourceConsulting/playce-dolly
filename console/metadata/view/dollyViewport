@@ -61,8 +61,8 @@
                     },
                     "codeClass": null,
                     "userConfig": {
-                        "activeItem": 1,
                         "frame": false,
+                        "id": "centerContainer",
                         "itemId": "centerContainer",
                         "layout": "card",
                         "layout|region": "center"
@@ -86,8 +86,8 @@
                                 "type": "array"
                             },
                             "codeClass": null,
-                            "designerId": "1c5d4574-02d7-4d65-a6f9-c264bd0888c3",
-                            "masterInstanceId": "bf499a75-cff6-42a0-beaa-fefcae86af67"
+                            "designerId": "a695bd0f-ec54-4ef5-bbde-b73017bda35d",
+                            "masterInstanceId": "48d006f3-a2fa-4b5b-afe9-feb1a3913916"
                         },
                         {
                             "type": "linkedinstance",
@@ -96,8 +96,8 @@
                                 "type": "array"
                             },
                             "codeClass": null,
-                            "designerId": "a695bd0f-ec54-4ef5-bbde-b73017bda35d",
-                            "masterInstanceId": "48d006f3-a2fa-4b5b-afe9-feb1a3913916"
+                            "designerId": "1c5d4574-02d7-4d65-a6f9-c264bd0888c3",
+                            "masterInstanceId": "bf499a75-cff6-42a0-beaa-fefcae86af67"
                         }
                     ]
                 },
