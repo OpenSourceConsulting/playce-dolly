@@ -13,7 +13,8 @@
             "sessionDataController",
             "globalController",
             "LoginController",
-            "MenuController"
+            "MenuController",
+            "TomcatInstanceController"
         ],
         "models": [
             "SessionKeyData",
@@ -33,9 +34,10 @@
             "dollyViewport",
             "loginWindow",
             "dashboardPanel",
-            "TomcatMngContainer",
+            "TomcatInstanceContainer",
             "sessionDataPanel",
-            "TomcatInstanceFormWindow"
+            "TomcatInstanceFormWindow",
+            "TomcatDatasourceContainer"
         ]
     },
     "designerId": "application"

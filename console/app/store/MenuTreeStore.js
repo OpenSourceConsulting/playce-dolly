@@ -47,6 +47,11 @@ Ext.define('webapp.store.MenuTreeStore', {
                                 text: 'DataSource 설정',
                                 menuId: 'dbcp',
                                 leaf: true
+                            },
+                            {
+                                text: 'Template 관리',
+                                menuId: 'template',
+                                leaf: true
                             }
                         ]
                     },

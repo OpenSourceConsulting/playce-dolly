@@ -869,16 +869,21 @@ Ext.ClassManager.addNameAlternateMappings({
   "console.view.Viewport": [],
   "webapp.controller.LoginController": [],
   "webapp.controller.MenuController": [],
+  "webapp.controller.TomcatInstanceController": [],
   "webapp.controller.dashboardController": [],
   "webapp.controller.footerController": [],
   "webapp.controller.globalController": [],
   "webapp.controller.headerController": [],
   "webapp.controller.sessionDataController": [],
   "webapp.model.SessionKeyData": [],
+  "webapp.model.TomcatInstanceModel": [],
   "webapp.model.UserModel": [],
   "webapp.store.MenuTreeStore": [],
+  "webapp.store.TomcatInstanceListStore": [],
   "webapp.store.sessionDataStore": [],
-  "webapp.view.TomcatMngContainer": [],
+  "webapp.view.TomcatDatasourceContainer": [],
+  "webapp.view.TomcatInstanceContainer": [],
+  "webapp.view.TomcatInstanceFormWindow": [],
   "webapp.view.dashboardPanel": [],
   "webapp.view.dollyViewport": [],
   "webapp.view.loginWindow": [],
@@ -1895,19 +1900,28 @@ Ext.ClassManager.addNameAliasMappings({
   "console.view.Viewport": [],
   "webapp.controller.LoginController": [],
   "webapp.controller.MenuController": [],
+  "webapp.controller.TomcatInstanceController": [],
   "webapp.controller.dashboardController": [],
   "webapp.controller.footerController": [],
   "webapp.controller.globalController": [],
   "webapp.controller.headerController": [],
   "webapp.controller.sessionDataController": [],
   "webapp.model.SessionKeyData": [],
+  "webapp.model.TomcatInstanceModel": [],
   "webapp.model.UserModel": [
     "model.UserModel"
   ],
   "webapp.store.MenuTreeStore": [],
+  "webapp.store.TomcatInstanceListStore": [],
   "webapp.store.sessionDataStore": [],
-  "webapp.view.TomcatMngContainer": [
-    "widget.tomcatmngcontainer"
+  "webapp.view.TomcatDatasourceContainer": [
+    "widget.TomcatDatasourceContainer"
+  ],
+  "webapp.view.TomcatInstanceContainer": [
+    "widget.TomcatInstanceContainer"
+  ],
+  "webapp.view.TomcatInstanceFormWindow": [
+    "widget.TomcatInstanceFormWindow"
   ],
   "webapp.view.dashboardPanel": [
     "widget.dashboardpanel"

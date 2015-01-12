@@ -38,7 +38,7 @@ Ext.define('webapp.controller.MenuController', {
         }else if(menuId === "dbcp"){
             activeItem = 2;
 
-        }else if(menuId === "templet"){
+        }else if(menuId === "template"){
             activeItem = 3;
 
         }else if(menuId === "ssncluster"){

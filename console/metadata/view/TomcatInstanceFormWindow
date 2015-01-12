@@ -1,0 +1,764 @@
+{
+    "type": "Ext.window.Window",
+    "reference": {
+        "name": "items",
+        "type": "array"
+    },
+    "codeClass": null,
+    "userConfig": {
+        "designer|userAlias": "TomcatInstanceFormWindow",
+        "designer|userClassName": "TomcatInstanceFormWindow",
+        "height": 404,
+        "id": "TomcatInstanceFormWindow",
+        "itemId": "TomcatInstanceFormWindow",
+        "layout": "card",
+        "modal": true,
+        "resizable": false,
+        "title": "Tomcat Instance 등록 1/2",
+        "width": 450
+    },
+    "configAlternates": {
+        "resizable": "boolean"
+    },
+    "designerId": "023371fa-98ef-47e6-9d91-020200ea0cf5",
+    "cn": [
+        {
+            "type": "Ext.form.Panel",
+            "reference": {
+                "name": "items",
+                "type": "array"
+            },
+            "codeClass": null,
+            "userConfig": {
+                "bodyPadding": 15,
+                "fieldDefaults": [
+                    "{",
+                    "    msgTarget: 'side',",
+                    "    labelWidth : 120",
+                    "}"
+                ],
+                "id": null,
+                "itemId": null,
+                "title": null,
+                "width": 150
+            },
+            "designerId": "39c751ff-d4a6-45f6-ae86-a842f04b12ed",
+            "cn": [
+                {
+                    "type": "Ext.form.field.ComboBox",
+                    "reference": {
+                        "name": "items",
+                        "type": "array"
+                    },
+                    "codeClass": null,
+                    "userConfig": {
+                        "fieldLabel": "Template 선택",
+                        "layout|anchor": "100%",
+                        "name": "template_id"
+                    },
+                    "designerId": "a26b7861-12b2-41b7-aa15-577bd2c08939"
+                },
+                {
+                    "type": "Ext.form.field.Text",
+                    "reference": {
+                        "name": "items",
+                        "type": "array"
+                    },
+                    "codeClass": null,
+                    "userConfig": {
+                        "allowBlank": false,
+                        "fieldLabel": "Instance Name",
+                        "labelWidth": 120,
+                        "layout|anchor": "100%",
+                        "name": "instanceName",
+                        "vtype": "template"
+                    },
+                    "designerId": "120d0305-839f-4344-b27e-009166e9e556",
+                    "cn": [
+                        {
+                            "type": "Ext.XTemplate",
+                            "reference": {
+                                "name": "afterLabelTextTpl",
+                                "type": "object"
+                            },
+                            "codeClass": null,
+                            "userConfig": {
+                                "designer|displayName": "afterLabelTextTpl",
+                                "implHandler": [
+                                    "<span style=\"color:red;font-weight:bold\" data-qtip=\"Required\">*</span>"
+                                ]
+                            },
+                            "designerId": "2a856ba6-8cd4-4c9d-a396-5be16d2e5ddc"
+                        }
+                    ]
+                },
+                {
+                    "type": "Ext.form.field.Text",
+                    "reference": {
+                        "name": "items",
+                        "type": "array"
+                    },
+                    "codeClass": null,
+                    "userConfig": {
+                        "allowBlank": false,
+                        "fieldLabel": "IP Address",
+                        "labelWidth": 120,
+                        "layout|anchor": "100%",
+                        "name": "ipAddr",
+                        "vtype": "template"
+                    },
+                    "designerId": "3aa7f173-2f81-46d2-bb88-e638e8fd6733",
+                    "cn": [
+                        {
+                            "type": "Ext.XTemplate",
+                            "reference": {
+                                "name": "afterLabelTextTpl",
+                                "type": "object"
+                            },
+                            "codeClass": null,
+                            "userConfig": {
+                                "designer|displayName": "afterLabelTextTpl",
+                                "implHandler": [
+                                    "<span style=\"color:red;font-weight:bold\" data-qtip=\"Required\">*</span>"
+                                ]
+                            },
+                            "designerId": "1d4e8226-e003-4eb1-9dc3-d78df768fc08"
+                        }
+                    ]
+                },
+                {
+                    "type": "Ext.form.field.Text",
+                    "reference": {
+                        "name": "items",
+                        "type": "array"
+                    },
+                    "codeClass": null,
+                    "userConfig": {
+                        "allowBlank": false,
+                        "fieldLabel": "CATALINA_HOME",
+                        "layout|anchor": "100%",
+                        "name": "catalinaHome"
+                    },
+                    "designerId": "cc723f04-36d4-4f04-bab0-5e2ee2e5bb3d",
+                    "cn": [
+                        {
+                            "type": "Ext.XTemplate",
+                            "reference": {
+                                "name": "afterLabelTextTpl",
+                                "type": "object"
+                            },
+                            "codeClass": null,
+                            "userConfig": {
+                                "designer|displayName": "afterLabelTextTpl",
+                                "implHandler": [
+                                    "<span style=\"color:red;font-weight:bold\" data-qtip=\"Required\">*</span>"
+                                ]
+                            },
+                            "designerId": "52841cc5-f8d8-4458-8ffe-a10ed865aa1f"
+                        }
+                    ]
+                },
+                {
+                    "type": "Ext.form.field.Text",
+                    "reference": {
+                        "name": "items",
+                        "type": "array"
+                    },
+                    "codeClass": null,
+                    "userConfig": {
+                        "allowBlank": false,
+                        "fieldLabel": "CATALINA_BASE",
+                        "layout|anchor": "100%",
+                        "name": "catalinaBase"
+                    },
+                    "designerId": "2441f4fc-d669-415e-8d81-a9d4d3306024",
+                    "cn": [
+                        {
+                            "type": "Ext.XTemplate",
+                            "reference": {
+                                "name": "afterLabelTextTpl",
+                                "type": "object"
+                            },
+                            "codeClass": null,
+                            "userConfig": {
+                                "designer|displayName": "afterLabelTextTpl",
+                                "implHandler": [
+                                    "<span style=\"color:red;font-weight:bold\" data-qtip=\"Required\">*</span>"
+                                ]
+                            },
+                            "designerId": "9f46fd10-6619-408f-bd8f-43ae6e2b3b9a"
+                        }
+                    ]
+                },
+                {
+                    "type": "Ext.form.FieldSet",
+                    "reference": {
+                        "name": "items",
+                        "type": "array"
+                    },
+                    "codeClass": null,
+                    "userConfig": {
+                        "collapsible": true,
+                        "margin": "18 0 0 0",
+                        "title": "SSH Settings (Required)"
+                    },
+                    "designerId": "3de542e1-a878-4b54-9eab-4d71cd9c9b55",
+                    "cn": [
+                        {
+                            "type": "Ext.form.field.Text",
+                            "reference": {
+                                "name": "items",
+                                "type": "array"
+                            },
+                            "codeClass": null,
+                            "userConfig": {
+                                "fieldLabel": "SSH Port",
+                                "labelWidth": 130,
+                                "layout|anchor": "100%",
+                                "name": "sshPort",
+                                "vtype": null
+                            },
+                            "designerId": "1a6e4d72-0c9b-49f1-8f9c-4881bc19e5f2",
+                            "cn": [
+                                {
+                                    "type": "Ext.XTemplate",
+                                    "reference": {
+                                        "name": "afterLabelTextTpl",
+                                        "type": "object"
+                                    },
+                                    "codeClass": null,
+                                    "userConfig": {
+                                        "designer|displayName": "afterLabelTextTpl",
+                                        "implHandler": [
+                                            "<span style=\"color:red;font-weight:bold\" data-qtip=\"Required\">*</span>"
+                                        ]
+                                    },
+                                    "designerId": "9a98f7eb-12d5-4457-9763-ab822069a0e6"
+                                }
+                            ]
+                        },
+                        {
+                            "type": "Ext.form.field.Text",
+                            "reference": {
+                                "name": "items",
+                                "type": "array"
+                            },
+                            "codeClass": null,
+                            "userConfig": {
+                                "fieldLabel": "Username",
+                                "labelWidth": 130,
+                                "layout|anchor": "100%",
+                                "name": "sshUsername",
+                                "vtype": null
+                            },
+                            "designerId": "bbf75282-0e95-431e-b647-26585b2b5cf3",
+                            "cn": [
+                                {
+                                    "type": "Ext.XTemplate",
+                                    "reference": {
+                                        "name": "afterLabelTextTpl",
+                                        "type": "object"
+                                    },
+                                    "codeClass": null,
+                                    "userConfig": {
+                                        "designer|displayName": "afterLabelTextTpl",
+                                        "implHandler": [
+                                            "<span style=\"color:red;font-weight:bold\" data-qtip=\"Required\">*</span>"
+                                        ]
+                                    },
+                                    "designerId": "336316ff-cb9f-47f8-8bf0-337d01519dcd"
+                                }
+                            ]
+                        },
+                        {
+                            "type": "Ext.form.field.Text",
+                            "reference": {
+                                "name": "items",
+                                "type": "array"
+                            },
+                            "codeClass": null,
+                            "userConfig": {
+                                "allowBlank": false,
+                                "fieldLabel": "Password",
+                                "inputType": "password",
+                                "labelWidth": 130,
+                                "layout|anchor": "100%",
+                                "name": "sshPassword",
+                                "vtype": null
+                            },
+                            "designerId": "fd2a6019-6115-45bd-8fbe-5368b43f6ac3",
+                            "cn": [
+                                {
+                                    "type": "fixedfunction",
+                                    "reference": {
+                                        "name": "items",
+                                        "type": "array"
+                                    },
+                                    "codeClass": null,
+                                    "userConfig": {
+                                        "designer|params": [
+                                            "value"
+                                        ],
+                                        "fn": "validator",
+                                        "implHandler": [
+                                            "//var chkValue = Ext.getCmp('editInstanceForm').getForm().findField('chkUseType').getValue();",
+                                            "var chkValue = true;",
+                                            "",
+                                            "if(chkValue == true) {",
+                                            "    if(value) {",
+                                            "        return true;",
+                                            "    } else {",
+                                            "        return 'This field is required';",
+                                            "    }",
+                                            "} else {",
+                                            "    return true;",
+                                            "}",
+                                            ""
+                                        ]
+                                    },
+                                    "designerId": "f8465391-cb26-4fd5-a419-d7ac3f6153a6"
+                                },
+                                {
+                                    "type": "Ext.XTemplate",
+                                    "reference": {
+                                        "name": "afterLabelTextTpl",
+                                        "type": "object"
+                                    },
+                                    "codeClass": null,
+                                    "userConfig": {
+                                        "designer|displayName": "afterLabelTextTpl",
+                                        "implHandler": [
+                                            "<span style=\"color:red;font-weight:bold\" data-qtip=\"Required\">*</span>"
+                                        ]
+                                    },
+                                    "designerId": "6a156949-1ece-47e6-9475-f7f869d92e4a"
+                                }
+                            ]
+                        },
+                        {
+                            "type": "Ext.form.field.Text",
+                            "reference": {
+                                "name": "items",
+                                "type": "array"
+                            },
+                            "codeClass": null,
+                            "userConfig": {
+                                "allowBlank": false,
+                                "fieldLabel": "Password Confirm",
+                                "inputType": "password",
+                                "labelWidth": 130,
+                                "layout|anchor": "100%",
+                                "name": "confirmSshPassword",
+                                "vtype": "password"
+                            },
+                            "designerId": "883a32c9-499d-4c1a-913f-b0a0da095e36",
+                            "cn": [
+                                {
+                                    "type": "fixedfunction",
+                                    "reference": {
+                                        "name": "items",
+                                        "type": "array"
+                                    },
+                                    "codeClass": null,
+                                    "userConfig": {
+                                        "designer|params": [
+                                            "value"
+                                        ],
+                                        "fn": "validator",
+                                        "implHandler": [
+                                            "//var chkValue = Ext.getCmp('editInstanceForm').getForm().findField('chkUseType').getValue();",
+                                            "var chkValue = true;",
+                                            "",
+                                            "if(chkValue == true) {",
+                                            "    if(value) {",
+                                            "        return true;",
+                                            "    } else {",
+                                            "        return 'This field is required';",
+                                            "    }",
+                                            "} else {",
+                                            "    return true;",
+                                            "}",
+                                            ""
+                                        ]
+                                    },
+                                    "designerId": "fb778057-9842-44a3-b62a-5a643fb5f11e"
+                                },
+                                {
+                                    "type": "Ext.XTemplate",
+                                    "reference": {
+                                        "name": "afterLabelTextTpl",
+                                        "type": "object"
+                                    },
+                                    "codeClass": null,
+                                    "userConfig": {
+                                        "designer|displayName": "afterLabelTextTpl",
+                                        "implHandler": [
+                                            "<span style=\"color:red;font-weight:bold\" data-qtip=\"Required\">*</span>"
+                                        ]
+                                    },
+                                    "designerId": "b48565bd-1e44-4cc2-b251-9afe8a6549c3"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "type": "Ext.form.field.Hidden",
+                    "reference": {
+                        "name": "items",
+                        "type": "array"
+                    },
+                    "codeClass": null,
+                    "userConfig": {
+                        "fieldLabel": "Label",
+                        "layout|anchor": "100%",
+                        "name": "id"
+                    },
+                    "designerId": "1cf637e3-b2f7-4178-a9b7-733a332a632d"
+                },
+                {
+                    "type": "Ext.toolbar.Toolbar",
+                    "reference": {
+                        "name": "dockedItems",
+                        "type": "array"
+                    },
+                    "codeClass": null,
+                    "userConfig": {
+                        "container|pack": "center",
+                        "designer|uiInterfaceName": "footer",
+                        "dock": "bottom",
+                        "ui": "footer"
+                    },
+                    "designerId": "895cd471-e967-4060-9195-3550a8159f9e",
+                    "cn": [
+                        {
+                            "type": "Ext.button.Button",
+                            "reference": {
+                                "name": "items",
+                                "type": "array"
+                            },
+                            "codeClass": null,
+                            "userConfig": {
+                                "id": null,
+                                "itemId": null,
+                                "layout|flex": null,
+                                "margin": "0 10 0 0",
+                                "padding": "2 5 2 5",
+                                "text": "OK"
+                            },
+                            "designerId": "b93b99a7-f699-41e0-b25a-7524fe69ff30",
+                            "cn": [
+                                {
+                                    "type": "fixedfunction",
+                                    "reference": {
+                                        "name": "items",
+                                        "type": "array"
+                                    },
+                                    "codeClass": null,
+                                    "userConfig": {
+                                        "designer|params": [
+                                            "button",
+                                            "e"
+                                        ],
+                                        "fn": "handler",
+                                        "implHandler": [
+                                            "var formPanel = button.up(\"form\");",
+                                            "",
+                                            "",
+                                            "formPanel.getForm().submit({",
+                                            "    clientValidation: true,",
+                                            "    url: GlobalData.urlPrefix + \"tomcat/instance\",",
+                                            "    method: \"POST\",",
+                                            "    waitMsg: 'Saving Data...',",
+                                            "    success: function(form, action) {",
+                                            "        //Ext.Msg.alert('Success', action.result.msg);",
+                                            "",
+                                            "        Ext.getCmp('tomcatInstGrid').getStore().load();",
+                                            "        //formPanel.up('window').close();",
+                                            "        formPanel.up('window').setTitle(\"Tomcat Instance 등록 2/2\");",
+                                            "        formPanel.up('window').layout.setActiveItem(1);",
+                                            "    },",
+                                            "    failure: function(form, action) {",
+                                            "",
+                                            "        switch (action.failureType) {",
+                                            "            case Ext.form.action.Action.CLIENT_INVALID:",
+                                            "            Ext.Msg.alert('Failure', '유효하지 않은 입력값이 존재합니다.');",
+                                            "            break;",
+                                            "            case Ext.form.action.Action.CONNECT_FAILURE:",
+                                            "            Ext.Msg.alert('Failure', 'Server communication failed');",
+                                            "        }",
+                                            "    }",
+                                            "});",
+                                            ""
+                                        ]
+                                    },
+                                    "designerId": "0aa2f369-72c9-4443-a893-0fd88c137576"
+                                }
+                            ]
+                        },
+                        {
+                            "type": "Ext.button.Button",
+                            "reference": {
+                                "name": "items",
+                                "type": "array"
+                            },
+                            "codeClass": null,
+                            "userConfig": {
+                                "layout|flex": null,
+                                "margin": "0 10 0 0",
+                                "padding": "2 5 2 5",
+                                "text": "Template 등록"
+                            },
+                            "designerId": "0c8d09a9-1c27-4272-8cb7-be21a1fbb133"
+                        },
+                        {
+                            "type": "Ext.button.Button",
+                            "reference": {
+                                "name": "items",
+                                "type": "array"
+                            },
+                            "codeClass": null,
+                            "userConfig": {
+                                "id": null,
+                                "itemId": null,
+                                "layout|flex": null,
+                                "margin": "0 0 0 0",
+                                "padding": "2 5 2 5",
+                                "text": "Cancel"
+                            },
+                            "designerId": "4b6d2bfa-df64-4716-a283-dd1931ef9970",
+                            "cn": [
+                                {
+                                    "type": "fixedfunction",
+                                    "reference": {
+                                        "name": "items",
+                                        "type": "array"
+                                    },
+                                    "codeClass": null,
+                                    "userConfig": {
+                                        "designer|params": [
+                                            "button",
+                                            "e"
+                                        ],
+                                        "fn": "handler",
+                                        "implHandler": [
+                                            "Ext.MessageBox.confirm('Confirm', '작업을 취소하시겠습니까?', function(btn){",
+                                            "",
+                                            "    if(btn == \"yes\"){",
+                                            "        button.up(\"window\").close();",
+                                            "    }",
+                                            "",
+                                            "});",
+                                            ""
+                                        ]
+                                    },
+                                    "designerId": "cd813225-3817-49cb-ab8a-0274bd437c69"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "Ext.panel.Panel",
+            "reference": {
+                "name": "items",
+                "type": "array"
+            },
+            "codeClass": null,
+            "userConfig": {
+                "container|align": "stretch",
+                "header": false,
+                "layout": "vbox",
+                "style": null,
+                "title": "My Panel"
+            },
+            "designerId": "d3328a27-8995-46f0-ac54-adb2edc75d16",
+            "cn": [
+                {
+                    "type": "Ext.toolbar.Toolbar",
+                    "reference": {
+                        "name": "dockedItems",
+                        "type": "array"
+                    },
+                    "codeClass": null,
+                    "userConfig": {
+                        "container|pack": "center",
+                        "designer|uiInterfaceName": "footer",
+                        "dock": "bottom",
+                        "ui": "footer"
+                    },
+                    "designerId": "9c316dec-8e8e-4fdf-814c-02aa49e69157",
+                    "cn": [
+                        {
+                            "type": "Ext.button.Button",
+                            "reference": {
+                                "name": "items",
+                                "type": "array"
+                            },
+                            "codeClass": null,
+                            "userConfig": {
+                                "layout|flex": null,
+                                "text": "뒤로"
+                            },
+                            "designerId": "97aa8f93-724b-4e25-82b1-c21ae785bf59"
+                        },
+                        {
+                            "type": "Ext.button.Button",
+                            "reference": {
+                                "name": "items",
+                                "type": "array"
+                            },
+                            "codeClass": null,
+                            "userConfig": {
+                                "layout|flex": null,
+                                "text": "재시도"
+                            },
+                            "designerId": "675c9f67-9d86-404e-8ef5-9d0e9f16b9a8"
+                        },
+                        {
+                            "type": "Ext.button.Button",
+                            "reference": {
+                                "name": "items",
+                                "type": "array"
+                            },
+                            "codeClass": null,
+                            "userConfig": {
+                                "layout|flex": null,
+                                "text": "확인"
+                            },
+                            "designerId": "871dd2f4-b185-41bf-9908-e68707215fc5"
+                        }
+                    ]
+                },
+                {
+                    "type": "Ext.panel.Panel",
+                    "reference": {
+                        "name": "items",
+                        "type": "array"
+                    },
+                    "codeClass": null,
+                    "userConfig": {
+                        "container|align": "stretch",
+                        "container|padding": 10,
+                        "header": false,
+                        "layout": "vbox",
+                        "layout|flex": 1,
+                        "margin": "10 10 10 40",
+                        "padding": "",
+                        "title": "NothPanel"
+                    },
+                    "designerId": "3862c90d-e9e5-4fb7-9afd-3eaeea511804",
+                    "cn": [
+                        {
+                            "type": "Ext.form.Label",
+                            "reference": {
+                                "name": "items",
+                                "type": "array"
+                            },
+                            "codeClass": null,
+                            "userConfig": {
+                                "text": "Instance Name :"
+                            },
+                            "designerId": "6f8a2a8d-1b1a-4868-b36d-736f26c3dc22"
+                        },
+                        {
+                            "type": "Ext.form.Label",
+                            "reference": {
+                                "name": "items",
+                                "type": "array"
+                            },
+                            "codeClass": null,
+                            "userConfig": {
+                                "text": "IP Adress :"
+                            },
+                            "designerId": "132942d0-2d80-4590-be9b-6a15dd756f70"
+                        },
+                        {
+                            "type": "Ext.form.Label",
+                            "reference": {
+                                "name": "items",
+                                "type": "array"
+                            },
+                            "codeClass": null,
+                            "userConfig": {
+                                "text": "CATALINA_HOME :"
+                            },
+                            "designerId": "064db012-5a65-4cca-91c1-2ee2b37f7dd2"
+                        },
+                        {
+                            "type": "Ext.form.Label",
+                            "reference": {
+                                "name": "items",
+                                "type": "array"
+                            },
+                            "codeClass": null,
+                            "userConfig": {
+                                "text": "CATALINA_BASE :"
+                            },
+                            "designerId": "c9e04cb6-cc1b-41f4-91a3-6d54a9bbe171"
+                        },
+                        {
+                            "type": "Ext.form.Label",
+                            "reference": {
+                                "name": "items",
+                                "type": "array"
+                            },
+                            "codeClass": null,
+                            "userConfig": {
+                                "margin": "10 0 10 0",
+                                "text": "  "
+                            },
+                            "designerId": "664f3dec-f307-4213-b1d9-4adc1552fd01"
+                        },
+                        {
+                            "type": "Ext.form.Label",
+                            "reference": {
+                                "name": "items",
+                                "type": "array"
+                            },
+                            "codeClass": null,
+                            "userConfig": {
+                                "text": "등록중입니다. 잠시만 기다려주세요."
+                            },
+                            "designerId": "e680dbba-1ce6-4c58-a878-ac0bef74ce61"
+                        }
+                    ]
+                },
+                {
+                    "type": "Ext.panel.Panel",
+                    "reference": {
+                        "name": "items",
+                        "type": "array"
+                    },
+                    "codeClass": null,
+                    "userConfig": {
+                        "header": false,
+                        "height": 150,
+                        "layout|flex": 1,
+                        "margin": "0 10 0 20",
+                        "title": "SouthPanel"
+                    },
+                    "designerId": "c1a64d72-19e4-402c-bed5-73a4248fad43",
+                    "cn": [
+                        {
+                            "type": "Ext.form.field.Checkbox",
+                            "reference": {
+                                "name": "items",
+                                "type": "array"
+                            },
+                            "codeClass": null,
+                            "userConfig": {
+                                "boxLabel": "env.sh 로딩중...",
+                                "fieldLabel": "Label",
+                                "hideLabel": true
+                            },
+                            "designerId": "f8dec07b-e951-418e-a410-701816830071"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

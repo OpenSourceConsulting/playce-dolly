@@ -35,6 +35,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.athena.dolly.controller.tomcat.instance.domain.TomcatInstance;
 import com.athena.dolly.controller.tomcat.instance.service.TomcatInstanceService;
 import com.athena.dolly.controller.web.common.model.ExtjsGridParam;
+import com.athena.dolly.controller.web.common.model.GridJsonResponse;
 
 /**
  * <pre>
@@ -54,13 +55,18 @@ public class TomcatInsanceController {
 		// TODO Auto-generated constructor stub
 	}
 	
-	@RequestMapping(value="/instance/_all", method=RequestMethod.GET)
-	public Page<TomcatInstance> getList(ExtjsGridParam gridParam){
+	@RequestMapping(value="/instance/list", method=RequestMethod.GET)
+	public GridJsonResponse getList(GridJsonResponse res, ExtjsGridParam gridParam){
 		
 		//service.save(new TomcatInstance("inst11", "1234"));
 		//service.save(new TomcatInstance("inst22", "2222"));
 		
-		return service.getList(new PageRequest(gridParam.getPage()-1, gridParam.getLimit()));
+		Page<TomcatInstance> page = service.getList(new PageRequest(gridParam.getPage()-1, gridParam.getLimit()));
+		
+		res.setTotal((int)page.getTotalElements()); 
+		res.setList(page.getContent());
+		
+		return res;
 	}
 	
 	@RequestMapping(value="/instance", method={RequestMethod.POST, RequestMethod.PUT})

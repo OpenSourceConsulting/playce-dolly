@@ -21,7 +21,6 @@ Ext.define('webapp.controller.globalController', {
          * Global Variables를 정의
          */
 
-        var me = this;
 
         // Memory Chart, CPU Chart 용 Store 정의
         var memoryStore, cpuStore;
@@ -87,7 +86,9 @@ Ext.define('webapp.controller.globalController', {
             isLogined: false
         });
 
-        me.initExtAjax();
+
+        this.initExtAjax();
+        this.initVType();
     },
 
     initExtAjax: function() {
@@ -129,6 +130,61 @@ Ext.define('webapp.controller.globalController', {
                     icon: Ext.Msg.ERROR
                 });
             }
+        });
+    },
+
+    initVType: function() {
+        /*
+         * Global Validation(VTypes) Config
+         */
+        Ext.apply(Ext.form.field.VTypes, {
+            daterange: function(val, field) {
+                var date = field.parseDate(val);
+
+                if (!date) {
+                    return false;
+                }
+                if (field.startDateField && (!this.dateRangeMax || (date.getTime() != this.dateRangeMax.getTime()))) {
+                    var start = field.up('form').down('#' + field.startDateField);
+                    start.setMaxValue(date);
+                    start.validate();
+                    this.dateRangeMax = date;
+                }
+                else if (field.endDateField && (!this.dateRangeMin || (date.getTime() != this.dateRangeMin.getTime()))) {
+                    var end = field.up('form').down('#' + field.endDateField);
+                    end.setMinValue(date);
+                    end.validate();
+                    this.dateRangeMin = date;
+                }
+                /*
+                 * Always return true since we're only using this vtype to set the
+                 * min/max allowed values (these are tested for after the vtype test)
+                 */
+                return true;
+            },
+
+            daterangeText: 'Start date must be less than end date',
+
+            password: function(val, field) {
+                //var pwd = field.up('form').down('#passwd');
+                pwd = field.previousNode('textfield');
+                return (val == pwd.getValue());
+            },
+
+            passwordText: 'Passwords do not match',
+
+            numeric: function(val, field) {
+                var numericRe = /(^-?\d\d*\.\d*$)|(^-?\d\d*$)|(^-?\.\d\d*$)/;
+                return numericRe.test(val);
+            },
+            numericText : 'Not a valid numeric number. Must be numbers',
+            numericMask : /[.0-9]/,
+
+            template: function(val, field) {
+                var templateRe = /^[a-zA-Z0-9_\.\-]*$/;
+                return templateRe.test(val);
+            },
+            templateText : "영문 대소문자, 숫자, '_', '-', '.' 만 가능합니다."
         });
     }
 

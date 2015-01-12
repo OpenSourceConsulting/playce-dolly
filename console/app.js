@@ -38,9 +38,10 @@ Ext.application({
         'dollyViewport',
         'loginWindow',
         'dashboardPanel',
-        'TomcatMngContainer',
+        'TomcatInstanceContainer',
         'sessionDataPanel',
-        'TomcatInstanceFormWindow'
+        'TomcatInstanceFormWindow',
+        'TomcatDatasourceContainer'
     ],
     controllers: [
         'headerController',
@@ -49,7 +50,8 @@ Ext.application({
         'sessionDataController',
         'globalController',
         'LoginController',
-        'MenuController'
+        'MenuController',
+        'TomcatInstanceController'
     ],
     name: 'webapp',
 
