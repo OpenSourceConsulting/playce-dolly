@@ -62,6 +62,8 @@ public class CouchbaseClient implements DollyClient {
 	
 	final Gson gson = new Gson();
 	
+	private int node = 0;
+	
 	/**
 	 * <pre>
 	 * 주어진 프로퍼티를 이용하여 CouchbaseClient 객체를 생성한다. 
@@ -247,12 +249,14 @@ public class CouchbaseClient implements DollyClient {
 		
 		List<SocketAddress> socketList = new ArrayList<SocketAddress>(statMap.keySet());
 		
+		int idx = (node++ + socketList.size()) % socketList.size();
+		
 		Map<String, String> stat = null;
-		stat = statMap.get(socketList.get(0));
+		stat = statMap.get(socketList.get(idx));
 		DollyStats dollyStat = new DollyStats();
 		
-		dollyStat.setSize(Integer.parseInt(stat.get("curr_items")));
-		dollyStat.setCurrentNumberOfEntries(stat.get("curr_items"));
+		dollyStat.setSize(Integer.parseInt(stat.get("curr_items_tot")));
+		dollyStat.setCurrentNumberOfEntries(stat.get("curr_items_tot"));
 		dollyStat.setTimeSinceStart(stat.get("uptime"));
 		dollyStat.setStores(stat.get("ep_total_new_items"));
 		dollyStat.setMisses(stat.get("get_misses"));
@@ -268,7 +272,7 @@ public class CouchbaseClient implements DollyClient {
 			
 			System.out.println(addr + " : " + stat);
 		}
-		*/
+		//*/
 		
 		return dollyStat;
 	}//end of getStats()
