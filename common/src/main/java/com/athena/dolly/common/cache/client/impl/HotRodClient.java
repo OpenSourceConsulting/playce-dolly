@@ -153,7 +153,7 @@ public class HotRodClient implements DollyClient {
 	/* (non-Javadoc)
 	 * @see com.athena.dolly.enhancer.client.DollyClient#getKeys()
 	 */
-	public List<SessionKey> getKeys() {
+	public List<SessionKey> getKeys(String viewName) {
 		List<SessionKey> keyList = new ArrayList<SessionKey>();
 		
 		Enumeration<String> cacheKeys = Collections.enumeration(cache.keySet());

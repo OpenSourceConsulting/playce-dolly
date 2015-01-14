@@ -1,0 +1,87 @@
+{
+    "type": "Ext.tree.Panel",
+    "reference": {
+        "name": "items",
+        "type": "array"
+    },
+    "codeClass": null,
+    "userConfig": {
+        "autoScroll": true,
+        "collapsible": false,
+        "designer|userAlias": "mytreepanel29",
+        "designer|userClassName": "MyTreePanel29",
+        "id": "viewTreePanel",
+        "itemId": "viewTreePanel",
+        "rootVisible": false,
+        "store": "viewTreeStore",
+        "title": null,
+        "useArrows": true,
+        "width": 250
+    },
+    "designerId": "6e1a0c1a-6ae5-46ac-8ddd-864421bf3e79",
+    "cn": [
+        {
+            "type": "Ext.tree.View",
+            "reference": {
+                "name": "viewConfig",
+                "type": "object"
+            },
+            "codeClass": null,
+            "userConfig": {
+                "autoScroll": true,
+                "disableSelection": null,
+                "id": "viewTreeView",
+                "itemId": "viewTreeView",
+                "preserveScrollOnRefresh": null,
+                "rootVisible": null
+            },
+            "designerId": "9b2bc3d8-a9c3-42c5-8b98-8f66ccfcd1b6"
+        },
+        {
+            "type": "Ext.selection.RowModel",
+            "reference": {
+                "name": "selModel",
+                "type": "object"
+            },
+            "codeClass": "Ext.selection.RowModel",
+            "designerId": "b678f10a-9edd-4c55-a7df-c511f3ab37f1",
+            "cn": [
+                {
+                    "type": "basiceventbinding",
+                    "reference": {
+                        "name": "listeners",
+                        "type": "array"
+                    },
+                    "codeClass": null,
+                    "userConfig": {
+                        "fn": "onRowModelSelect",
+                        "implHandler": [
+                            "if (record.data.leaf) {",
+                            "    Ext.getCmp('mapPanel').setTitle('Map ' + '(' + record.data.id + ')');",
+                            "    Ext.getCmp('reducePanel').setTitle('Reduce ' + '(' + record.data.id + ')');",
+                            "} else {",
+                            "    Ext.getCmp('mapPanel').setTitle('Map');",
+                            "    Ext.getCmp('reducePanel').setTitle('Reduce');",
+                            "}",
+                            "",
+                            "Ext.getCmp('mapTextArea').setValue(record.data.map);",
+                            "Ext.getCmp('reduceTextArea').setValue(record.data.reduce);",
+                            "",
+                            "/*",
+                            "//Ext.getCmp('mapTextArea').update(selected[selected.length - 1].data.map.replace(/\\n/gi, '</br>').replace(/ /gi, '&nbsp;'));",
+                            "",
+                            "if (selected.length > 0) {",
+                            "    Ext.getCmp('mapTextArea').setValue(selected[selected.length - 1].data.map);",
+                            "    Ext.getCmp('reduceTextArea').setValue(selected[selected.length - 1].data.reduce);",
+                            "}",
+                            "*/"
+                        ],
+                        "name": "select",
+                        "scope": "me"
+                    },
+                    "designerId": "f97bde03-1582-4e69-9270-a1dea1fe24db"
+                }
+            ]
+        }
+    ]
+}

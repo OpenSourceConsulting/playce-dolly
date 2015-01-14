@@ -30,6 +30,10 @@ Ext.define('webapp.controller.dashboardController', {
             selector: '#sessionDataBtn'
         },
         {
+            ref: 'viewListBtn',
+            selector: '#viewListBtn'
+        },
+        {
             ref: 'monitoringPanel',
             selector: '#monitoringPanel'
         },
@@ -39,13 +43,14 @@ Ext.define('webapp.controller.dashboardController', {
         }
     ],
 
-    click: function(button, e, eOpts) {
+    onDashboardBtnclick: function(button, e, eOpts) {
         /**
          * Dashboard 메뉴 버튼 클릭 시 수행되는 function
          */
         var centerContainer = this.getCenterContainer(),
             dashboardBtn = this.getDashboardBtn(),
-            sessionDataBtn = this.getSessionDataBtn();
+            sessionDataBtn = this.getSessionDataBtn(),
+            viewListBtn = this.getViewListBtn();
 
         // 현재 선택된 item이 dashboardPanel일 경우 무시한다.
         if (centerContainer.layout.getActiveItem().itemId === "dashboardPanel") {
@@ -54,6 +59,7 @@ Ext.define('webapp.controller.dashboardController', {
         }
 
         sessionDataBtn.toggle(false);
+        viewListBtn.toggle(false);
         centerContainer.layout.setActiveItem(0);
 
         var me = this;
@@ -63,7 +69,7 @@ Ext.define('webapp.controller.dashboardController', {
         //me.monitor();
     },
 
-    onToolClick: function(tool, e, eOpts) {
+    onRefreshToolClick: function(tool, e, eOpts) {
         /**
          * 통계 정보를 refresh 하기 위해 panel의 refresh tool을 활성화
          */
@@ -680,10 +686,10 @@ Ext.define('webapp.controller.dashboardController', {
     init: function(application) {
         this.control({
             "#dashboardBtn": {
-                click: this.click
+                click: this.onDashboardBtnclick
             },
             "#statRefreshTool": {
-                click: this.onToolClick
+                click: this.onRefreshToolClick
             }
         });
     }

@@ -1,0 +1,557 @@
+{
+    "type": "Ext.app.Controller",
+    "reference": {
+        "name": "items",
+        "type": "array"
+    },
+    "codeClass": null,
+    "userConfig": {
+        "designer|userClassName": "viewListController"
+    },
+    "designerId": "9a6d5736-e9e9-431c-a923-34dfb5a3113b",
+    "cn": [
+        {
+            "type": "controlleraction",
+            "reference": {
+                "name": "listeners",
+                "type": "array"
+            },
+            "codeClass": null,
+            "userConfig": {
+                "designer|controlQuery": "#viewListBtn",
+                "designer|targetType": "Ext.button.Button",
+                "fn": "onViewListBtnClick",
+                "implHandler": [
+                    "/**",
+                    " * Views 메뉴 버튼 클릭 시 수행되는 function",
+                    " */",
+                    "var centerContainer = this.getCenterContainer(),",
+                    "    dashboardBtn = this.getDashboardBtn(),",
+                    "    sessionDataBtn = this.getSessionDataBtn(),",
+                    "    viewListBtn = this.getViewListBtn();",
+                    "",
+                    "// 현재 선택된 item이 viewsPanel일 경우 무시한다.",
+                    "if (centerContainer.layout.getActiveItem().itemId === \"viewsPanel\") {",
+                    "    viewListBtn.toggle(true);",
+                    "    return;",
+                    "}",
+                    "",
+                    "dashboardBtn.toggle(false);",
+                    "sessionDataBtn.toggle(false);",
+                    "centerContainer.layout.setActiveItem(2);",
+                    "",
+                    "var me = this;",
+                    "me.getDdocs();"
+                ],
+                "name": "click",
+                "scope": "me"
+            },
+            "designerId": "b67b9913-8415-40a5-8113-22bd9c9ccca6"
+        },
+        {
+            "type": "controlleraction",
+            "reference": {
+                "name": "listeners",
+                "type": "array"
+            },
+            "codeClass": null,
+            "userConfig": {
+                "designer|controlQuery": "#viewRefreshTool",
+                "designer|targetType": "Ext.panel.Tool",
+                "fn": "onRefreshToolClick",
+                "implHandler": [
+                    "/**",
+                    " * Couchbase View List를 refresh 하기 위해 panel의 refresh tool을 활성화",
+                    " */",
+                    "var me = this;",
+                    "me.getDdocs();"
+                ],
+                "name": "click",
+                "scope": "me"
+            },
+            "designerId": "ec7f1392-f4ba-476f-9d05-4d8ad3e11fe4"
+        },
+        {
+            "type": "controllerref",
+            "reference": {
+                "name": "items",
+                "type": "array"
+            },
+            "codeClass": null,
+            "userConfig": {
+                "ref": "centerContainer",
+                "selector": "#centerContainer"
+            },
+            "designerId": "06b33ab7-4da4-4ce9-8dd7-a4f8ef9d0e9c"
+        },
+        {
+            "type": "controllerref",
+            "reference": {
+                "name": "items",
+                "type": "array"
+            },
+            "codeClass": null,
+            "userConfig": {
+                "ref": "dashboardBtn",
+                "selector": "#dashboardBtn"
+            },
+            "designerId": "59302762-850e-430c-a53e-1d85866e4c66"
+        },
+        {
+            "type": "controllerref",
+            "reference": {
+                "name": "items",
+                "type": "array"
+            },
+            "codeClass": null,
+            "userConfig": {
+                "ref": "sessionDataBtn",
+                "selector": "#sessionDataBtn"
+            },
+            "designerId": "5a45adeb-3fdb-4421-9063-ea852fbd8fd1"
+        },
+        {
+            "type": "controllerref",
+            "reference": {
+                "name": "items",
+                "type": "array"
+            },
+            "codeClass": null,
+            "userConfig": {
+                "ref": "viewListBtn",
+                "selector": "#viewListBtn"
+            },
+            "designerId": "5dea7ce3-8f37-43b3-b44f-111f0f545e5d"
+        },
+        {
+            "type": "controllerref",
+            "reference": {
+                "name": "items",
+                "type": "array"
+            },
+            "codeClass": null,
+            "userConfig": {
+                "ref": "viewsPanel",
+                "selector": "#viewsPanel"
+            },
+            "designerId": "9e7060d6-2f80-495c-a3d4-aee2e6aae8de"
+        },
+        {
+            "type": "controllerref",
+            "reference": {
+                "name": "items",
+                "type": "array"
+            },
+            "codeClass": null,
+            "userConfig": {
+                "ref": "viewTreePanel",
+                "selector": "#viewTreePanel"
+            },
+            "designerId": "92da9aaa-ee68-4db1-a7b4-561e273bb5a4"
+        },
+        {
+            "type": "controllerref",
+            "reference": {
+                "name": "items",
+                "type": "array"
+            },
+            "codeClass": null,
+            "userConfig": {
+                "ref": "viewSaveBtn",
+                "selector": "#viewSaveBtn"
+            },
+            "designerId": "4f4968d9-fb93-4803-963b-ef0dd3f53b33"
+        },
+        {
+            "type": "controllerref",
+            "reference": {
+                "name": "items",
+                "type": "array"
+            },
+            "codeClass": null,
+            "userConfig": {
+                "ref": "viewCreateBtn",
+                "selector": "#viewCreateBtn"
+            },
+            "designerId": "d6f4f4e3-1161-4115-8222-2e1e6bae9b27"
+        },
+        {
+            "type": "controllerref",
+            "reference": {
+                "name": "items",
+                "type": "array"
+            },
+            "codeClass": null,
+            "userConfig": {
+                "ref": "viewDeleteBtn",
+                "selector": "#viewDeleteBtn"
+            },
+            "designerId": "7187dc82-384f-4192-aaa7-7ebd87c30c84"
+        },
+        {
+            "type": "controlleraction",
+            "reference": {
+                "name": "listeners",
+                "type": "array"
+            },
+            "codeClass": null,
+            "userConfig": {
+                "designer|controlQuery": "#viewSaveBtn",
+                "designer|targetType": "Ext.button.Button",
+                "fn": "onViewSaveBtnClick",
+                "implHandler": [
+                    "var treePanel = Ext.getCmp('viewTreePanel'),",
+                    "    viewsPanel = this.getViewsPanel();",
+                    "",
+                    "if (!treePanel.selModel.lastSelected) {",
+                    "    Ext.Msg.alert('Message', 'Please select a view to edit.');",
+                    "    return;",
+                    "}",
+                    "",
+                    "if (!treePanel.selModel.lastSelected.data.leaf) {",
+                    "    Ext.Msg.alert('Message', 'This is not a view. Please select a view to edit.');",
+                    "    return;",
+                    "}",
+                    "",
+                    "if (Ext.getCmp('mapTextArea').getValue() === '') {",
+                    "    Ext.Msg.alert('Message', 'Map function can not be empty.<br/>Please insert a valid map function.');",
+                    "    return;",
+                    "}",
+                    "",
+                    "var map = Ext.getCmp('mapTextArea').getValue(),",
+                    "    reduce = Ext.getCmp('reduceTextArea').getValue();",
+                    "",
+                    "Ext.Msg.confirm('Confirm', 'Are you sure you want to save this view?', function(btn) {",
+                    "    if (btn == 'yes') {",
+                    "        viewsPanel.setLoading(true);",
+                    "",
+                    "        var viewData = {};",
+                    "        viewData.map = map;",
+                    "        viewData.reduce = reduce;",
+                    "",
+                    "        Ext.Ajax.request({",
+                    "            url: GlobalData.urlPrefix + 'ddocs/' + treePanel.selModel.lastSelected.data.id,",
+                    "            method: 'PUT',",
+                    "            headers: {",
+                    "                'Content-Type': 'application/json'",
+                    "            },",
+                    "            jsonData: viewData,",
+                    "            success: function(response, opts){",
+                    "                viewsPanel.setLoading(false);",
+                    "                ",
+                    "                if (response.responseText === 'true') {",
+                    "                    treePanel.selModel.lastSelected.data.map = map;",
+                    "                    treePanel.selModel.lastSelected.data.reduce = reduce;",
+                    "                    ",
+                    "                    Ext.Msg.alert('Message', 'View saved successfully.');",
+                    "                } else {",
+                    "                    Ext.Msg.alert('Message', 'Failed to save view.');",
+                    "                }",
+                    "            },",
+                    "            failure: function(response, opts) {",
+                    "                viewsPanel.setLoading(false);",
+                    "                Ext.Msg.alert('Error', 'Server-side failure with status code ' + response.status);",
+                    "            }",
+                    "        });",
+                    "    }",
+                    "});"
+                ],
+                "name": "click",
+                "scope": "me"
+            },
+            "designerId": "0aa5641f-2fe0-4758-93f1-65d8ccdd43b4"
+        },
+        {
+            "type": "basicfunction",
+            "reference": {
+                "name": "items",
+                "type": "array"
+            },
+            "codeClass": null,
+            "userConfig": {
+                "fn": "getDdocs",
+                "implHandler": [
+                    "/**",
+                    " * Couchbase View 정보를 조회하는 function",
+                    " */",
+                    "var viewTreePanel = this.getViewTreePanel(),",
+                    "    viewsPanel = this.getViewsPanel();",
+                    "",
+                    "viewsPanel.setLoading(true);",
+                    "",
+                    "Ext.Ajax.request({",
+                    "    url: GlobalData.urlPrefix + 'ddocs',",
+                    "    params: {",
+                    "    },",
+                    "    success: function(response, opts){",
+                    "        viewsPanel.setLoading(false);",
+                    "",
+                    "        var obj = Ext.decode(response.responseText);",
+                    "",
+                    "        var root = Ext.decode(\"{expand: true, text: 'Views'}\");",
+                    "        ",
+                    "        var diff1 = 0, diff2 = 0;",
+                    "        for (var i = 0; i < obj.length; i++) {",
+                    "            var doc = obj[i];",
+                    "            ",
+                    "            if (doc.designDocumentName === 'dolly' && doc.viewList.length === 1 && doc.viewList[0].viewName === 'getKeys') {",
+                    "                diff1 = 1;",
+                    "                continue;",
+                    "            }",
+                    "            ",
+                    "            if (!root.children) {",
+                    "                root.children = [];",
+                    "            }",
+                    "",
+                    "            root.children.push({});",
+                    "            ",
+                    "            root.children[i - diff1].text = '<b>' + doc.designDocumentName + '</b>';",
+                    "            root.children[i - diff1].id = doc.designDocumentName;",
+                    "            root.children[i - diff1].iconCls = 'no-icon';",
+                    "            root.children[i - diff1].cls = 'parent-node last-children';",
+                    "",
+                    "            if (doc.viewList.length > 0) {",
+                    "                root.children[i - diff1].expandable = false;",
+                    "                root.children[i - diff1].expanded = true;",
+                    "            } else {",
+                    "                root.children[i - diff1].leaf = true;",
+                    "            }",
+                    "",
+                    "            diff2 = 0;",
+                    "            for (var j = 0; j < doc.viewList.length; j++) {",
+                    "                ",
+                    "                if (doc.viewList[j].viewName === 'getKeys') {",
+                    "                    diff2 = 1;",
+                    "                    continue;",
+                    "                }",
+                    "                ",
+                    "                if (!root.children[i - diff1].children) {",
+                    "                    root.children[i - diff1].children = [];",
+                    "                }",
+                    "                ",
+                    "                root.children[i - diff1].children.push({});",
+                    "                ",
+                    "                root.children[i - diff1].children[j - diff2].text = doc.viewList[j].viewName;",
+                    "                root.children[i - diff1].children[j - diff2].id = doc.designDocumentName + '/' + doc.viewList[j].viewName;",
+                    "                root.children[i - diff1].children[j - diff2].leaf = true;",
+                    "                root.children[i - diff1].children[j - diff2].iconCls = 'no-icon';",
+                    "                root.children[i - diff1].children[j - diff2].cls = 'view';",
+                    "                root.children[i - diff1].children[j - diff2].map = doc.viewList[j].map;",
+                    "                root.children[i - diff1].children[j - diff2].reduce = doc.viewList[j].reduce;",
+                    "            }",
+                    "        }",
+                    "",
+                    "        var store = Ext.data.StoreManager.lookup('viewTreeStore');",
+                    "",
+                    "        store.setRootNode(root);",
+                    "        viewTreePanel.update();",
+                    "        Ext.getCmp(\"viewTreePanel1\").update();",
+                    "",
+                    "        Ext.getCmp('mapPanel').setTitle('Map');",
+                    "        Ext.getCmp('reducePanel').setTitle('Reduce');",
+                    "        Ext.getCmp('mapTextArea').setValue('');",
+                    "        Ext.getCmp('reduceTextArea').setValue('');",
+                    "",
+                    "        if (obj.length > 0) {",
+                    "            Ext.getCmp(\"emptyViewPanel\").hide();",
+                    "        } else {",
+                    "            Ext.getCmp(\"emptyViewPanel\").show();",
+                    "        }",
+                    "    },",
+                    "    failure: function(response, opts) {",
+                    "        viewsPanel.setLoading(false);",
+                    "        var root = Ext.decode(\"{expand: true, text: 'Views'}\");",
+                    "        var store = Ext.data.StoreManager.lookup('viewTreeStore');",
+                    "        store.setRootNode(root);",
+                    "        viewTreePanel.update();",
+                    "        Ext.getCmp(\"viewTreePanel1\").update();",
+                    "",
+                    "        Ext.getCmp('mapPanel').setTitle('Map');",
+                    "        Ext.getCmp('reducePanel').setTitle('Reduce');",
+                    "        Ext.getCmp('mapTextArea').setValue('');",
+                    "        Ext.getCmp('reduceTextArea').setValue('');",
+                    "    }",
+                    "});",
+                    ""
+                ]
+            },
+            "designerId": "0e58bf6e-0688-40f3-a9b8-322f58e5e769"
+        },
+        {
+            "type": "controlleraction",
+            "reference": {
+                "name": "listeners",
+                "type": "array"
+            },
+            "codeClass": null,
+            "userConfig": {
+                "designer|controlQuery": "#viewCreateBtn",
+                "designer|targetType": "Ext.button.Button",
+                "fn": "onViewCreateBtnClick",
+                "implHandler": [
+                    "// Create view form window",
+                    "var create = Ext.create(\"widget.createViewWindow\");",
+                    "",
+                    "// Show window",
+                    "create.show();",
+                    "",
+                    "Ext.getCmp(\"designDocumentName\").focus();"
+                ],
+                "name": "click",
+                "scope": "me"
+            },
+            "designerId": "21f126cd-631c-4096-a0ac-85edd9fb88eb"
+        },
+        {
+            "type": "controlleraction",
+            "reference": {
+                "name": "listeners",
+                "type": "array"
+            },
+            "codeClass": null,
+            "userConfig": {
+                "designer|controlQuery": "#viewDeleteBtn",
+                "designer|targetType": "Ext.button.Button",
+                "fn": "onViewDeleteBtnClick",
+                "implHandler": [
+                    "var treeView = Ext.getCmp('viewTreeView'),",
+                    "    viewsPanel = this.getViewsPanel();",
+                    "",
+                    "var nodes = treeView.getSelectedNodes();",
+                    "",
+                    "if (nodes.length === 0) {",
+                    "    Ext.Msg.alert('Message', 'Please select a view to delete.');",
+                    "    return;",
+                    "}",
+                    "",
+                    "var record = treeView.getRecord(nodes[0]).data;",
+                    "/*",
+                    "Ext.Array.each(nodes, function(rec, idx) {",
+                    "    names.push(treeView.getRecord(nodes[idx]).data.id);",
+                    "});",
+                    "*/",
+                    "",
+                    "var msg = 'Are you sure you want to delete this view?';",
+                    "",
+                    "if (!record.map) {",
+                    "    msg = 'Are you sure you want to delete this design document and sub view(s)?';",
+                    "}",
+                    "",
+                    "Ext.Msg.confirm('Confirm', msg, function(btn) {",
+                    "    if (btn == 'yes') {",
+                    "        viewsPanel.setLoading(true);",
+                    "",
+                    "        Ext.Ajax.request({",
+                    "            url: GlobalData.urlPrefix + 'ddocs/' + record.id,",
+                    "            params: {",
+                    "            },",
+                    "            method: 'DELETE',",
+                    "            success: function(response, opts){",
+                    "                viewsPanel.setLoading(false);",
+                    "                ",
+                    "                if (response.responseText === 'true') {",
+                    "                    Ext.Msg.alert('Message', 'View deleted successfully.');",
+                    "                } else {",
+                    "                    Ext.Msg.alert('Message', 'Failed to delete view.');",
+                    "                }",
+                    "                ",
+                    "                Ext.getCmp('viewRefreshTool').fireEvent('click');",
+                    "            },",
+                    "            failure: function(response, opts) {",
+                    "                viewsPanel.setLoading(false);",
+                    "                Ext.Msg.alert('Error', 'Server-side failure with status code ' + response.status);",
+                    "            }",
+                    "        });",
+                    "    }",
+                    "});"
+                ],
+                "name": "click",
+                "scope": "me"
+            },
+            "designerId": "4fc124ae-9909-4637-b73d-f657e5a79984"
+        },
+        {
+            "type": "controlleraction",
+            "reference": {
+                "name": "listeners",
+                "type": "array"
+            },
+            "codeClass": null,
+            "userConfig": {
+                "designer|controlQuery": "#viewPopupCancelBtn",
+                "designer|targetType": "Ext.button.Button",
+                "fn": "onPopupCancelBtnClick",
+                "implHandler": [
+                    "Ext.getCmp(\"createViewWindow\").close();"
+                ],
+                "name": "click",
+                "scope": "me"
+            },
+            "designerId": "d98c8430-1645-46e0-9842-27789ed9d54f"
+        },
+        {
+            "type": "controlleraction",
+            "reference": {
+                "name": "listeners",
+                "type": "array"
+            },
+            "codeClass": null,
+            "userConfig": {
+                "designer|controlQuery": "#viewPopupSaveBtn",
+                "designer|targetType": "Ext.button.Button",
+                "fn": "onPopupSaveBtnClick",
+                "implHandler": [
+                    "var viewWindow = Ext.getCmp(\"createViewWindow\"),",
+                    "    designDocumentName = Ext.getCmp(\"designDocumentName\"),",
+                    "    viewName = Ext.getCmp(\"viewName\"),",
+                    "    viewsPanel = this.getViewsPanel();",
+                    "",
+                    "if (designDocumentName.getValue() === '') {",
+                    "    Ext.Msg.alert('Message', 'Design document name can not be empty.');",
+                    "    designDocumentName.focus();",
+                    "    return;",
+                    "}",
+                    "",
+                    "if (viewName.getValue() === '') {",
+                    "    Ext.Msg.alert('Message', 'View name can not be empty.');",
+                    "    viewName.focus();",
+                    "    return;",
+                    "}",
+                    "",
+                    "viewsPanel.setLoading(true);",
+                    "",
+                    "Ext.Ajax.request({",
+                    "    url: GlobalData.urlPrefix + 'ddocs/' + designDocumentName.getValue() + '/' + viewName.getValue(),",
+                    "    method: 'POST',",
+                    "    headers: {",
+                    "        'Content-Type': 'application/json'",
+                    "    },",
+                    "    jsonData: '',",
+                    "    success: function(response, opts){",
+                    "        viewsPanel.setLoading(false);",
+                    "        ",
+                    "        if (response.responseText === 'already exist') {",
+                    "            Ext.Msg.alert('Message', 'Failed to create view. [' + viewName.getValue() + '] is duplicated view name.');",
+                    "        } else if (response.responseText === 'true') {",
+                    "            Ext.Msg.alert('Message', 'View created successfully.');",
+                    "        } else {",
+                    "            Ext.Msg.alert('Message', 'Failed to create view.');",
+                    "        }",
+                    "        ",
+                    "        Ext.getCmp('viewRefreshTool').fireEvent('click');",
+                    "    },",
+                    "    failure: function(response, opts) {",
+                    "        viewsPanel.setLoading(false);",
+                    "        Ext.Msg.alert('Error', 'Server-side failure with status code ' + response.status);",
+                    "    }",
+                    "});",
+                    "",
+                    "viewWindow.close();"
+                ],
+                "name": "click",
+                "scope": "me"
+            },
+            "designerId": "3a713c82-9cb2-492d-9832-683ee9268968"
+        }
+    ]
+}

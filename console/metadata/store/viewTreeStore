@@ -1,0 +1,52 @@
+{
+    "type": "Ext.data.TreeStore",
+    "reference": {
+        "name": "items",
+        "type": "array"
+    },
+    "codeClass": null,
+    "userConfig": {
+        "designer|userClassName": "viewTreeStore",
+        "root": null,
+        "storeId": "viewTreeStore"
+    },
+    "designerId": "023b404c-1f40-49d8-b637-8d230be420f1",
+    "cn": [
+        {
+            "type": "Ext.data.Field",
+            "reference": {
+                "name": "fields",
+                "type": "array"
+            },
+            "codeClass": null,
+            "userConfig": {
+                "name": "text"
+            },
+            "designerId": "d43e148e-f53d-41bc-84b1-7ad392e4b784"
+        },
+        {
+            "type": "Ext.data.Field",
+            "reference": {
+                "name": "fields",
+                "type": "array"
+            },
+            "codeClass": null,
+            "userConfig": {
+                "name": "map"
+            },
+            "designerId": "417d9763-81af-478d-b2d9-6c37db042395"
+        },
+        {
+            "type": "Ext.data.Field",
+            "reference": {
+                "name": "fields",
+                "type": "array"
+            },
+            "codeClass": null,
+            "userConfig": {
+                "name": "reduce"
+            },
+            "designerId": "1064a84b-38e6-4afd-8f64-fdb3db3603cd"
+        }
+    ]
+}

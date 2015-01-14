@@ -34,6 +34,10 @@ Ext.define('webapp.controller.sessionDataController', {
             selector: '#sessionDataBtn'
         },
         {
+            ref: 'viewListBtn',
+            selector: '#viewListBtn'
+        },
+        {
             ref: 'sessionDataGrid',
             selector: '#sessionDataGrid'
         },
@@ -43,13 +47,14 @@ Ext.define('webapp.controller.sessionDataController', {
         }
     ],
 
-    click: function(button, e, eOpts) {
+    onSessionDataBtnClick: function(button, e, eOpts) {
         /**
          * Session Data List 메뉴 버튼 클릭 시 수행되는 function
          */
         var centerContainer = this.getCenterContainer(),
             dashboardBtn = this.getDashboardBtn(),
-            sessionDataBtn = this.getSessionDataBtn();
+            sessionDataBtn = this.getSessionDataBtn(),
+            viewListBtn = this.getViewListBtn();
 
         // 현재 선택된 item이 sessionDataPanel일 경우 무시한다.
         if (centerContainer.layout.getActiveItem().itemId === "sessionDataPanel") {
@@ -58,13 +63,14 @@ Ext.define('webapp.controller.sessionDataController', {
         }
 
         dashboardBtn.toggle(false);
+        viewListBtn.toggle(false);
         centerContainer.layout.setActiveItem(1);
 
         var me = this;
         me.loadSessionList();
     },
 
-    select: function(rowmodel, record, index, eOpts) {
+    onSessionDataSelect: function(rowmodel, record, index, eOpts) {
         /**
          * Session Data List에서 특정 세션 선택 시 해당 세션의 내용을 조회하고 Detail Panel에 보여주기 위한 function
          */
@@ -124,7 +130,7 @@ Ext.define('webapp.controller.sessionDataController', {
 
     },
 
-    onToolClick: function(tool, e, eOpts) {
+    onRefreshToolClick: function(tool, e, eOpts) {
         /**
          * Session Data List를 refresh 하기 위해 panel의 refresh tool을 활성화
          */
@@ -137,7 +143,9 @@ Ext.define('webapp.controller.sessionDataController', {
          * Session Data List를 refresh 하기 위한 function
          */
         var sessionDataGrid = this.getSessionDataGrid(),
-            detailPanel = this.getDetailPanel();
+            detailPanel = this.getDetailPanel(),
+            treePanel1 = Ext.getCmp('viewTreePanel1'),
+            treeView1 = Ext.getCmp('viewTreeView1');
 
         if (detailPanel.collapsed === false) {
             detailPanel.toggleCollapse();
@@ -145,8 +153,171 @@ Ext.define('webapp.controller.sessionDataController', {
 
         sessionDataGrid.setLoading(true);
 
+        if (GlobalData.cacheType === 'couchbase') {
+            this.getController("viewListController").getDdocs();
+        }
+
+        /*
+        else if (GlobalData.cacheType === '') {
+            if (designDocCombo.menu === null) {
+                console.log("Empty!!!!!!");
+
+
+                Ext.Ajax.request({
+                    url: GlobalData.urlPrefix + 'ddocs',
+                    async: false,
+                    params: {
+                    },
+                    success: function(response, opts) {
+                        var obj = Ext.decode(response.responseText);
+
+                        // *
+                        var menu = Ext.create('Ext.menu.Menu', {
+                            id: 'viewMenu',
+                            width: 120,
+                            items: [
+                                {
+                                    xtype: 'menuitem',
+                                    text: 'Menu Item1',
+                                    menu: {
+                                        xtype: 'menu',
+                                        width: 120,
+                                        items: [
+                                            {
+                                                xtype: 'menuitem',
+                                                text: 'Menu Item11'
+                                            },
+                                            {
+                                                xtype: 'menuitem',
+                                                text: 'Menu Item12'
+                                            },
+                                            {
+                                                xtype: 'menuitem',
+                                                text: 'Menu Item13'
+                                            }
+                                        ]
+                                    }
+                                },
+                                {
+                                    xtype: 'menuseparator'
+                                },
+                                {
+                                    xtype: 'menuitem',
+                                    text: 'Menu Item2',
+                                    menu: {
+                                        xtype: 'menu',
+                                        width: 120,
+                                        items: [
+                                            {
+                                                xtype: 'menuitem',
+                                                text: 'Menu Item21'
+                                            },
+                                            {
+                                                xtype: 'menuitem',
+                                                text: 'Menu Item22'
+                                            },
+                                            {
+                                                xtype: 'menuitem',
+                                                text: 'Menu Item23'
+                                            }
+                                        ]
+                                    }
+                                },
+                                {
+                                    xtype: 'menuseparator'
+                                },
+                                {
+                                    xtype: 'menuitem',
+                                    text: 'Menu Item3',
+                                    menu: {
+                                        xtype: 'menu',
+                                        width: 120,
+                                        items: [
+                                            {
+                                                xtype: 'menuitem',
+                                                text: 'Menu Item31'
+                                            },
+                                            {
+                                                xtype: 'menuitem',
+                                                text: 'Menu Item32'
+                                            },
+                                            {
+                                                xtype: 'menuitem',
+                                                text: 'Menu Item33'
+                                            }
+                                        ]
+                                    }
+                                }
+                            ]
+                        });
+                        / *
+                        var menu = Ext.create('Ext.menu.Menu', {
+                            //id: 'viewMenu2',
+                            width: 120
+                        });
+
+                        var items = menu.items, item = null;
+                        var subMenu = null, subItems = null, subItem = null;
+                        var viewCnt = 0;
+                        for (var i = 0; i < obj.length; i++) {
+                            var doc = obj[i];
+
+                            if (i > 0) {
+                                separator = Ext.create('Ext.menu.Separator', {});
+                                //items.add("couchbase-view-separator-" + i, Ext.create('Ext.menu.Separator', {}));
+                                items.add(separator.id, separator);
+                            }
+
+                            item = Ext.create('Ext.menu.Item', {
+                                xtype: 'menuitem',
+                                text: doc.designDocumentName
+                            });
+
+                            subMenu = Ext.create('Ext.menu.Menu', {width: 120});
+                            subItems = subMenu.items;
+                            for (var j = 0; j < doc.viewList.length; j++) {
+                                subItem = Ext.create('Ext.menu.Item', {
+                                    xtype: 'menuitem',
+                                    text: doc.viewList[j].viewName
+                                });
+                                //subItems.add("couchbase-view" + viewCnt++, subItem);
+                                subItems.add(subItem.id, subItem);
+                            }
+                            //subMenu.items = subItems;
+                            subMenu.add(subItems);
+
+                            item.setMenu(subMenu, true);
+                            //items.add("couchbase-design-doc-" + i, item);
+                            items.add(item.id, item);
+                            //items[i].menu.xtype = 'menu';
+                            //items[i].menu.items = subItems;
+                        }
+
+                        //console.log(items);
+                        //menu.items = items;
+                        menu.add(items);
+                        // * /
+                        console.log(menu);
+
+                        designDocCombo.menu = menu;
+                    }
+                });
+
+            }
+
+            console.log(designDocCombo);
+        }
+        */
+
+        var url = GlobalData.urlPrefix + 'getSessionKeyList';
+        if (treePanel1.selModel.lastSelected && treePanel1.selModel.lastSelected.data.leaf) {
+            url = GlobalData.urlPrefix + 'getSessionKeyList?viewName=' + treePanel1.selModel.lastSelected.data.id;
+
+            treeView1.focusNode(treePanel1.selModel.lastSelected);
+        }
+
         Ext.Ajax.request({
-            url: GlobalData.urlPrefix + 'getSessionKeyList',
+            url: url,
             params: {
             },
             success: function(response, opts) {
@@ -166,13 +337,13 @@ Ext.define('webapp.controller.sessionDataController', {
     init: function(application) {
         this.control({
             "#sessionDataBtn": {
-                click: this.click
+                click: this.onSessionDataBtnClick
             },
             "#sessionDataGrid": {
-                select: this.select
+                select: this.onSessionDataSelect
             },
             "#refreshTool": {
-                click: this.onToolClick
+                click: this.onRefreshToolClick
             }
         });
     }

@@ -28,17 +28,21 @@ Ext.application({
         'SessionKeyData'
     ],
     stores: [
-        'sessionDataStore'
+        'sessionDataStore',
+        'viewTreeStore'
     ],
     views: [
-        'MyViewport'
+        'MyViewport',
+        'createViewWindow',
+        'MyTreePanel29'
     ],
     controllers: [
         'headerController',
         'footerController',
         'dashboardController',
         'sessionDataController',
-        'globalController'
+        'globalController',
+        'viewListController'
     ],
     name: 'webapp',
 

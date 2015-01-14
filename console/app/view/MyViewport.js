@@ -17,6 +17,7 @@ Ext.define('webapp.view.MyViewport', {
     extend: 'Ext.container.Viewport',
 
     requires: [
+        'webapp.view.MyTreePanel29',
         'Ext.Img',
         'Ext.toolbar.Spacer',
         'Ext.button.Button',
@@ -25,14 +26,21 @@ Ext.define('webapp.view.MyViewport', {
         'Ext.form.FieldContainer',
         'Ext.form.field.Display',
         'Ext.panel.Tool',
+        'Ext.tree.Panel',
+        'Ext.form.Panel',
+        'Ext.tree.View',
+        'Ext.selection.RowModel',
         'Ext.grid.Panel',
+        'Ext.grid.RowNumberer',
         'Ext.grid.column.Action',
+        'Ext.form.field.TextArea',
         'Ext.layout.container.Border',
         'Ext.layout.container.Card',
         'Ext.ux.GMapPanel',
         'Ext.util.Point',
         'Ext.chart.*',
-        'Ext.data.*'
+        'Ext.data.*',
+        'Ext.layout.container.Absolute'
     ],
 
     layout: 'border',
@@ -121,6 +129,18 @@ Ext.define('webapp.view.MyViewport', {
                             iconAlign: 'right',
                             scale: 'large',
                             text: 'Session Data List'
+                        },
+                        {
+                            xtype: 'button',
+                            margins: '5 5 5 5',
+                            hidden: true,
+                            id: 'viewListBtn',
+                            itemId: 'viewListBtn',
+                            enableToggle: true,
+                            icon: 'resources/images/icon/views.png',
+                            iconAlign: 'right',
+                            scale: 'large',
+                            text: 'Views'
                         }
                     ]
                 },
@@ -299,7 +319,7 @@ Ext.define('webapp.view.MyViewport', {
                                                             xtype: 'displayfield',
                                                             id: 'statField5',
                                                             itemId: 'statField5',
-                                                            fieldLabel: 'Retrivals'
+                                                            fieldLabel: 'Retrievals'
                                                         },
                                                         {
                                                             xtype: 'displayfield',
@@ -359,71 +379,122 @@ Ext.define('webapp.view.MyViewport', {
                             layout: 'border',
                             items: [
                                 {
-                                    xtype: 'gridpanel',
-                                    flex: 1,
+                                    xtype: 'panel',
                                     region: 'center',
-                                    id: 'sessionDataGrid',
-                                    itemId: 'sessionDataGrid',
-                                    autoScroll: true,
+                                    layout: 'border',
                                     title: 'Session List',
-                                    emptyText: 'No Cache Keys',
-                                    forceFit: true,
-                                    store: 'sessionDataStore',
-                                    columns: [
+                                    items: [
                                         {
-                                            xtype: 'gridcolumn',
-                                            dataIndex: 'key',
-                                            text: 'Key',
-                                            flex: 1
+                                            xtype: 'treepanel',
+                                            region: 'west',
+                                            split: true,
+                                            id: 'viewTreePanel1',
+                                            itemId: 'viewTreePanel1',
+                                            width: 150,
+                                            autoScroll: true,
+                                            collapsed: false,
+                                            store: 'viewTreeStore',
+                                            rootVisible: false,
+                                            dockedItems: [
+                                                {
+                                                    xtype: 'form',
+                                                    dock: 'top',
+                                                    hidden: true,
+                                                    id: 'emptyViewPanel',
+                                                    itemId: 'emptyViewPanel',
+                                                    width: 100,
+                                                    layout: 'fit',
+                                                    bodyPadding: 10,
+                                                    items: [
+                                                        {
+                                                            xtype: 'label',
+                                                            html: '<font size=\'4pt\'><b>View(s) does not exist.</b></font>',
+                                                            width: 100
+                                                        }
+                                                    ]
+                                                }
+                                            ],
+                                            viewConfig: {
+                                                id: 'viewTreeView1',
+                                                itemId: 'viewTreeView1',
+                                                autoScroll: true,
+                                                preserveScrollOnRefresh: true
+                                            },
+                                            selModel: Ext.create('Ext.selection.RowModel', {
+                                                listeners: {
+                                                    select: {
+                                                        fn: me.onRowModelSelect,
+                                                        scope: me
+                                                    }
+                                                }
+                                            })
                                         },
                                         {
-                                            xtype: 'actioncolumn',
-                                            width: 50,
-                                            align: 'center',
-                                            menuDisabled: true,
-                                            items: [
+                                            xtype: 'gridpanel',
+                                            flex: 1,
+                                            region: 'center',
+                                            id: 'sessionDataGrid',
+                                            itemId: 'sessionDataGrid',
+                                            autoScroll: true,
+                                            emptyText: 'No Cache Keys',
+                                            forceFit: true,
+                                            store: 'sessionDataStore',
+                                            columns: [
                                                 {
-                                                    handler: function(view, rowIndex, colIndex, item, e, record, row) {
-                                                        var sessionDataGrid = Ext.getCmp('sessionDataGrid'),
-                                                            detailPanel = Ext.getCmp('detailPanel');
+                                                    xtype: 'rownumberer',
+                                                    width: 45,
+                                                    text: 'No'
+                                                },
+                                                {
+                                                    xtype: 'gridcolumn',
+                                                    dataIndex: 'key',
+                                                    text: 'Key',
+                                                    flex: 1
+                                                },
+                                                {
+                                                    xtype: 'actioncolumn',
+                                                    width: 50,
+                                                    align: 'center',
+                                                    menuDisabled: true,
+                                                    items: [
+                                                        {
+                                                            handler: function(view, rowIndex, colIndex, item, e, record, row) {
+                                                                var sessionDataGrid = Ext.getCmp('sessionDataGrid'),
+                                                                    detailPanel = Ext.getCmp('detailPanel');
 
-                                                        Ext.Msg.confirm('Confirm', 'Are you sure you want to delete this session?', function(btn) {
-                                                            if (btn == 'yes') {
-                                                                sessionDataGrid.setLoading(true);
+                                                                Ext.Msg.confirm('Confirm', 'Are you sure you want to delete this session?', function(btn) {
+                                                                    if (btn == 'yes') {
+                                                                        sessionDataGrid.setLoading(true);
 
-                                                                Ext.Ajax.request({
-                                                                    url: GlobalData.urlPrefix + 'deleteSessionData?key=' + record.get('key'),
-                                                                    params: {
-                                                                    },
-                                                                    success: function(response, opts){
-                                                                        sessionDataGrid.setLoading(false);
+                                                                        Ext.Ajax.request({
+                                                                            url: GlobalData.urlPrefix + 'deleteSessionData?key=' + record.get('key'),
+                                                                            params: {
+                                                                            },
+                                                                            success: function(response, opts){
+                                                                                sessionDataGrid.setLoading(false);
 
-                                                                        var store = Ext.data.StoreManager.lookup('sessionDataStore');
-                                                                        store.removeAt(rowIndex);
+                                                                                var store = Ext.data.StoreManager.lookup('sessionDataStore');
+                                                                                store.removeAt(rowIndex);
 
-                                                                        //Ext.getCmp('refreshTool').fireEvent('click');
-                                                                    },
-                                                                    failure: function(response, opts) {
-                                                                        sessionDataGrid.setLoading(false);
-                                                                        Ext.Msg.alert('Error', 'Server-side failure with status code ' + response.status);
+                                                                                //Ext.getCmp('refreshTool').fireEvent('click');
+                                                                            },
+                                                                            failure: function(response, opts) {
+                                                                                sessionDataGrid.setLoading(false);
+                                                                                Ext.Msg.alert('Error', 'Server-side failure with status code ' + response.status);
+                                                                            }
+                                                                        });
                                                                     }
                                                                 });
-                                                            }
-                                                        });
-                                                    },
-                                                    icon: 'resources/images/icon/delete.png',
-                                                    tooltip: 'Delete Session Data'
+                                                            },
+                                                            icon: 'resources/images/icon/delete.png',
+                                                            tooltip: 'Delete Session Data'
+                                                        }
+                                                    ]
                                                 }
                                             ]
                                         }
                                     ],
                                     tools: [
-                                        {
-                                            xtype: 'tool',
-                                            id: 'searchTool',
-                                            itemId: 'searchTool',
-                                            type: 'search'
-                                        },
                                         {
                                             xtype: 'tool',
                                             id: 'refreshTool',
@@ -457,6 +528,131 @@ Ext.define('webapp.view.MyViewport', {
                                     ]
                                 }
                             ]
+                        },
+                        {
+                            xtype: 'panel',
+                            id: 'viewsPanel',
+                            itemId: 'viewsPanel',
+                            layout: 'border',
+                            title: 'Views',
+                            items: [
+                                {
+                                    xtype: 'panel',
+                                    region: 'west',
+                                    split: true,
+                                    width: 250,
+                                    collapsible: false,
+                                    layout: {
+                                        type: 'hbox',
+                                        align: 'stretch'
+                                    },
+                                    dockedItems: [
+                                        {
+                                            xtype: 'toolbar',
+                                            flex: 1,
+                                            dock: 'top',
+                                            items: [
+                                                {
+                                                    xtype: 'tbspacer',
+                                                    flex: 1
+                                                },
+                                                {
+                                                    xtype: 'button',
+                                                    id: 'viewCreateBtn',
+                                                    itemId: 'viewCreateBtn',
+                                                    text: 'Create'
+                                                },
+                                                {
+                                                    xtype: 'button',
+                                                    id: 'viewDeleteBtn',
+                                                    itemId: 'viewDeleteBtn',
+                                                    text: 'Delete'
+                                                }
+                                            ]
+                                        }
+                                    ],
+                                    items: [
+                                        {
+                                            xtype: 'mytreepanel29',
+                                            flex: 1
+                                        }
+                                    ]
+                                },
+                                {
+                                    xtype: 'panel',
+                                    region: 'center',
+                                    split: false,
+                                    collapsible: false,
+                                    layout: {
+                                        type: 'vbox',
+                                        align: 'stretch'
+                                    },
+                                    dockedItems: [
+                                        {
+                                            xtype: 'toolbar',
+                                            dock: 'top',
+                                            items: [
+                                                {
+                                                    xtype: 'tbspacer',
+                                                    flex: 1
+                                                },
+                                                {
+                                                    xtype: 'button',
+                                                    id: 'viewSaveBtn',
+                                                    itemId: 'viewSaveBtn',
+                                                    text: 'Save'
+                                                }
+                                            ]
+                                        }
+                                    ],
+                                    items: [
+                                        {
+                                            xtype: 'panel',
+                                            flex: 1,
+                                            id: 'mapPanel',
+                                            itemId: 'mapPanel',
+                                            layout: 'fit',
+                                            title: 'Map',
+                                            items: [
+                                                {
+                                                    xtype: 'textareafield',
+                                                    id: 'mapTextArea',
+                                                    itemId: 'mapTextArea',
+                                                    margin: '5 5 5 5',
+                                                    overflowX: 'auto',
+                                                    overflowY: 'auto'
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            xtype: 'panel',
+                                            flex: 1,
+                                            id: 'reducePanel',
+                                            itemId: 'reducePanel',
+                                            layout: 'fit',
+                                            title: 'Reduce',
+                                            items: [
+                                                {
+                                                    xtype: 'textareafield',
+                                                    id: 'reduceTextArea',
+                                                    itemId: 'reduceTextArea',
+                                                    margin: '5 5 5 5',
+                                                    overflowX: 'auto',
+                                                    overflowY: 'auto'
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ],
+                            tools: [
+                                {
+                                    xtype: 'tool',
+                                    id: 'viewRefreshTool',
+                                    itemId: 'viewRefreshTool',
+                                    type: 'refresh'
+                                }
+                            ]
                         }
                     ]
                 }
@@ -464,6 +660,34 @@ Ext.define('webapp.view.MyViewport', {
         });
 
         me.callParent(arguments);
+    },
+
+    onRowModelSelect: function(rowmodel, record, index, eOpts) {
+        if (record.data.leaf === true) {
+            var sessionDataGrid = Ext.getCmp("sessionDataGrid");
+            var detailPanel = Ext.getCmp("detailPanel");
+
+            if (detailPanel.collapsed === false) {
+                detailPanel.toggleCollapse();
+            }
+
+            Ext.Ajax.request({
+                url: GlobalData.urlPrefix + 'getSessionKeyList?viewName=' + record.data.id,
+                params: {
+                },
+                success: function(response, opts) {
+                    sessionDataGrid.setLoading(false);
+                    var obj = Ext.decode(response.responseText);
+                    var store = Ext.data.StoreManager.lookup('sessionDataStore');
+                    store.loadData(obj);
+                    sessionDataGrid.update();
+                },
+                failure: function(response, opts) {
+                    sessionDataGrid.setLoading(false);
+                    Ext.Msg.alert('Error', 'Server-side failure with status code ' + response.status);
+                }
+            });
+        }
     }
 
 });

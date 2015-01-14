@@ -186,26 +186,37 @@ public class CouchbaseClient implements DollyClient {
 	/* (non-Javadoc)
 	 * @see com.athena.dolly.enhancer.client.DollyClient#getKeys()
 	 */
-	public List<SessionKey> getKeys() {
-		DesignDocument designDoc = getDesignDocument(config.getCouchbaseBucketName());
-
-        boolean found = false;
-        for (ViewDesign view : designDoc.getViews()) {
-            if (view.getName().equals("get_all")) {
-                found = true;
-                break;
-            }
-        }
+	public List<SessionKey> getKeys(String viewName) {
+		View view = null;
+		
+		if (viewName == null) {
+			//DesignDocument designDoc = getDesignDocument(config.getCouchbaseBucketName());
+			DesignDocument designDoc = getDesignDocument("dolly");
+	
+	        boolean found = false;
+	        for (ViewDesign design : designDoc.getViews()) {
+	            if (design.getName().equals("getKeys")) {
+	                found = true;
+	                break;
+	            }
+	        }
+	        
+	        if (!found) {
+	            ViewDesign design = new ViewDesign("getKeys", "function (doc, meta) {\n" +
+	                    "    emit(meta.id, null);\n" +
+	                    "}");
+	            designDoc.getViews().add(design);
+	            client.createDesignDoc(designDoc);
+	        }
+	        
+			//View view = client.getView(config.getCouchbaseBucketName(), "get_all");
+        	view = client.getView("dolly", "getKeys");
         
-        if (!found) {
-            ViewDesign design = new ViewDesign("get_all", "function (doc, meta) {\n" +
-                    "  emit(meta.id, 1);\n" +
-                    "}", "_count");
-            designDoc.getViews().add(design);
-            client.createDesignDoc(designDoc);
-        }
+		} else {
+			String[] names = viewName.split("/");
+			view = client.getView(names[0], names[1]);
+		}
         
-		View view = client.getView(config.getCouchbaseBucketName(), "get_all");
 		Query query = new Query().setStale(Stale.FALSE).setReduce(false).setIncludeDocs(false);
 		
 		ViewResponse response = client.query(view, query);
@@ -216,8 +227,6 @@ public class CouchbaseClient implements DollyClient {
 			key = new SessionKey();
 			key.setKey(row.getKey());
 			keyList.add(key);
-			
-			System.out.println(row.getKey());
 		}
 		
 		return keyList;
@@ -263,31 +272,34 @@ public class CouchbaseClient implements DollyClient {
 		
 		return dollyStat;
 	}//end of getStats()
-
+	
 	/* (non-Javadoc)
 	 * @see com.athena.dolly.enhancer.client.DollyClient#printAllCache()
 	 */
 	public void printAllCache() {
-		DesignDocument designDoc = getDesignDocument(config.getCouchbaseBucketName());
-
+		DesignDocument designDoc = getDesignDocument("dolly");
+		
         boolean found = false;
-        for (ViewDesign view : designDoc.getViews()) {
-            if (view.getName().equals("get_all")) {
+        for (ViewDesign design : designDoc.getViews()) {
+            if (design.getName().equals("getKeys")) {
                 found = true;
                 break;
             }
         }
         
+        System.out.println("Found => " + found);
+        
         if (!found) {
-            ViewDesign design = new ViewDesign("get_all", "function (doc, meta) {\n" +
-                    "  emit(meta.id, 1);\n" +
-                    "}", "_count");
+            ViewDesign design = new ViewDesign("getKeys", "function (doc, meta) {\n" +
+                    "    emit(meta.id, null);\n" +
+                    "}");
             designDoc.getViews().add(design);
             client.createDesignDoc(designDoc);
         }
         
-		View view = client.getView(config.getCouchbaseBucketName(), "get_all");
-		Query query = new Query().setStale(Stale.FALSE).setReduce(false).setIncludeDocs(true).setLimit(20);
+		//View view = client.getView(config.getCouchbaseBucketName(), "get_all");
+    	View view = client.getView("dolly", "getKeys");
+		Query query = new Query().setStale(Stale.FALSE).setReduce(false).setIncludeDocs(true);
 		//int docsPerPage = 25;
 		
 		ViewResponse response = client.query(view, query);

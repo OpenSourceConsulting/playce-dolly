@@ -11,7 +11,8 @@
             "footerController",
             "dashboardController",
             "sessionDataController",
-            "globalController"
+            "globalController",
+            "viewListController"
         ],
         "models": [
             "SessionKeyData"
@@ -21,10 +22,13 @@
             "Ext.window.MessageBox"
         ],
         "stores": [
-            "sessionDataStore"
+            "sessionDataStore",
+            "viewTreeStore"
         ],
         "views": [
-            "MyViewport"
+            "MyViewport",
+            "createViewWindow",
+            "MyTreePanel29"
         ]
     },
     "designerId": "application"

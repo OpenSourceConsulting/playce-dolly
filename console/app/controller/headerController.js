@@ -30,6 +30,11 @@ Ext.define('webapp.controller.headerController', {
         this.getLogoImg().getEl().on('click', function() {
             window.open('http://www.osci.kr', '_blank');
         });
+
+        if (GlobalData.cacheType === 'couchbase') {
+            Ext.getCmp("viewTreePanel1").show();
+            Ext.getCmp("viewListBtn").show();
+        }
     }
 
 });

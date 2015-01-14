@@ -1,0 +1,183 @@
+{
+    "type": "Ext.window.Window",
+    "reference": {
+        "name": "items",
+        "type": "array"
+    },
+    "codeClass": null,
+    "userConfig": {
+        "designer|userAlias": "createViewWindow",
+        "designer|userClassName": "createViewWindow",
+        "height": 264,
+        "id": "createViewWindow",
+        "itemId": "createViewWindow",
+        "layout": "fit",
+        "modal": true,
+        "resizable": false,
+        "title": "Create View",
+        "width": 400
+    },
+    "configAlternates": {
+        "resizable": "boolean"
+    },
+    "designerId": "1bb4c1e0-4912-422f-b1f9-77a6782d3de9",
+    "cn": [
+        {
+            "type": "Ext.panel.Panel",
+            "reference": {
+                "name": "items",
+                "type": "array"
+            },
+            "codeClass": null,
+            "userConfig": {
+                "designer|snapToGrid": 10,
+                "layout": "absolute",
+                "margin": "10 10 10 10",
+                "title": null
+            },
+            "designerId": "9505f395-02db-4d95-8c8d-94096ebf0d29",
+            "cn": [
+                {
+                    "type": "Ext.form.Label",
+                    "reference": {
+                        "name": "items",
+                        "type": "array"
+                    },
+                    "codeClass": null,
+                    "userConfig": {
+                        "html": "<font size='4pt'><b>Design Document Name :</b></font>",
+                        "layout|x": 10,
+                        "layout|y": 10,
+                        "text": null
+                    },
+                    "designerId": "87862ffe-fb88-4d1a-8c2b-30b83ff20b8f"
+                },
+                {
+                    "type": "Ext.form.field.Text",
+                    "reference": {
+                        "name": "items",
+                        "type": "array"
+                    },
+                    "codeClass": null,
+                    "userConfig": {
+                        "fieldLabel": null,
+                        "height": 30,
+                        "hideLabel": true,
+                        "id": "designDocumentName",
+                        "itemId": "designDocumentName",
+                        "layout|x": 20,
+                        "layout|y": 40,
+                        "width": 330
+                    },
+                    "designerId": "13869c6b-1b64-4028-ba5a-f68a0199945e"
+                },
+                {
+                    "type": "Ext.form.Label",
+                    "reference": {
+                        "name": "items",
+                        "type": "array"
+                    },
+                    "codeClass": null,
+                    "userConfig": {
+                        "html": "<font size='4pt'><b>View Name :</b></font>",
+                        "layout|x": 10,
+                        "layout|y": 90,
+                        "text": null
+                    },
+                    "designerId": "64fa6e4e-36cb-4e2d-9895-851325070ab5"
+                },
+                {
+                    "type": "Ext.form.field.Text",
+                    "reference": {
+                        "name": "items",
+                        "type": "array"
+                    },
+                    "codeClass": null,
+                    "userConfig": {
+                        "fieldLabel": null,
+                        "height": 30,
+                        "hideLabel": true,
+                        "id": "viewName",
+                        "itemId": "viewName",
+                        "layout|x": 20,
+                        "layout|y": 120,
+                        "width": 330
+                    },
+                    "designerId": "b73cc12c-6666-42b4-a4c4-977190c0b7d5"
+                },
+                {
+                    "type": "Ext.toolbar.Toolbar",
+                    "reference": {
+                        "name": "dockedItems",
+                        "type": "array"
+                    },
+                    "codeClass": null,
+                    "userConfig": {
+                        "dock": "bottom",
+                        "layout|x": 73,
+                        "layout|y": null
+                    },
+                    "designerId": "a754f202-c8fb-4438-9ea5-27088a42b113",
+                    "cn": [
+                        {
+                            "type": "Ext.toolbar.Spacer",
+                            "reference": {
+                                "name": "items",
+                                "type": "array"
+                            },
+                            "codeClass": null,
+                            "userConfig": {
+                                "layout|flex": 1
+                            },
+                            "designerId": "216d4654-9643-4451-9470-2cc9b55917b4"
+                        },
+                        {
+                            "type": "Ext.button.Button",
+                            "reference": {
+                                "name": "items",
+                                "type": "array"
+                            },
+                            "codeClass": null,
+                            "userConfig": {
+                                "id": "viewPopupSaveBtn",
+                                "itemId": "viewPopupSaveBtn",
+                                "layout|flex": null,
+                                "text": "Create",
+                                "width": 60
+                            },
+                            "designerId": "e57322e5-7191-4543-ba18-2352a42ea599"
+                        },
+                        {
+                            "type": "Ext.button.Button",
+                            "reference": {
+                                "name": "items",
+                                "type": "array"
+                            },
+                            "codeClass": null,
+                            "userConfig": {
+                                "id": "viewPopupCancelBtn",
+                                "itemId": "viewPopupCancelBtn",
+                                "layout|flex": null,
+                                "text": "Cancel",
+                                "width": 60
+                            },
+                            "designerId": "2b8c0403-1df3-44fb-8862-2219dbaa2357"
+                        },
+                        {
+                            "type": "Ext.toolbar.Spacer",
+                            "reference": {
+                                "name": "items",
+                                "type": "array"
+                            },
+                            "codeClass": null,
+                            "userConfig": {
+                                "layout|flex": 1
+                            },
+                            "designerId": "e7707afa-61ba-42f8-8984-28ac2ff943bf"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

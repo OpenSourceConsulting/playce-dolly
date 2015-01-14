@@ -38,7 +38,12 @@
                     " */",
                     "this.getLogoImg().getEl().on('click', function() {",
                     "    window.open('http://www.osci.kr', '_blank');",
-                    "});"
+                    "});",
+                    "",
+                    "if (GlobalData.cacheType === 'couchbase') {",
+                    "    Ext.getCmp(\"viewTreePanel1\").show();",
+                    "    Ext.getCmp(\"viewListBtn\").show();",
+                    "}"
                 ]
             },
             "designerId": "8d078194-849d-4149-95c6-a71e64ed3ea7"

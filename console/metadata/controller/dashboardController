@@ -20,14 +20,15 @@
             "userConfig": {
                 "designer|controlQuery": "#dashboardBtn",
                 "designer|targetType": "Ext.button.Button",
-                "fn": "click",
+                "fn": "onDashboardBtnclick",
                 "implHandler": [
                     "/**",
                     " * Dashboard 메뉴 버튼 클릭 시 수행되는 function",
                     " */",
                     "var centerContainer = this.getCenterContainer(),",
                     "    dashboardBtn = this.getDashboardBtn(),",
-                    "    sessionDataBtn = this.getSessionDataBtn();",
+                    "    sessionDataBtn = this.getSessionDataBtn(),",
+                    "    viewListBtn = this.getViewListBtn();",
                     "",
                     "// 현재 선택된 item이 dashboardPanel일 경우 무시한다.",
                     "if (centerContainer.layout.getActiveItem().itemId === \"dashboardPanel\") {",
@@ -36,6 +37,7 @@
                     "}",
                     "",
                     "sessionDataBtn.toggle(false);",
+                    "viewListBtn.toggle(false);",
                     "centerContainer.layout.setActiveItem(0);",
                     "",
                     "var me = this;",
@@ -87,6 +89,19 @@
                 "selector": "#sessionDataBtn"
             },
             "designerId": "2d7ba58c-6a65-4727-91bb-24c39c19d9d1"
+        },
+        {
+            "type": "controllerref",
+            "reference": {
+                "name": "items",
+                "type": "array"
+            },
+            "codeClass": null,
+            "userConfig": {
+                "ref": "viewListBtn",
+                "selector": "#viewListBtn"
+            },
+            "designerId": "e11352e1-e949-4d92-bef0-6ec32f9ce3ec"
         },
         {
             "type": "controllerref",
@@ -763,7 +778,7 @@
             "userConfig": {
                 "designer|controlQuery": "#statRefreshTool",
                 "designer|targetType": "Ext.panel.Tool",
-                "fn": "onToolClick",
+                "fn": "onRefreshToolClick",
                 "implHandler": [
                     "/**",
                     " * 통계 정보를 refresh 하기 위해 panel의 refresh tool을 활성화",
