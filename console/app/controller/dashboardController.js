@@ -91,6 +91,10 @@ Ext.define('webapp.controller.dashboardController', {
          */
         var statPanel = this.getStatPanel();
 
+        if (GlobalData.cacheType === 'couchbase') {
+            statPanel.setTitle("Couchbase Statistics");
+        }
+
         statPanel.setLoading(true);
 
         Ext.Ajax.request({
@@ -165,6 +169,12 @@ Ext.define('webapp.controller.dashboardController', {
         var memoryStore = GlobalData.memoryStore;
         var cpuStore = GlobalData.cpuStore;
 
+        var memTitle = "Memory(Heap) Usage(MB)";
+
+        if (GlobalData.cacheType === 'couchbase') {
+            memTitle = "System Memory Usage(MB)";
+        }
+
         // Memory Chart 생성 후 memoryPanel에 draw 한다.
         Ext.create('Ext.panel.Panel', {
             renderTo: "memoryPanel-body",
@@ -188,7 +198,7 @@ Ext.define('webapp.controller.dashboardController', {
                     //minimum: 0,
                     //maximum: 100,
                     position: 'left',
-                    title: 'Memory(Heap) Usage(MB)',
+                    title: memTitle,
                     grid: {
                         odd: {
                             fill: '#dedede',
