@@ -36,6 +36,7 @@ import com.athena.dolly.controller.tomcat.instance.domain.TomcatInstance;
 import com.athena.dolly.controller.tomcat.instance.service.TomcatInstanceService;
 import com.athena.dolly.controller.web.common.model.ExtjsGridParam;
 import com.athena.dolly.controller.web.common.model.GridJsonResponse;
+import com.athena.dolly.controller.web.common.model.SimpleJsonResponse;
 
 /**
  * <pre>
@@ -70,8 +71,14 @@ public class TomcatInsanceController {
 	}
 	
 	@RequestMapping(value="/instance", method={RequestMethod.POST, RequestMethod.PUT})
-	public void save(TomcatInstance inst){
-		service.save(inst);
+	public SimpleJsonResponse save(SimpleJsonResponse res, TomcatInstance inst){
+		TomcatInstance result = service.save(inst);
+		
+		service.loadTomcatConfig(result);
+		
+		res.setData(result);
+		
+		return res;
 	}
 	
 	@RequestMapping(value="/instance/{instId}", method=RequestMethod.GET)

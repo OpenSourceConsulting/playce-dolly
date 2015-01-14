@@ -1,0 +1,197 @@
+{
+    "type": "Ext.app.Controller",
+    "reference": {
+        "name": "items",
+        "type": "array"
+    },
+    "codeClass": null,
+    "userConfig": {
+        "designer|userClassName": "TomcatInstanceController"
+    },
+    "designerId": "bd53a871-9be8-43bc-9ab9-bf2ea546e96f",
+    "cn": [
+        {
+            "type": "controlleraction",
+            "reference": {
+                "name": "listeners",
+                "type": "array"
+            },
+            "codeClass": null,
+            "userConfig": {
+                "designer|controlQuery": "#InstActionMenu menuitem",
+                "designer|targetType": "Ext.menu.Item",
+                "fn": "onMenuitemClick",
+                "implHandler": [
+                    "alert(item.getId());"
+                ],
+                "name": "click",
+                "scope": "me"
+            },
+            "designerId": "73949f05-bab6-4bf0-b8a9-de0e8ff6719a"
+        },
+        {
+            "type": "controlleraction",
+            "reference": {
+                "name": "listeners",
+                "type": "array"
+            },
+            "codeClass": null,
+            "userConfig": {
+                "designer|controlQuery": "#TomcatInstanceLoadgingPanel",
+                "designer|targetType": "Ext.panel.Panel",
+                "fn": "onPanelActivate",
+                "implHandler": [
+                    "Ext.getCmp(\"loadingInstanceName\").setText(\"Instance Name : \"+ this.getInstanceField(\"instanceName\"));",
+                    "Ext.getCmp(\"loadingIpAddr\").setText(\"IP Adress : \"+ this.getInstanceField(\"ipAddr\"));",
+                    "Ext.getCmp(\"loadingCatalinaHome\").setText(\"CATALINA_HOME : \"+ this.getInstanceField(\"catalinaHome\"));",
+                    "Ext.getCmp(\"loadingCatalinaBase\").setText(\"CATALINA_BASE : \"+ this.getInstanceField(\"catalinaBase\"));",
+                    "",
+                    "this.checkServerStatus(this.getInstanceField(\"id\"));",
+                    "",
+                    ""
+                ],
+                "name": "activate",
+                "scope": "me"
+            },
+            "designerId": "816aa184-1770-4652-bef2-9f19d7792892"
+        },
+        {
+            "type": "basicfunction",
+            "reference": {
+                "name": "items",
+                "type": "array"
+            },
+            "codeClass": null,
+            "userConfig": {
+                "designer|params": [
+                    "instance"
+                ],
+                "fn": "saveInstance",
+                "implHandler": [
+                    "this.instance = instance;"
+                ]
+            },
+            "designerId": "111b19c4-e6ea-495e-99d7-ec58149e252f"
+        },
+        {
+            "type": "basicfunction",
+            "reference": {
+                "name": "items",
+                "type": "array"
+            },
+            "codeClass": null,
+            "userConfig": {
+                "designer|params": [
+                    "fieldName"
+                ],
+                "fn": "getInstanceField",
+                "implHandler": [
+                    "return this.instance[fieldName];"
+                ]
+            },
+            "designerId": "4616563e-76a0-45b0-959b-b6354d077ddb"
+        },
+        {
+            "type": "basicfunction",
+            "reference": {
+                "name": "items",
+                "type": "array"
+            },
+            "codeClass": null,
+            "userConfig": {
+                "designer|params": [
+                    "instId"
+                ],
+                "fn": "checkServerStatus",
+                "implHandler": [
+                    "var me = this;",
+                    "",
+                    "Ext.Ajax.request({",
+                    "        url: GlobalData.urlPrefix + \"tomcat/instance/\"+instId,",
+                    "        method: \"GET\",",
+                    "        success: function(resp, ops) {",
+                    "",
+                    "            var instance = Ext.decode(resp.responseText);",
+                    "            me.setLoadingMessage(instance.state);",
+                    "            ",
+                    "            if(instance.state < 100 && instance.state % 10 === 0){",
+                    "                setTimeout(function(){ me.checkServerStatus(instId);}, 1000);",
+                    "            }",
+                    "            // state == 100 or 에러발생.",
+                    "        }",
+                    "});"
+                ]
+            },
+            "designerId": "e8def4ef-55be-4f28-867d-2ee4bbae3a87"
+        },
+        {
+            "type": "basicfunction",
+            "reference": {
+                "name": "items",
+                "type": "array"
+            },
+            "codeClass": null,
+            "userConfig": {
+                "designer|params": [
+                    "state"
+                ],
+                "fn": "setLoadingMessage",
+                "implHandler": [
+                    "",
+                    "var envshCheckbox = Ext.getCmp(\"envshCheckbox\");",
+                    "var serverxmlCheckbox = Ext.getCmp(\"serverxmlCheckbox\");",
+                    "var contextxmlCheckbox = Ext.getCmp(\"contextxmlCheckbox\");",
+                    "var progressBar = Ext.getCmp(\"tomcatProgressBar\");",
+                    "",
+                    "",
+                    "switch(state) {",
+                    "    case 10:",
+                    "        progressBar.updateProgress(0.25);",
+                    "        break;",
+                    "    case 20:",
+                    "        progressBar.updateProgress(0.5);",
+                    "        break;",
+                    "    case 30:",
+                    "        progressBar.updateProgress(0.75);",
+                    "        break;",
+                    "    case 100:",
+                    "        progressBar.updateProgress(1);",
+                    "        break;",
+                    "}",
+                    "",
+                    "",
+                    "switch(state) {",
+                    "    case 100:",
+                    "        Ext.getCmp(\"loadingStatus\").setText(\"등록 완료.\");",
+                    "    case 30:",
+                    "        if(contextxmlCheckbox.getValue() == false){",
+                    "            contextxmlCheckbox.setValue(true);",
+                    "            contextxmlCheckbox.setBoxLabel(\"context.xml 파일 로딩 완료.\");",
+                    "        }",
+                    "    case 20:",
+                    "        if(serverxmlCheckbox.getValue() == false){",
+                    "            serverxmlCheckbox.setValue(true);",
+                    "            serverxmlCheckbox.setBoxLabel(\"server.xml 파일 로딩 완료.\");",
+                    "            if(contextxmlCheckbox.getValue() == false){",
+                    "                contextxmlCheckbox.setBoxLabel(\"context.xml 파일 로딩중...\");",
+                    "            }",
+                    "        }",
+                    "    case 10:",
+                    "        if(envshCheckbox.getValue() == false){",
+                    "            envshCheckbox.setValue(true);",
+                    "            envshCheckbox.setBoxLabel(\"env.sh 파일 로딩 완료.\");",
+                    "            if(serverxmlCheckbox.getValue() == false){",
+                    "                serverxmlCheckbox.setBoxLabel(\"server.xml 파일 로딩중...\");",
+                    "            }",
+                    "        }",
+                    "        break;",
+                    "    case 0:",
+                    "        envshCheckbox.setBoxLabel(\"env.sh 파일 로딩중...\");",
+                    "        break;",
+                    "}"
+                ]
+            },
+            "designerId": "0c85bc0e-60fb-489b-94eb-389e9c4f6a4c"
+        }
+    ]
+}

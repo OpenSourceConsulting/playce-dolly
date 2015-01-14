@@ -27,8 +27,10 @@ package com.athena.dolly.controller.tomcat.instance.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import com.athena.dolly.controller.DollyConstants;
 import com.athena.dolly.controller.tomcat.instance.domain.TomcatInstance;
 import com.athena.dolly.controller.tomcat.instance.domain.TomcatInstanceRepository;
 
@@ -57,8 +59,8 @@ public class TomcatInstanceService {
 	 * insert or update
 	 * @param inst
 	 */
-	public void save(TomcatInstance inst){
-		repo.save(inst);
+	public TomcatInstance save(TomcatInstance inst){
+		return repo.save(inst);
 	}
 	
 	public TomcatInstance getOne(Long id){
@@ -67,6 +69,56 @@ public class TomcatInstanceService {
 	
 	public void delete(Long id){
 		repo.delete(id);
+	}
+	
+	@Async
+	public void loadTomcatConfig(TomcatInstance inst){
+		
+		int state = DollyConstants.INSTANCE_STATE_PEND1;
+		
+		try{
+			loadEnvSH(inst, state);
+			
+			state = DollyConstants.INSTANCE_STATE_PEND2;
+			loadServerXML(inst, state);
+			
+			state = DollyConstants.INSTANCE_STATE_PEND3;
+			loadContextXML(inst, state);
+			
+			state = DollyConstants.INSTANCE_STATE_VALID;
+			saveState(inst, state);
+		}catch(Exception e){
+			
+			state++;
+			saveState(inst, state);
+		}
+	}
+	
+	/**
+	 * env.sh 파일을 로딩 & 없으면 생성?? 
+	 * @param inst
+	 */
+	public void loadEnvSH(TomcatInstance inst, int state){
+		
+		
+		saveState(inst, state);
+	}
+	
+	public void loadServerXML(TomcatInstance inst, int state){
+		
+		
+		saveState(inst, state);
+	}
+	
+	public void loadContextXML(TomcatInstance inst, int state){
+		
+		
+		saveState(inst, state);
+	}
+	
+	private void saveState(TomcatInstance inst, int state){
+		inst.setState(state);
+		repo.save(inst);
 	}
 
 }

@@ -26,7 +26,8 @@ Ext.define('webapp.view.TomcatInstanceFormWindow', {
         'Ext.toolbar.Toolbar',
         'Ext.button.Button',
         'Ext.form.Label',
-        'Ext.form.field.Checkbox'
+        'Ext.form.field.Checkbox',
+        'Ext.ProgressBar'
     ],
 
     height: 404,
@@ -216,6 +217,8 @@ Ext.define('webapp.view.TomcatInstanceFormWindow', {
                                             success: function(form, action) {
                                                 //Ext.Msg.alert('Success', action.result.msg);
 
+                                                webapp.app.getController('TomcatInstanceController').saveInstance(action.result.data);
+
                                                 Ext.getCmp('tomcatInstGrid').getStore().load();
                                                 //formPanel.up('window').close();
                                                 formPanel.up('window').setTitle("Tomcat Instance 등록 2/2");
@@ -229,6 +232,14 @@ Ext.define('webapp.view.TomcatInstanceFormWindow', {
                                                     break;
                                                     case Ext.form.action.Action.CONNECT_FAILURE:
                                                     Ext.Msg.alert('Failure', 'Server communication failed');
+                                                    break;
+                                                    case Ext.form.action.Action.SERVER_INVALID:
+                                                    if(action.result.msg){
+                                                        Ext.Msg.alert('Failure', action.result.msg);
+                                                    }else{
+                                                        Ext.Msg.alert('Failure', "Server error.");
+                                                    }
+
                                                 }
                                             }
                                         });
@@ -266,37 +277,14 @@ Ext.define('webapp.view.TomcatInstanceFormWindow', {
                 },
                 {
                     xtype: 'panel',
+                    id: 'TomcatInstanceLoadgingPanel',
+                    itemId: 'TomcatInstanceLoadgingPanel',
                     header: false,
                     title: 'My Panel',
                     layout: {
                         type: 'vbox',
                         align: 'stretch'
                     },
-                    dockedItems: [
-                        {
-                            xtype: 'toolbar',
-                            dock: 'bottom',
-                            ui: 'footer',
-                            layout: {
-                                type: 'hbox',
-                                pack: 'center'
-                            },
-                            items: [
-                                {
-                                    xtype: 'button',
-                                    text: '뒤로'
-                                },
-                                {
-                                    xtype: 'button',
-                                    text: '재시도'
-                                },
-                                {
-                                    xtype: 'button',
-                                    text: '확인'
-                                }
-                            ]
-                        }
-                    ],
                     items: [
                         {
                             xtype: 'panel',
@@ -313,18 +301,26 @@ Ext.define('webapp.view.TomcatInstanceFormWindow', {
                             items: [
                                 {
                                     xtype: 'label',
+                                    id: 'loadingInstanceName',
+                                    itemId: 'loadingInstanceName',
                                     text: 'Instance Name :'
                                 },
                                 {
                                     xtype: 'label',
+                                    id: 'loadingIpAddr',
+                                    itemId: 'loadingIpAddr',
                                     text: 'IP Adress :'
                                 },
                                 {
                                     xtype: 'label',
+                                    id: 'loadingCatalinaHome',
+                                    itemId: 'loadingCatalinaHome',
                                     text: 'CATALINA_HOME :'
                                 },
                                 {
                                     xtype: 'label',
+                                    id: 'loadingCatalinaBase',
+                                    itemId: 'loadingCatalinaBase',
                                     text: 'CATALINA_BASE :'
                                 },
                                 {
@@ -334,6 +330,8 @@ Ext.define('webapp.view.TomcatInstanceFormWindow', {
                                 },
                                 {
                                     xtype: 'label',
+                                    id: 'loadingStatus',
+                                    itemId: 'loadingStatus',
                                     text: '등록중입니다. 잠시만 기다려주세요.'
                                 }
                             ]
@@ -342,15 +340,65 @@ Ext.define('webapp.view.TomcatInstanceFormWindow', {
                             xtype: 'panel',
                             flex: 1,
                             height: 150,
-                            margin: '0 10 0 20',
+                            margin: '0 30 0 30',
                             header: false,
                             title: 'SouthPanel',
                             items: [
                                 {
                                     xtype: 'checkboxfield',
+                                    id: 'envshCheckbox',
+                                    itemId: 'envshCheckbox',
                                     fieldLabel: 'Label',
                                     hideLabel: true,
                                     boxLabel: 'env.sh 로딩중...'
+                                },
+                                {
+                                    xtype: 'checkboxfield',
+                                    id: 'serverxmlCheckbox',
+                                    itemId: 'serverxmlCheckbox',
+                                    fieldLabel: 'Label',
+                                    hideLabel: true,
+                                    boxLabel: 'server.xml 로딩.'
+                                },
+                                {
+                                    xtype: 'checkboxfield',
+                                    id: 'contextxmlCheckbox',
+                                    itemId: 'contextxmlCheckbox',
+                                    fieldLabel: 'Label',
+                                    hideLabel: true,
+                                    boxLabel: 'context.xml 로딩.'
+                                },
+                                {
+                                    xtype: 'progressbar',
+                                    border: 1,
+                                    id: 'tomcatProgressBar',
+                                    text: ''
+                                }
+                            ]
+                        }
+                    ],
+                    dockedItems: [
+                        {
+                            xtype: 'toolbar',
+                            flex: 1,
+                            dock: 'bottom',
+                            ui: 'footer',
+                            layout: {
+                                type: 'hbox',
+                                pack: 'center'
+                            },
+                            items: [
+                                {
+                                    xtype: 'button',
+                                    disabled: true,
+                                    text: '뒤로'
+                                },
+                                {
+                                    xtype: 'button',
+                                    handler: function(button, e) {
+                                        button.up("window").close();
+                                    },
+                                    text: 'Close'
                                 }
                             ]
                         }

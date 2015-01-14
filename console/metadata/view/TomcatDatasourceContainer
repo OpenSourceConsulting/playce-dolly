@@ -1,0 +1,276 @@
+{
+    "type": "Ext.container.Container",
+    "reference": {
+        "name": "items",
+        "type": "array"
+    },
+    "codeClass": null,
+    "userConfig": {
+        "designer|userAlias": "TomcatDatasourceContainer",
+        "designer|userClassName": "TomcatDatasourceContainer",
+        "height": null,
+        "layout": "border",
+        "width": null
+    },
+    "designerId": "ac6fda94-af28-41b7-a373-a14bd7d2ae42",
+    "cn": [
+        {
+            "type": "Ext.grid.Panel",
+            "reference": {
+                "name": "items",
+                "type": "array"
+            },
+            "codeClass": null,
+            "userConfig": {
+                "forceFit": true,
+                "id": "tomcatDSGrid",
+                "itemId": "tomcatDSGrid",
+                "layout|flex": null,
+                "layout|region": "center",
+                "store": "TomcatInstanceListStore",
+                "title": "DataSource List"
+            },
+            "designerId": "1a9338cf-2195-4cc7-9600-edfa5229f206",
+            "cn": [
+                {
+                    "type": "Ext.grid.View",
+                    "reference": {
+                        "name": "viewConfig",
+                        "type": "object"
+                    },
+                    "codeClass": null,
+                    "designerId": "d2492ff9-2f1d-4a84-a198-4566e44bfe26"
+                },
+                {
+                    "type": "Ext.grid.column.Column",
+                    "reference": {
+                        "name": "columns",
+                        "type": "array"
+                    },
+                    "codeClass": null,
+                    "userConfig": {
+                        "dataIndex": "id",
+                        "text": "ID",
+                        "width": 30
+                    },
+                    "designerId": "582dc9b0-c789-4c56-9b10-d5e19a06bdaf"
+                },
+                {
+                    "type": "Ext.grid.column.Column",
+                    "reference": {
+                        "name": "columns",
+                        "type": "array"
+                    },
+                    "codeClass": null,
+                    "userConfig": {
+                        "dataIndex": "instanceName",
+                        "text": "DataSource Name"
+                    },
+                    "designerId": "822341d7-e36a-4ea9-9396-a913402445a8"
+                },
+                {
+                    "type": "Ext.grid.column.Column",
+                    "reference": {
+                        "name": "columns",
+                        "type": "array"
+                    },
+                    "codeClass": null,
+                    "userConfig": {
+                        "dataIndex": "ipAddr",
+                        "text": "JDBC Url",
+                        "width": 70
+                    },
+                    "designerId": "cce1f211-f9b5-428c-bed8-7f1b47665720"
+                },
+                {
+                    "type": "Ext.grid.column.Column",
+                    "reference": {
+                        "name": "columns",
+                        "type": "array"
+                    },
+                    "codeClass": null,
+                    "userConfig": {
+                        "dataIndex": "httpPort",
+                        "text": "대상서버 개수",
+                        "width": 70
+                    },
+                    "designerId": "94c58d54-b721-4895-bfb5-84a0cdd1637b"
+                },
+                {
+                    "type": "Ext.toolbar.Toolbar",
+                    "reference": {
+                        "name": "dockedItems",
+                        "type": "array"
+                    },
+                    "codeClass": null,
+                    "userConfig": {
+                        "dock": "top"
+                    },
+                    "designerId": "dfc45f96-831c-4049-a6dd-2b1b1cafc915",
+                    "cn": [
+                        {
+                            "type": "Ext.button.Button",
+                            "reference": {
+                                "name": "items",
+                                "type": "array"
+                            },
+                            "codeClass": null,
+                            "userConfig": {
+                                "id": "createTomcatInstBtn1",
+                                "layout|flex": null,
+                                "text": "생성"
+                            },
+                            "designerId": "c9cbd5f6-bde7-4273-88f2-56b4455ddbac",
+                            "cn": [
+                                {
+                                    "type": "fixedfunction",
+                                    "reference": {
+                                        "name": "items",
+                                        "type": "array"
+                                    },
+                                    "codeClass": null,
+                                    "userConfig": {
+                                        "designer|params": [
+                                            "button",
+                                            "e"
+                                        ],
+                                        "fn": "handler",
+                                        "implHandler": [
+                                            "var formWindow = Ext.create(\"widget.TomcatInstanceFormWindow\");",
+                                            "formWindow.show();"
+                                        ]
+                                    },
+                                    "designerId": "5ef0c01b-1b2e-4681-bd69-8fdbb7bf0831"
+                                }
+                            ]
+                        },
+                        {
+                            "type": "Ext.button.Button",
+                            "reference": {
+                                "name": "items",
+                                "type": "array"
+                            },
+                            "codeClass": null,
+                            "userConfig": {
+                                "layout|flex": null,
+                                "text": "삭제"
+                            },
+                            "designerId": "e91d3d29-e65f-49d4-a5f5-465d779b8d92"
+                        },
+                        {
+                            "type": "Ext.toolbar.Separator",
+                            "reference": {
+                                "name": "items",
+                                "type": "array"
+                            },
+                            "codeClass": null,
+                            "userConfig": {
+                                "layout|flex": null
+                            },
+                            "designerId": "3cca663d-c899-478d-83a2-c3f24cccf539"
+                        },
+                        {
+                            "type": "Ext.form.field.Text",
+                            "reference": {
+                                "name": "items",
+                                "type": "array"
+                            },
+                            "codeClass": null,
+                            "userConfig": {
+                                "emptyText": "Instance Name",
+                                "fieldLabel": "Filtering",
+                                "id": "searchInstanceName1",
+                                "itemId": "searchInstanceName",
+                                "labelWidth": 60,
+                                "layout|flex": null,
+                                "name": "searchInstanceName"
+                            },
+                            "designerId": "68de0faf-2d49-4586-a568-331ef6d53374"
+                        }
+                    ]
+                },
+                {
+                    "type": "Ext.toolbar.Paging",
+                    "reference": {
+                        "name": "dockedItems",
+                        "type": "array"
+                    },
+                    "codeClass": null,
+                    "userConfig": {
+                        "displayInfo": true,
+                        "dock": "bottom",
+                        "store": "TomcatInstanceListStore",
+                        "width": 360
+                    },
+                    "designerId": "f6d7abb1-69c5-4bcc-9fc2-6103e403cccf"
+                }
+            ]
+        },
+        {
+            "type": "Ext.tab.Panel",
+            "reference": {
+                "name": "items",
+                "type": "array"
+            },
+            "codeClass": null,
+            "userConfig": {
+                "activeTab": 0,
+                "height": 150,
+                "id": "tomcatDSTabPanel",
+                "itemId": "tomcatDSTabPanel",
+                "layout|flex": 1,
+                "layout|region": "south",
+                "layout|split": true
+            },
+            "designerId": "8ba3bbd5-5974-47d0-a04b-387a94f4b6d4",
+            "cn": [
+                {
+                    "type": "Ext.panel.Panel",
+                    "reference": {
+                        "name": "items",
+                        "type": "array"
+                    },
+                    "codeClass": null,
+                    "userConfig": {
+                        "title": "상세정보"
+                    },
+                    "designerId": "b5be4795-07ce-470c-a466-ab76d01483d0",
+                    "cn": [
+                        {
+                            "type": "Ext.tab.Tab",
+                            "reference": {
+                                "name": "tabConfig",
+                                "type": "object"
+                            },
+                            "codeClass": null,
+                            "designerId": "ef02507c-9ecb-498c-92b0-27f75a11a448"
+                        }
+                    ]
+                },
+                {
+                    "type": "Ext.panel.Panel",
+                    "reference": {
+                        "name": "items",
+                        "type": "array"
+                    },
+                    "codeClass": null,
+                    "userConfig": {
+                        "title": "대상서버"
+                    },
+                    "designerId": "f1cc5e5b-a15c-4555-94ee-75e01345348e",
+                    "cn": [
+                        {
+                            "type": "Ext.tab.Tab",
+                            "reference": {
+                                "name": "tabConfig",
+                                "type": "object"
+                            },
+                            "codeClass": null,
+                            "designerId": "ed974370-6499-4e2b-8a34-137fb23789aa"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

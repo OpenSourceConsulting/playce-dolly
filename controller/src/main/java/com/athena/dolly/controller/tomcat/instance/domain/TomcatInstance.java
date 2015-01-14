@@ -29,6 +29,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
+import org.hibernate.annotations.DynamicUpdate;
+
 /**
  * <pre>
  *
@@ -37,6 +39,7 @@ import javax.persistence.Id;
  * @version 2.0
  */
 @Entity
+@DynamicUpdate
 public class TomcatInstance {
 
 	@Id
@@ -68,7 +71,7 @@ public class TomcatInstance {
 	
 	private int applications; // application 개수
 	
-	private String state;
+	private int state;
 	
 	public TomcatInstance() {}
 	
@@ -144,20 +147,20 @@ public class TomcatInstance {
 		this.httpPort = httpPort;
 	}
 
-	public String getState() {
-		return state;
-	}
-
-	public void setState(String state) {
-		this.state = state;
-	}
-
 	public int getApplications() {
 		return applications;
 	}
 
 	public void setApplications(int applications) {
 		this.applications = applications;
+	}
+
+	public int getState() {
+		return state;
+	}
+
+	public void setState(int state) {
+		this.state = state;
 	}
 	
 }

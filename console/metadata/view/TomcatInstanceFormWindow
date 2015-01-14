@@ -472,6 +472,8 @@
                                             "    waitMsg: 'Saving Data...',",
                                             "    success: function(form, action) {",
                                             "        //Ext.Msg.alert('Success', action.result.msg);",
+                                            "        ",
+                                            "        webapp.app.getController('TomcatInstanceController').saveInstance(action.result.data);",
                                             "",
                                             "        Ext.getCmp('tomcatInstGrid').getStore().load();",
                                             "        //formPanel.up('window').close();",
@@ -479,13 +481,21 @@
                                             "        formPanel.up('window').layout.setActiveItem(1);",
                                             "    },",
                                             "    failure: function(form, action) {",
-                                            "",
+                                            "        ",
                                             "        switch (action.failureType) {",
                                             "            case Ext.form.action.Action.CLIENT_INVALID:",
-                                            "            Ext.Msg.alert('Failure', '유효하지 않은 입력값이 존재합니다.');",
-                                            "            break;",
+                                            "                Ext.Msg.alert('Failure', '유효하지 않은 입력값이 존재합니다.');",
+                                            "                break;",
                                             "            case Ext.form.action.Action.CONNECT_FAILURE:",
-                                            "            Ext.Msg.alert('Failure', 'Server communication failed');",
+                                            "                Ext.Msg.alert('Failure', 'Server communication failed');",
+                                            "                break;",
+                                            "            case Ext.form.action.Action.SERVER_INVALID:",
+                                            "                if(action.result.msg){",
+                                            "                    Ext.Msg.alert('Failure', action.result.msg);",
+                                            "                }else{",
+                                            "                    Ext.Msg.alert('Failure', \"Server error.\");",
+                                            "                }",
+                                            "               ",
                                             "        }",
                                             "    }",
                                             "});",
@@ -569,69 +579,17 @@
             "codeClass": null,
             "userConfig": {
                 "container|align": "stretch",
+                "designer|createAlias": null,
+                "designer|displayName": null,
                 "header": false,
+                "id": "TomcatInstanceLoadgingPanel",
+                "itemId": "TomcatInstanceLoadgingPanel",
                 "layout": "vbox",
                 "style": null,
                 "title": "My Panel"
             },
             "designerId": "d3328a27-8995-46f0-ac54-adb2edc75d16",
             "cn": [
-                {
-                    "type": "Ext.toolbar.Toolbar",
-                    "reference": {
-                        "name": "dockedItems",
-                        "type": "array"
-                    },
-                    "codeClass": null,
-                    "userConfig": {
-                        "container|pack": "center",
-                        "designer|uiInterfaceName": "footer",
-                        "dock": "bottom",
-                        "ui": "footer"
-                    },
-                    "designerId": "9c316dec-8e8e-4fdf-814c-02aa49e69157",
-                    "cn": [
-                        {
-                            "type": "Ext.button.Button",
-                            "reference": {
-                                "name": "items",
-                                "type": "array"
-                            },
-                            "codeClass": null,
-                            "userConfig": {
-                                "layout|flex": null,
-                                "text": "뒤로"
-                            },
-                            "designerId": "97aa8f93-724b-4e25-82b1-c21ae785bf59"
-                        },
-                        {
-                            "type": "Ext.button.Button",
-                            "reference": {
-                                "name": "items",
-                                "type": "array"
-                            },
-                            "codeClass": null,
-                            "userConfig": {
-                                "layout|flex": null,
-                                "text": "재시도"
-                            },
-                            "designerId": "675c9f67-9d86-404e-8ef5-9d0e9f16b9a8"
-                        },
-                        {
-                            "type": "Ext.button.Button",
-                            "reference": {
-                                "name": "items",
-                                "type": "array"
-                            },
-                            "codeClass": null,
-                            "userConfig": {
-                                "layout|flex": null,
-                                "text": "확인"
-                            },
-                            "designerId": "871dd2f4-b185-41bf-9908-e68707215fc5"
-                        }
-                    ]
-                },
                 {
                     "type": "Ext.panel.Panel",
                     "reference": {
@@ -659,6 +617,8 @@
                             },
                             "codeClass": null,
                             "userConfig": {
+                                "id": "loadingInstanceName",
+                                "itemId": "loadingInstanceName",
                                 "text": "Instance Name :"
                             },
                             "designerId": "6f8a2a8d-1b1a-4868-b36d-736f26c3dc22"
@@ -671,6 +631,8 @@
                             },
                             "codeClass": null,
                             "userConfig": {
+                                "id": "loadingIpAddr",
+                                "itemId": "loadingIpAddr",
                                 "text": "IP Adress :"
                             },
                             "designerId": "132942d0-2d80-4590-be9b-6a15dd756f70"
@@ -683,6 +645,8 @@
                             },
                             "codeClass": null,
                             "userConfig": {
+                                "id": "loadingCatalinaHome",
+                                "itemId": "loadingCatalinaHome",
                                 "text": "CATALINA_HOME :"
                             },
                             "designerId": "064db012-5a65-4cca-91c1-2ee2b37f7dd2"
@@ -695,6 +659,8 @@
                             },
                             "codeClass": null,
                             "userConfig": {
+                                "id": "loadingCatalinaBase",
+                                "itemId": "loadingCatalinaBase",
                                 "text": "CATALINA_BASE :"
                             },
                             "designerId": "c9e04cb6-cc1b-41f4-91a3-6d54a9bbe171"
@@ -720,6 +686,8 @@
                             },
                             "codeClass": null,
                             "userConfig": {
+                                "id": "loadingStatus",
+                                "itemId": "loadingStatus",
                                 "text": "등록중입니다. 잠시만 기다려주세요."
                             },
                             "designerId": "e680dbba-1ce6-4c58-a878-ac0bef74ce61"
@@ -737,7 +705,7 @@
                         "header": false,
                         "height": 150,
                         "layout|flex": 1,
-                        "margin": "0 10 0 20",
+                        "margin": "0 30 0 30",
                         "title": "SouthPanel"
                     },
                     "designerId": "c1a64d72-19e4-402c-bed5-73a4248fad43",
@@ -752,9 +720,123 @@
                             "userConfig": {
                                 "boxLabel": "env.sh 로딩중...",
                                 "fieldLabel": "Label",
-                                "hideLabel": true
+                                "hideLabel": true,
+                                "id": "envshCheckbox",
+                                "itemId": "envshCheckbox"
                             },
                             "designerId": "f8dec07b-e951-418e-a410-701816830071"
+                        },
+                        {
+                            "type": "Ext.form.field.Checkbox",
+                            "reference": {
+                                "name": "items",
+                                "type": "array"
+                            },
+                            "codeClass": null,
+                            "userConfig": {
+                                "boxLabel": "server.xml 로딩.",
+                                "fieldLabel": "Label",
+                                "hideLabel": true,
+                                "id": "serverxmlCheckbox",
+                                "itemId": "serverxmlCheckbox"
+                            },
+                            "designerId": "6fa75925-3021-4092-850c-5efc4b6a8073"
+                        },
+                        {
+                            "type": "Ext.form.field.Checkbox",
+                            "reference": {
+                                "name": "items",
+                                "type": "array"
+                            },
+                            "codeClass": null,
+                            "userConfig": {
+                                "boxLabel": "context.xml 로딩.",
+                                "fieldLabel": "Label",
+                                "hideLabel": true,
+                                "id": "contextxmlCheckbox",
+                                "itemId": "contextxmlCheckbox"
+                            },
+                            "designerId": "dc7e98fc-b4bd-4527-afd3-9d415f6f4f5a"
+                        },
+                        {
+                            "type": "Ext.ProgressBar",
+                            "reference": {
+                                "name": "items",
+                                "type": "array"
+                            },
+                            "codeClass": null,
+                            "userConfig": {
+                                "border": 1,
+                                "id": "tomcatProgressBar",
+                                "text": ""
+                            },
+                            "designerId": "19e8cb4a-5cb4-40e8-9203-cfd522ae152e"
+                        }
+                    ]
+                },
+                {
+                    "type": "Ext.toolbar.Toolbar",
+                    "reference": {
+                        "name": "dockedItems",
+                        "type": "array"
+                    },
+                    "codeClass": null,
+                    "userConfig": {
+                        "container|pack": "center",
+                        "designer|uiInterfaceName": "footer",
+                        "dock": "bottom",
+                        "layout|flex": 1,
+                        "ui": "footer"
+                    },
+                    "designerId": "9c316dec-8e8e-4fdf-814c-02aa49e69157",
+                    "cn": [
+                        {
+                            "type": "Ext.button.Button",
+                            "reference": {
+                                "name": "items",
+                                "type": "array"
+                            },
+                            "codeClass": null,
+                            "userConfig": {
+                                "disabled": true,
+                                "layout|flex": null,
+                                "text": "뒤로"
+                            },
+                            "designerId": "97aa8f93-724b-4e25-82b1-c21ae785bf59"
+                        },
+                        {
+                            "type": "Ext.button.Button",
+                            "reference": {
+                                "name": "items",
+                                "type": "array"
+                            },
+                            "codeClass": null,
+                            "userConfig": {
+                                "layout|flex": null,
+                                "text": "Close"
+                            },
+                            "designerId": "871dd2f4-b185-41bf-9908-e68707215fc5",
+                            "cn": [
+                                {
+                                    "type": "fixedfunction",
+                                    "reference": {
+                                        "name": "items",
+                                        "type": "array"
+                                    },
+                                    "codeClass": null,
+                                    "userConfig": {
+                                        "designer|params": [
+                                            "button",
+                                            "e"
+                                        ],
+                                        "fn": "handler",
+                                        "implHandler": [
+                                            "button.up(\"window\").close();"
+                                        ]
+                                    },
+                                    "designerId": "2c86c850-9578-4af2-b6a7-a51729384919"
+                                }
+                            ]
                         }
                     ]
                 }

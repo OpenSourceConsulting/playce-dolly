@@ -28,6 +28,7 @@ package com.athena.dolly.controller.web.common.model;
  * <pre>
  * 서버 C,U,D 작업 결과에 대한 JSON Response 클래스.
  * - ex) {"success": true, "msg":"Create sucess"}
+ * - 특히 Extjs form.Panel 에서 submit() 함수 사용시 필수 사용해야함.
  * </pre>
  * @author Bong-Jin Kwon
  * @version 1.0
