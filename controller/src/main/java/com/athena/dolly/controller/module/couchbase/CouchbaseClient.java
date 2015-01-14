@@ -67,10 +67,9 @@ public class CouchbaseClient extends DollyClient {
 	private String name;
 	private String passwd;
 	private String credential;
-	
-	private String cpu;
-	private long totalMem;
-	private long freeMem;
+
+	private List<MemoryVo> memoryList;
+	private List<String> cpuList;
 	private long timestamp = 0L;
 	
 	public CouchbaseClient(String url, String name, String passwd) {
@@ -175,56 +174,135 @@ public class CouchbaseClient extends DollyClient {
 	}//end of submit()
 
 	@SuppressWarnings("unchecked")
-	public MemoryVo getMemoryUsage() {
+	public List<MemoryVo> getMemoryUsageList() {
+		List<MemoryVo> memoryList = new ArrayList<MemoryVo>();
+		List<String> cpuList = new ArrayList<String>();
 		MemoryVo memory = null;
 		
-		if (System.currentTimeMillis() - timestamp > 0) {
+		if (System.currentTimeMillis() - timestamp > 2000) {
 			try {
 				Map<String, Object> response = submit(url + "/default/buckets/" + name, null, HttpMethod.GET);
 				
 				List<Map<String, Object>> nodeList = (List<Map<String, Object>>) response.get("nodes");
-				Map<String, Object> systemStats = (Map<String, Object>) nodeList.get(0).get("systemStats");
 				
-				this.totalMem = (Long)systemStats.get("mem_total");
-				this.freeMem = (Long)systemStats.get("mem_free");
-				this.cpu = systemStats.get("cpu_utilization_rate").toString();
+				Map<String, Object> systemStats = null;
+				for (int i = 0; i < nodeList.size(); i++) {
+					systemStats = (Map<String, Object>) nodeList.get(i).get("systemStats");
+					
+					Long totalMem = Long.parseLong(systemStats.get("mem_total").toString());
+					Long freeMem = Long.parseLong(systemStats.get("mem_free").toString());
+					String cpu = systemStats.get("cpu_utilization_rate").toString();
+					
+					memory = new MemoryVo();
+					memory.setCommitted(totalMem);
+					memory.setMax(totalMem);
+					memory.setUsed(totalMem - freeMem);
+					
+					memoryList.add(memory);
+					cpuList.add(cpu);
+				}
+				
+				this.memoryList = memoryList;
+				this.cpuList = cpuList;
 				this.timestamp = System.currentTimeMillis();
 			} catch (RestClientException e) {
 				logger.error("RestClientException has occurred.", e);
 			} catch (Exception e) {
 				logger.error("Unhandled Exception has occurred.", e);
 			}
+		} 
+		
+		return this.memoryList;
+	}
+
+	@SuppressWarnings("unchecked")
+	public MemoryVo getMemoryUsage() {
+		MemoryVo memory = null;
+		
+		Long totalMem = 0L;
+		Long freeMem = 0L;
+		
+		try {
+			Map<String, Object> response = submit(url + "/default/buckets/" + name, null, HttpMethod.GET);
+			
+			List<Map<String, Object>> nodeList = (List<Map<String, Object>>) response.get("nodes");
+			Map<String, Object> systemStats = (Map<String, Object>) nodeList.get(0).get("systemStats");
+			
+			totalMem = Long.parseLong(systemStats.get("mem_total").toString());
+			freeMem = Long.parseLong(systemStats.get("mem_free").toString());
+		} catch (RestClientException e) {
+			logger.error("RestClientException has occurred.", e);
+		} catch (Exception e) {
+			logger.error("Unhandled Exception has occurred.", e);
 		}
 		
 		memory = new MemoryVo();
-		memory.setCommitted(this.totalMem);
-		memory.setMax(this.totalMem);
-		memory.setUsed(this.totalMem - this.freeMem);
+		memory.setCommitted(totalMem);
+		memory.setMax(totalMem);
+		memory.setUsed(totalMem - freeMem);
 		
 		return memory;
 	}
 
 	@SuppressWarnings("unchecked")
-	public String getCpuUsage() {
-		if (System.currentTimeMillis() - timestamp > 0) {
+	public List<String> getCpuUsageList() {
+		List<MemoryVo> memoryList = new ArrayList<MemoryVo>();
+		List<String> cpuList = new ArrayList<String>();
+		MemoryVo memory = null;
+		
+		if (System.currentTimeMillis() - timestamp > 2000) {
 			try {
 				Map<String, Object> response = submit(url + "/default/buckets/" + name, null, HttpMethod.GET);
 				
 				List<Map<String, Object>> nodeList = (List<Map<String, Object>>) response.get("nodes");
-				Map<String, Object> systemStats = (Map<String, Object>) nodeList.get(0).get("systemStats");
 				
-				this.totalMem = (Long)systemStats.get("mem_total");
-				this.freeMem = (Long)systemStats.get("mem_free");
-				this.cpu = systemStats.get("cpu_utilization_rate").toString();
+				Map<String, Object> systemStats = null;
+				for (int i = 0; i < nodeList.size(); i++) {
+					systemStats = (Map<String, Object>) nodeList.get(i).get("systemStats");
+					
+					Long totalMem = Long.parseLong(systemStats.get("mem_total").toString());
+					Long freeMem = Long.parseLong(systemStats.get("mem_free").toString());
+					String cpu = systemStats.get("cpu_utilization_rate").toString();
+					
+					memory = new MemoryVo();
+					memory.setCommitted(totalMem);
+					memory.setMax(totalMem);
+					memory.setUsed(totalMem - freeMem);
+					
+					memoryList.add(memory);
+					cpuList.add(cpu);
+				}
+				
+				this.memoryList = memoryList;
+				this.cpuList = cpuList;
 				this.timestamp = System.currentTimeMillis();
 			} catch (RestClientException e) {
 				logger.error("RestClientException has occurred.", e);
 			} catch (Exception e) {
 				logger.error("Unhandled Exception has occurred.", e);
 			}
+		} 
+		
+		return this.cpuList;
+	}
+
+	@SuppressWarnings("unchecked")
+	public String getCpuUsage() {
+		String cpu = null;
+		try {
+			Map<String, Object> response = submit(url + "/default/buckets/" + name, null, HttpMethod.GET);
+			
+			List<Map<String, Object>> nodeList = (List<Map<String, Object>>) response.get("nodes");
+			Map<String, Object> systemStats = (Map<String, Object>) nodeList.get(0).get("systemStats");
+			
+			cpu = systemStats.get("cpu_utilization_rate").toString();
+		} catch (RestClientException e) {
+			logger.error("RestClientException has occurred.", e);
+		} catch (Exception e) {
+			logger.error("Unhandled Exception has occurred.", e);
 		}
 		
-		return this.cpu;
+		return cpu;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -396,8 +474,8 @@ public class CouchbaseClient extends DollyClient {
 		
 		try {
 			client.init();
-			//System.out.println(client.getMemoryUsage());
-			//System.out.println(client.getCpuUsage());
+			System.out.println(client.getMemoryUsage());
+			System.out.println(client.getCpuUsage());
 			//System.err.println(client.getDesigndocs());
 			//System.err.println(client.deleteDesignDoc("test"));
 			//System.err.println(client.deleteView("test", "test"));

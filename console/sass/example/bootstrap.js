@@ -871,9 +871,13 @@ Ext.ClassManager.addNameAlternateMappings({
   "webapp.controller.globalController": [],
   "webapp.controller.headerController": [],
   "webapp.controller.sessionDataController": [],
+  "webapp.controller.viewListController": [],
   "webapp.model.SessionKeyData": [],
   "webapp.store.sessionDataStore": [],
-  "webapp.view.MyViewport": []
+  "webapp.store.viewTreeStore": [],
+  "webapp.view.MyTreePanel29": [],
+  "webapp.view.MyViewport": [],
+  "webapp.view.createViewWindow": []
 });
 Ext.ClassManager.addNameAliasMappings({
   "Ext.AbstractComponent": [],
@@ -1888,9 +1892,17 @@ Ext.ClassManager.addNameAliasMappings({
   "webapp.controller.globalController": [],
   "webapp.controller.headerController": [],
   "webapp.controller.sessionDataController": [],
+  "webapp.controller.viewListController": [],
   "webapp.model.SessionKeyData": [],
   "webapp.store.sessionDataStore": [],
-  "webapp.view.MyViewport": []
+  "webapp.store.viewTreeStore": [],
+  "webapp.view.MyTreePanel29": [
+    "widget.mytreepanel29"
+  ],
+  "webapp.view.MyViewport": [],
+  "webapp.view.createViewWindow": [
+    "widget.createViewWindow"
+  ]
 });
 Ext.setVersion("ext-theme-base", "4.2.1");
 Ext.setVersion("ext-theme-neptune", "4.2.1");

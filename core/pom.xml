@@ -39,9 +39,9 @@
 							<addClasspath>true</addClasspath>
 						</manifest>
 						<manifestEntries>
-							<Premain-Class>com.athena.dolly.enhancer.DollyAgent</Premain-Class>
+							<Premain-Class>com.athena.dolly.core.DollyAgent</Premain-Class>
 							<!-- for test -->
-							<Main-Class>com.athena.dolly.enhancer.DollyManager</Main-Class>
+							<Main-Class>com.athena.dolly.common.cache.DollyManager</Main-Class>
 						</manifestEntries>
 					</archive>                              
                     <excludes>                                  

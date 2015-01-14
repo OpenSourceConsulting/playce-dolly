@@ -53,7 +53,7 @@ public class ClientManager implements InitializingBean {
 
 	private DollyConfig config;
 	private static String cacheType;
-	private static Map<String, DollyClient> dollyClientMap;
+	private static TreeMap<String, DollyClient> dollyClientMap;
 	
 	@Override
 	public void afterPropertiesSet() throws Exception {
@@ -171,16 +171,20 @@ public class ClientManager implements InitializingBean {
 	 * @return
 	 */
 	public static List<MemoryVo> getMemoryUsageList() {
-		List<MemoryVo> memoryList = new ArrayList<MemoryVo>();
-		List<String> nodeList = getServerList();
-		
-		MemoryVo memory = null;
-		for (String nodeName : nodeList) {
-			memory = getMemoryUsage(nodeName);
-			memoryList.add(memory);
+		if (cacheType.equals("couchbase")) {
+			return ((CouchbaseClient)dollyClientMap.get(dollyClientMap.firstKey())).getMemoryUsageList();
+		} else {
+			List<MemoryVo> memoryList = new ArrayList<MemoryVo>();
+			List<String> nodeList = getServerList();
+			
+			MemoryVo memory = null;
+			for (String nodeName : nodeList) {
+				memory = getMemoryUsage(nodeName);
+				memoryList.add(memory);
+			}
+			
+			return memoryList;
 		}
-		
-		return memoryList;
 	}//end of getMemoryUsageList()
 
 	/**
@@ -190,25 +194,29 @@ public class ClientManager implements InitializingBean {
 	 * @return
 	 */
 	public static List<String> getCpuUsageList() {
-		Map<String, String> cpuMap = new TreeMap<String, String>();
-		List<String> cpuList = new ArrayList<String>();
-		List<String> nodeList = getServerList();
-		
-		for (String nodeName : nodeList) {
-			new CpuInfo(nodeName, cpuMap).start();
+		if (cacheType.equals("couchbase")) {
+			return ((CouchbaseClient)dollyClientMap.get(dollyClientMap.firstKey())).getCpuUsageList();
+		} else {
+			Map<String, String> cpuMap = new TreeMap<String, String>();
+			List<String> cpuList = new ArrayList<String>();
+			List<String> nodeList = getServerList();
+			
+			for (String nodeName : nodeList) {
+				new CpuInfo(nodeName, cpuMap).start();
+			}
+	
+			try {
+				Thread.sleep(1500);
+			} catch (Exception e) {
+				//ignore
+			}
+			
+			for (String nodeName : nodeList) {
+				cpuList.add(cpuMap.get(nodeName));
+			}
+			
+			return cpuList;
 		}
-
-		try {
-			Thread.sleep(1500);
-		} catch (Exception e) {
-			//ignore
-		}
-		
-		for (String nodeName : nodeList) {
-			cpuList.add(cpuMap.get(nodeName));
-		}
-		
-		return cpuList;
 	}//end of getCpuUsageList()
 	
 	public static List<DesignDocumentVo> getDesigndocs(String nodeName) {
