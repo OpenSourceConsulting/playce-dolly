@@ -34,6 +34,9 @@ Ext.define('webapp.controller.headerController', {
         if (GlobalData.cacheType === 'couchbase') {
             Ext.getCmp("viewTreePanel1").show();
             Ext.getCmp("viewListBtn").show();
+        } else {
+            Ext.getCmp("viewTreePanel1").hide();
+            Ext.getCmp("viewListBtn").hide();
         }
     }
 

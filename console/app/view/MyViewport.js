@@ -388,6 +388,7 @@ Ext.define('webapp.view.MyViewport', {
                                             xtype: 'treepanel',
                                             region: 'west',
                                             split: true,
+                                            hidden: true,
                                             id: 'viewTreePanel1',
                                             itemId: 'viewTreePanel1',
                                             width: 150,
@@ -417,8 +418,7 @@ Ext.define('webapp.view.MyViewport', {
                                             viewConfig: {
                                                 id: 'viewTreeView1',
                                                 itemId: 'viewTreeView1',
-                                                autoScroll: true,
-                                                preserveScrollOnRefresh: true
+                                                autoScroll: true
                                             },
                                             selModel: Ext.create('Ext.selection.RowModel', {
                                                 listeners: {
@@ -540,6 +540,8 @@ Ext.define('webapp.view.MyViewport', {
                                     xtype: 'panel',
                                     region: 'west',
                                     split: true,
+                                    id: 'viewsWestPanel',
+                                    itemId: 'viewsWestPanel',
                                     width: 250,
                                     collapsible: false,
                                     layout: {
