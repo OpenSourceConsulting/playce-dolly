@@ -83,6 +83,7 @@ public class ClientManager implements InitializingBean {
 				} else {
 					client = new InfinispanClient(jmxServers[i], null, null, embedded);
 				}
+				client.setNodeName("node-"+i);
 				dollyClientMap.put(i + "", client);
 			}
 			
