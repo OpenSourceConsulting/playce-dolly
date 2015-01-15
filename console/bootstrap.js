@@ -875,6 +875,7 @@ Ext.ClassManager.addNameAlternateMappings({
   "webapp.model.SessionKeyData": [],
   "webapp.store.sessionDataStore": [],
   "webapp.store.viewTreeStore": [],
+  "webapp.store.viewTreeStore1": [],
   "webapp.view.MyTreePanel29": [],
   "webapp.view.MyViewport": [],
   "webapp.view.createViewWindow": []
@@ -1896,6 +1897,7 @@ Ext.ClassManager.addNameAliasMappings({
   "webapp.model.SessionKeyData": [],
   "webapp.store.sessionDataStore": [],
   "webapp.store.viewTreeStore": [],
+  "webapp.store.viewTreeStore1": [],
   "webapp.view.MyTreePanel29": [
     "widget.mytreepanel29"
   ],

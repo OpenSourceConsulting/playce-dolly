@@ -29,7 +29,8 @@ Ext.application({
     ],
     stores: [
         'sessionDataStore',
-        'viewTreeStore'
+        'viewTreeStore',
+        'viewTreeStore1'
     ],
     views: [
         'MyViewport',

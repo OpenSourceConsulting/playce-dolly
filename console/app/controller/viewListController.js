@@ -331,9 +331,12 @@ Ext.define('webapp.controller.viewListController', {
                     }
                 }
 
-                var store = Ext.data.StoreManager.lookup('viewTreeStore');
+                var store = Ext.data.StoreManager.lookup('viewTreeStore'),
+                    store1 = Ext.data.StoreManager.lookup('viewTreeStore1');
 
                 store.setRootNode(root);
+                store1.setRootNode(root);
+
                 viewTreePanel.update();
                 Ext.getCmp("viewTreePanel1").update();
 
