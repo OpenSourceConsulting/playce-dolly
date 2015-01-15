@@ -25,6 +25,7 @@
 package com.athena.dolly.controller.web;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -35,6 +36,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -45,8 +47,11 @@ import com.athena.dolly.common.cache.DollyManager;
 import com.athena.dolly.common.cache.SessionKey;
 import com.athena.dolly.common.stats.DollyStats;
 import com.athena.dolly.controller.module.ClientManager;
+import com.athena.dolly.controller.module.vo.DesignDocumentVo;
 import com.athena.dolly.controller.module.vo.MemoryVo;
+import com.athena.dolly.controller.module.vo.ViewVo;
 import com.athena.dolly.controller.web.exception.ErrorInfo;
+import com.google.gson.Gson;
 
 /**
  * <pre>
@@ -70,6 +75,12 @@ public class ConsoleController {
     	return ClientManager.getServerList();
     }
 
+    @RequestMapping(value="/getServerType", method=RequestMethod.GET)
+    @ResponseBody
+    public String getServerType(HttpServletRequest request) {
+    	return ClientManager.getServerType();
+    }
+
     @RequestMapping(value="/getStat", method=RequestMethod.GET)
     @ResponseStatus(value=HttpStatus.OK)
     @ResponseBody
@@ -86,8 +97,8 @@ public class ConsoleController {
 
     @RequestMapping(value="/getSessionKeyList", method=RequestMethod.GET)
     @ResponseBody
-    public List<SessionKey> getSessionKeyList(HttpServletRequest request) {
-    	return DollyManager.getClient().getKeys();
+    public List<SessionKey> getSessionKeyList(HttpServletRequest request, @RequestParam("viewName") String viewName) {
+    	return DollyManager.getClient().getKeys(viewName);
     }
 
     @RequestMapping(value="/getSessionData", method=RequestMethod.GET)
@@ -152,6 +163,56 @@ public class ConsoleController {
     	}
     	
     	return ClientManager.getCpuUsage(nodeName);
+    }
+    
+    @RequestMapping(value="/ddocs", method=RequestMethod.GET)
+    @ResponseStatus(value=HttpStatus.OK)
+    @ResponseBody
+    public List<DesignDocumentVo> getDesignDocuments(HttpServletRequest request) {
+    	return ClientManager.getDesigndocs(ClientManager.getServerList().get(0));
+    }
+
+    @RequestMapping(value="/ddocs/{docName}/{viewName}", method=RequestMethod.POST)
+    @ResponseStatus(value=HttpStatus.OK)
+    @ResponseBody
+    public String createView(HttpServletRequest request, @PathVariable String docName, @PathVariable String viewName) {
+    	return ClientManager.createView(ClientManager.getServerList().get(0), docName, viewName);
+    }
+
+    @RequestMapping(value="/ddocs/{docName}/{viewName}", method=RequestMethod.PUT)
+    @ResponseStatus(value=HttpStatus.OK)
+    @ResponseBody
+    public Boolean updateView(HttpServletRequest request, @PathVariable String docName, @PathVariable String viewName, @RequestBody String body) {
+    	DesignDocumentVo designDoc = new DesignDocumentVo();
+    	designDoc.setDesignDocumentName(docName);
+
+		Gson gson = new Gson();
+		
+		@SuppressWarnings("unchecked")
+		Map<String, String> paramMap = gson.fromJson(body, Map.class);
+    	
+    	ViewVo view = new ViewVo();
+    	view.setViewName(viewName);
+    	view.setMap(paramMap.get("map"));
+    	view.setReduce(paramMap.get("reduce"));
+    	
+    	designDoc.getViewList().add(view);
+    	
+    	return ClientManager.updateView(ClientManager.getServerList().get(0), designDoc);
+    }
+    
+    @RequestMapping(value="/ddocs/{docName}", method=RequestMethod.DELETE)
+    @ResponseStatus(value=HttpStatus.OK)
+    @ResponseBody
+    public Boolean deleteDesignDoc(HttpServletRequest request, @PathVariable String docName) {
+    	return ClientManager.deleteDesignDoc(ClientManager.getServerList().get(0), docName);
+    }
+    
+    @RequestMapping(value="/ddocs/{docName}/{viewName}", method=RequestMethod.DELETE)
+    @ResponseStatus(value=HttpStatus.OK)
+    @ResponseBody
+    public Boolean deleteView(HttpServletRequest request, @PathVariable String docName, @PathVariable String viewName) {
+    	return ClientManager.deleteView(ClientManager.getServerList().get(0), docName, viewName);
     }
 
     /*

@@ -111,7 +111,7 @@ public interface DollyClient {
 	 * </pre>
 	 * @return
 	 */
-	public List<SessionKey> getKeys();
+	public List<SessionKey> getKeys(String viewName);
 	
 	/**
 	 * <pre>

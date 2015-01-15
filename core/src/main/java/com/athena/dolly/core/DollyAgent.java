@@ -54,7 +54,7 @@ import com.athena.dolly.common.cache.DollyConfig;
  */
 public class DollyAgent implements ClassFileTransformer {
 	
-	public static final String TRANSFORMER_CLASS = "com.athena.dolly.enhancer.DollyClassTransformer";
+	public static final String TRANSFORMER_CLASS = "com.athena.dolly.core.DollyClassTransformer";
     private ClassFileTransformer transformer;
     
     /**
