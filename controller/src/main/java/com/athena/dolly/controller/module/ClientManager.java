@@ -95,7 +95,7 @@ public class ClientManager implements InitializingBean {
 			
 			for (int i = 0; i < urls.length; i++) {
 				client = new CouchbaseClient(urls[i], name, passwd);
-				
+				client.setNodeName("node-"+i);
 				dollyClientMap.put(i + "", client);
 			}
 		}

@@ -76,7 +76,7 @@ public class DollyAgent implements ClassFileTransformer {
 
         boolean verbose = config.isVerbose();
         
-        if (config.isUseEmbedded()) {
+        if (config.getClientType().equals("infinispan") && config.isUseEmbedded()) {
         	System.out.println("[Dolly] Embedded infinispan hotrod cache server will be start.");
         	
             if (verbose) {
