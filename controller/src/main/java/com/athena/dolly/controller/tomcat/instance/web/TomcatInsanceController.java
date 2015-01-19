@@ -32,6 +32,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.athena.dolly.controller.ssh.SSHManager;
 import com.athena.dolly.controller.tomcat.instance.domain.TomcatInstance;
 import com.athena.dolly.controller.tomcat.instance.service.TomcatInstanceService;
 import com.athena.dolly.controller.web.common.model.ExtjsGridParam;
@@ -89,6 +90,25 @@ public class TomcatInsanceController {
 	@RequestMapping(value="/instance/{instId}", method=RequestMethod.DELETE)
 	public void delete(@PathVariable Long instId){
 		service.delete(instId);
+	}
+	
+	@RequestMapping(value="/sshtest", method=RequestMethod.POST)
+	public SimpleJsonResponse sshConnectionTest(SimpleJsonResponse res, TomcatInstance inst){
+		
+		SSHManager sshMng = new SSHManager(inst.getSshUsername(), inst.getSshPassword(), inst.getIpAddr(), "", inst.getSshPort());
+		
+		String errorMsg = sshMng.connect();
+		
+		try{
+			if(errorMsg != null){
+				res.setSuccess(false);
+				res.setMsg(errorMsg);
+			}
+		}finally{
+			sshMng.close();
+		}
+
+		return res;
 	}
 
 }

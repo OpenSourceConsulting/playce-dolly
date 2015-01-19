@@ -22,19 +22,19 @@ Ext.define('webapp.view.TomcatInstanceFormWindow', {
         'Ext.form.field.ComboBox',
         'Ext.XTemplate',
         'Ext.form.FieldSet',
-        'Ext.form.field.Hidden',
-        'Ext.toolbar.Toolbar',
         'Ext.button.Button',
         'Ext.form.Label',
+        'Ext.form.field.Hidden',
+        'Ext.toolbar.Toolbar',
         'Ext.form.field.Checkbox',
         'Ext.ProgressBar'
     ],
 
-    height: 404,
+    height: 543,
     id: 'TomcatInstanceFormWindow',
     itemId: 'TomcatInstanceFormWindow',
     width: 450,
-    resizable: false,
+    autoScroll: true,
     layout: 'card',
     title: 'Tomcat Instance 등록 1/2',
     modal: true,
@@ -81,6 +81,7 @@ Ext.define('webapp.view.TomcatInstanceFormWindow', {
                             labelWidth: 120,
                             name: 'ipAddr',
                             allowBlank: false,
+                            emptyText: 'ex) 192.168.0.5',
                             vtype: 'template'
                         },
                         {
@@ -91,20 +92,62 @@ Ext.define('webapp.view.TomcatInstanceFormWindow', {
                             ],
                             fieldLabel: 'CATALINA_HOME',
                             name: 'catalinaHome',
-                            allowBlank: false
-                        },
-                        {
-                            xtype: 'textfield',
-                            anchor: '100%',
-                            afterLabelTextTpl: [
-                                '<span style="color:red;font-weight:bold" data-qtip="Required">*</span>'
-                            ],
-                            fieldLabel: 'CATALINA_BASE',
-                            name: 'catalinaBase',
-                            allowBlank: false
+                            allowBlank: false,
+                            emptyText: 'ex) /opt/tomcat'
                         },
                         {
                             xtype: 'fieldset',
+                            title: 'Instance Environment',
+                            items: [
+                                {
+                                    xtype: 'textfield',
+                                    anchor: '100%',
+                                    afterLabelTextTpl: [
+                                        '<span style="color:red;font-weight:bold" data-qtip="Required">*</span>'
+                                    ],
+                                    fieldLabel: 'CATALINA_BASE',
+                                    name: 'catalinaBase',
+                                    allowBlank: false,
+                                    emptyText: 'ex) /apps/instance01'
+                                },
+                                {
+                                    xtype: 'textfield',
+                                    anchor: '100%',
+                                    afterLabelTextTpl: [
+                                        '<span style="color:red;font-weight:bold" data-qtip="Required">*</span>'
+                                    ],
+                                    fieldLabel: 'Env Script',
+                                    name: 'envScriptFile',
+                                    value: '$CATALINA_BASE/env.sh',
+                                    allowBlank: false
+                                },
+                                {
+                                    xtype: 'textfield',
+                                    anchor: '100%',
+                                    afterLabelTextTpl: [
+                                        '<span style="color:red;font-weight:bold" data-qtip="Required">*</span>'
+                                    ],
+                                    fieldLabel: 'Start Script',
+                                    name: 'startScriptFile',
+                                    value: '$CATALINA_BASE/start.sh',
+                                    allowBlank: false
+                                },
+                                {
+                                    xtype: 'textfield',
+                                    anchor: '100%',
+                                    afterLabelTextTpl: [
+                                        '<span style="color:red;font-weight:bold" data-qtip="Required">*</span>'
+                                    ],
+                                    fieldLabel: 'Stop Script',
+                                    name: 'stopScriptFile',
+                                    value: '$CATALINA_BASE/stop.sh',
+                                    allowBlank: false
+                                }
+                            ]
+                        },
+                        {
+                            xtype: 'fieldset',
+                            height: 169,
                             margin: '18 0 0 0',
                             collapsible: true,
                             title: 'SSH Settings (Required)',
@@ -117,7 +160,9 @@ Ext.define('webapp.view.TomcatInstanceFormWindow', {
                                     ],
                                     fieldLabel: 'SSH Port',
                                     labelWidth: 130,
-                                    name: 'sshPort'
+                                    name: 'sshPort',
+                                    value: 22,
+                                    allowBlank: false
                                 },
                                 {
                                     xtype: 'textfield',
@@ -127,7 +172,8 @@ Ext.define('webapp.view.TomcatInstanceFormWindow', {
                                     ],
                                     fieldLabel: 'Username',
                                     labelWidth: 130,
-                                    name: 'sshUsername'
+                                    name: 'sshUsername',
+                                    allowBlank: false
                                 },
                                 {
                                     xtype: 'textfield',
@@ -183,6 +229,60 @@ Ext.define('webapp.view.TomcatInstanceFormWindow', {
                                     inputType: 'password',
                                     allowBlank: false,
                                     vtype: 'password'
+                                },
+                                {
+                                    xtype: 'button',
+                                    handler: function(button, e) {
+                                        var formPanel = button.up("form");
+
+
+                                        formPanel.getForm().submit({
+                                            clientValidation: true,
+                                            url: GlobalData.urlPrefix + "tomcat/sshtest",
+                                            method: "POST",
+                                            waitMsg: 'Server connecting...',
+                                            success: function(form, action) {
+                                                //Ext.Msg.alert('Success', action.result.msg);
+
+
+                                                Ext.getCmp('sshTestResult').getEl().setStyle("color", "blue");
+                                                Ext.getCmp('sshTestResult').setText("OK");
+                                                button.setDisabled(true);
+
+                                            },
+                                            failure: function(form, action) {
+
+                                                switch (action.failureType) {
+                                                    case Ext.form.action.Action.CLIENT_INVALID:
+                                                    Ext.Msg.alert('Failure', '유효하지 않은 입력값이 존재합니다.');
+                                                    break;
+                                                    case Ext.form.action.Action.CONNECT_FAILURE:
+                                                    Ext.Msg.alert('Failure', 'Server communication failed');
+                                                    break;
+                                                    case Ext.form.action.Action.SERVER_INVALID:
+                                                    if(action.result.msg){
+                                                        Ext.Msg.alert('Failure', action.result.msg);
+                                                    }else{
+                                                        Ext.Msg.alert('Failure', "Server error.");
+                                                    }
+
+                                                }
+
+                                                Ext.getCmp('sshTestResult').getEl().setStyle("color", "red");
+                                                Ext.getCmp('sshTestResult').setText("Failed");
+                                            }
+                                        });
+                                    },
+                                    id: 'sshTestBtn',
+                                    itemId: 'sshTestBtn',
+                                    text: '접속 테스트'
+                                },
+                                {
+                                    xtype: 'label',
+                                    id: 'sshTestResult',
+                                    itemId: 'sshTestResult',
+                                    margin: '0 0 0 10',
+                                    text: ''
                                 }
                             ]
                         },
@@ -206,6 +306,14 @@ Ext.define('webapp.view.TomcatInstanceFormWindow', {
                                 {
                                     xtype: 'button',
                                     handler: function(button, e) {
+
+                                        if(!Ext.getCmp('sshTestBtn').isDisabled()){
+                                            Ext.Msg.alert('Alert', "ssh 접속테스트를 수행해주세요.");
+                                            return;
+                                        }
+
+
+
                                         var formPanel = button.up("form");
 
 

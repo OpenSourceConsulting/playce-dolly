@@ -59,6 +59,15 @@ public class TomcatInstance {
 	private String catalinaBase;
 	
 	@Column(nullable = false)
+	private String envScriptFile;
+
+	@Column(nullable = false)
+	private String startScriptFile;
+
+	@Column(nullable = false)
+	private String stopScriptFile;
+	
+	@Column(nullable = false)
 	private int sshPort;
 	
 	@Column(nullable = false)
@@ -113,6 +122,30 @@ public class TomcatInstance {
 
 	public void setCatalinaBase(String catalinaBase) {
 		this.catalinaBase = catalinaBase;
+	}
+
+	public String getEnvScriptFile() {
+		return envScriptFile;
+	}
+
+	public void setEnvScriptFile(String envScriptFile) {
+		this.envScriptFile = envScriptFile;
+	}
+
+	public String getStartScriptFile() {
+		return startScriptFile;
+	}
+
+	public void setStartScriptFile(String startScriptFile) {
+		this.startScriptFile = startScriptFile;
+	}
+
+	public String getStopScriptFile() {
+		return stopScriptFile;
+	}
+
+	public void setStopScriptFile(String stopScriptFile) {
+		this.stopScriptFile = stopScriptFile;
 	}
 
 	public int getSshPort() {

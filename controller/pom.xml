@@ -57,13 +57,11 @@
 			<version>1.0.0-SNAPSHOT</version>
 		</dependency>
 		
-		<!-- for JstlView
 		<dependency>
-		      <groupId>javax.servlet</groupId>
-		      <artifactId>jstl</artifactId>
+			<groupId>com.jcraft</groupId>
+			<artifactId>jsch</artifactId>
+			<version>0.1.51</version>
 		</dependency>
-		 -->
-		
 	</dependencies>
 	
 	<build>

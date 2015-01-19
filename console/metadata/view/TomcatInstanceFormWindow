@@ -6,14 +6,14 @@
     },
     "codeClass": null,
     "userConfig": {
+        "autoScroll": true,
         "designer|userAlias": "TomcatInstanceFormWindow",
         "designer|userClassName": "TomcatInstanceFormWindow",
-        "height": 404,
+        "height": 543,
         "id": "TomcatInstanceFormWindow",
         "itemId": "TomcatInstanceFormWindow",
         "layout": "card",
         "modal": true,
-        "resizable": false,
         "title": "Tomcat Instance 등록 1/2",
         "width": 450
     },
@@ -101,6 +101,7 @@
                     "codeClass": null,
                     "userConfig": {
                         "allowBlank": false,
+                        "emptyText": "ex) 192.168.0.5",
                         "fieldLabel": "IP Address",
                         "labelWidth": 120,
                         "layout|anchor": "100%",
@@ -135,6 +136,7 @@
                     "codeClass": null,
                     "userConfig": {
                         "allowBlank": false,
+                        "emptyText": "ex) /opt/tomcat",
                         "fieldLabel": "CATALINA_HOME",
                         "layout|anchor": "100%",
                         "name": "catalinaHome"
@@ -159,34 +161,154 @@
                     ]
                 },
                 {
-                    "type": "Ext.form.field.Text",
+                    "type": "Ext.form.FieldSet",
                     "reference": {
                         "name": "items",
                         "type": "array"
                     },
                     "codeClass": null,
                     "userConfig": {
-                        "allowBlank": false,
-                        "fieldLabel": "CATALINA_BASE",
-                        "layout|anchor": "100%",
-                        "name": "catalinaBase"
+                        "title": "Instance Environment"
                     },
-                    "designerId": "2441f4fc-d669-415e-8d81-a9d4d3306024",
+                    "designerId": "3c86a87a-932e-4ef2-9d78-a67316c0e86a",
                     "cn": [
                         {
-                            "type": "Ext.XTemplate",
+                            "type": "Ext.form.field.Text",
                             "reference": {
-                                "name": "afterLabelTextTpl",
-                                "type": "object"
+                                "name": "items",
+                                "type": "array"
                             },
                             "codeClass": null,
                             "userConfig": {
-                                "designer|displayName": "afterLabelTextTpl",
-                                "implHandler": [
-                                    "<span style=\"color:red;font-weight:bold\" data-qtip=\"Required\">*</span>"
+                                "allowBlank": false,
+                                "emptyText": "ex) /apps/instance01",
+                                "fieldLabel": "CATALINA_BASE",
+                                "layout|anchor": "100%",
+                                "name": "catalinaBase"
+                            },
+                            "designerId": "2441f4fc-d669-415e-8d81-a9d4d3306024",
+                            "cn": [
+                                {
+                                    "type": "Ext.XTemplate",
+                                    "reference": {
+                                        "name": "afterLabelTextTpl",
+                                        "type": "object"
+                                    },
+                                    "codeClass": null,
+                                    "userConfig": {
+                                        "designer|displayName": "afterLabelTextTpl",
+                                        "implHandler": [
+                                            "<span style=\"color:red;font-weight:bold\" data-qtip=\"Required\">*</span>"
+                                        ]
+                                    },
+                                    "designerId": "9f46fd10-6619-408f-bd8f-43ae6e2b3b9a"
+                                }
+                            ]
+                        },
+                        {
+                            "type": "Ext.form.field.Text",
+                            "reference": {
+                                "name": "items",
+                                "type": "array"
+                            },
+                            "codeClass": null,
+                            "userConfig": {
+                                "allowBlank": false,
+                                "fieldLabel": "Env Script",
+                                "layout|anchor": "100%",
+                                "name": "envScriptFile",
+                                "value": [
+                                    "\"$CATALINA_BASE/env.sh\""
                                 ]
                             },
-                            "designerId": "9f46fd10-6619-408f-bd8f-43ae6e2b3b9a"
+                            "designerId": "23ce315f-54d3-4bdf-989a-7fc41e55a2f5",
+                            "cn": [
+                                {
+                                    "type": "Ext.XTemplate",
+                                    "reference": {
+                                        "name": "afterLabelTextTpl",
+                                        "type": "object"
+                                    },
+                                    "codeClass": null,
+                                    "userConfig": {
+                                        "designer|displayName": "afterLabelTextTpl",
+                                        "implHandler": [
+                                            "<span style=\"color:red;font-weight:bold\" data-qtip=\"Required\">*</span>"
+                                        ]
+                                    },
+                                    "designerId": "ad767d8a-584c-45e9-be71-ddf01a18fc2e"
+                                }
+                            ]
+                        },
+                        {
+                            "type": "Ext.form.field.Text",
+                            "reference": {
+                                "name": "items",
+                                "type": "array"
+                            },
+                            "codeClass": null,
+                            "userConfig": {
+                                "allowBlank": false,
+                                "fieldLabel": "Start Script",
+                                "layout|anchor": "100%",
+                                "name": "startScriptFile",
+                                "value": [
+                                    "\"$CATALINA_BASE/start.sh\""
+                                ]
+                            },
+                            "designerId": "4c3f83a3-53cd-4b57-a4ad-6302751f6add",
+                            "cn": [
+                                {
+                                    "type": "Ext.XTemplate",
+                                    "reference": {
+                                        "name": "afterLabelTextTpl",
+                                        "type": "object"
+                                    },
+                                    "codeClass": null,
+                                    "userConfig": {
+                                        "designer|displayName": "afterLabelTextTpl",
+                                        "implHandler": [
+                                            "<span style=\"color:red;font-weight:bold\" data-qtip=\"Required\">*</span>"
+                                        ]
+                                    },
+                                    "designerId": "e2da24a8-42ac-44c3-8ad5-51b6024e486b"
+                                }
+                            ]
+                        },
+                        {
+                            "type": "Ext.form.field.Text",
+                            "reference": {
+                                "name": "items",
+                                "type": "array"
+                            },
+                            "codeClass": null,
+                            "userConfig": {
+                                "allowBlank": false,
+                                "fieldLabel": "Stop Script",
+                                "layout|anchor": "100%",
+                                "name": "stopScriptFile",
+                                "value": [
+                                    "\"$CATALINA_BASE/stop.sh\""
+                                ]
+                            },
+                            "designerId": "efbea127-03ce-4081-807e-8a97732531e1",
+                            "cn": [
+                                {
+                                    "type": "Ext.XTemplate",
+                                    "reference": {
+                                        "name": "afterLabelTextTpl",
+                                        "type": "object"
+                                    },
+                                    "codeClass": null,
+                                    "userConfig": {
+                                        "designer|displayName": "afterLabelTextTpl",
+                                        "implHandler": [
+                                            "<span style=\"color:red;font-weight:bold\" data-qtip=\"Required\">*</span>"
+                                        ]
+                                    },
+                                    "designerId": "904e2434-2955-48e4-9f7b-d2a907f475bb"
+                                }
+                            ]
                         }
                     ]
                 },
@@ -199,6 +321,7 @@
                     "codeClass": null,
                     "userConfig": {
                         "collapsible": true,
+                        "height": 169,
                         "margin": "18 0 0 0",
                         "title": "SSH Settings (Required)"
                     },
@@ -212,10 +335,14 @@
                             },
                             "codeClass": null,
                             "userConfig": {
+                                "allowBlank": false,
                                 "fieldLabel": "SSH Port",
                                 "labelWidth": 130,
                                 "layout|anchor": "100%",
                                 "name": "sshPort",
+                                "value": [
+                                    "22"
+                                ],
                                 "vtype": null
                             },
                             "designerId": "1a6e4d72-0c9b-49f1-8f9c-4881bc19e5f2",
@@ -245,6 +372,7 @@
                             },
                             "codeClass": null,
                             "userConfig": {
+                                "allowBlank": false,
                                 "fieldLabel": "Username",
                                 "labelWidth": 130,
                                 "layout|anchor": "100%",
@@ -399,6 +527,94 @@
                                     "designerId": "b48565bd-1e44-4cc2-b251-9afe8a6549c3"
                                 }
                             ]
+                        },
+                        {
+                            "type": "Ext.button.Button",
+                            "reference": {
+                                "name": "items",
+                                "type": "array"
+                            },
+                            "codeClass": null,
+                            "userConfig": {
+                                "id": "sshTestBtn",
+                                "itemId": "sshTestBtn",
+                                "text": "접속 테스트"
+                            },
+                            "designerId": "776f4550-fe5f-4fdb-afc7-e53522e0e3ee",
+                            "cn": [
+                                {
+                                    "type": "fixedfunction",
+                                    "reference": {
+                                        "name": "items",
+                                        "type": "array"
+                                    },
+                                    "codeClass": null,
+                                    "userConfig": {
+                                        "designer|params": [
+                                            "button",
+                                            "e"
+                                        ],
+                                        "fn": "handler",
+                                        "implHandler": [
+                                            "var formPanel = button.up(\"form\");",
+                                            "",
+                                            "",
+                                            "formPanel.getForm().submit({",
+                                            "    clientValidation: true,",
+                                            "    url: GlobalData.urlPrefix + \"tomcat/sshtest\",",
+                                            "    method: \"POST\",",
+                                            "    waitMsg: 'Server connecting...',",
+                                            "    success: function(form, action) {",
+                                            "        //Ext.Msg.alert('Success', action.result.msg);",
+                                            "",
+                                            "",
+                                            "        Ext.getCmp('sshTestResult').getEl().setStyle(\"color\", \"blue\");",
+                                            "        Ext.getCmp('sshTestResult').setText(\"OK\");",
+                                            "        button.setDisabled(true);",
+                                            "        ",
+                                            "    },",
+                                            "    failure: function(form, action) {",
+                                            "",
+                                            "        switch (action.failureType) {",
+                                            "            case Ext.form.action.Action.CLIENT_INVALID:",
+                                            "                Ext.Msg.alert('Failure', '유효하지 않은 입력값이 존재합니다.');",
+                                            "                break;",
+                                            "            case Ext.form.action.Action.CONNECT_FAILURE:",
+                                            "                Ext.Msg.alert('Failure', 'Server communication failed');",
+                                            "                break;",
+                                            "            case Ext.form.action.Action.SERVER_INVALID:",
+                                            "                if(action.result.msg){",
+                                            "                    Ext.Msg.alert('Failure', action.result.msg);",
+                                            "                }else{",
+                                            "                    Ext.Msg.alert('Failure', \"Server error.\");",
+                                            "                }",
+                                            "",
+                                            "        }",
+                                            "        ",
+                                            "        Ext.getCmp('sshTestResult').getEl().setStyle(\"color\", \"red\");",
+                                            "        Ext.getCmp('sshTestResult').setText(\"Failed\");",
+                                            "    }",
+                                            "});"
+                                        ]
+                                    },
+                                    "designerId": "e201ac78-3a2b-4347-a199-11d0376f286e"
+                                }
+                            ]
+                        },
+                        {
+                            "type": "Ext.form.Label",
+                            "reference": {
+                                "name": "items",
+                                "type": "array"
+                            },
+                            "codeClass": null,
+                            "userConfig": {
+                                "id": "sshTestResult",
+                                "itemId": "sshTestResult",
+                                "margin": "0 0 0 10",
+                                "text": ""
+                            },
+                            "designerId": "c4358fc7-8a82-4e08-b2ff-86ea4c6453c9"
                         }
                     ]
                 },
@@ -462,6 +678,14 @@
                                         ],
                                         "fn": "handler",
                                         "implHandler": [
+                                            "",
+                                            "if(!Ext.getCmp('sshTestBtn').isDisabled()){",
+                                            "    Ext.Msg.alert('Alert', \"ssh 접속테스트를 수행해주세요.\");",
+                                            "    return;",
+                                            "}",
+                                            "",
+                                            "",
+                                            "",
                                             "var formPanel = button.up(\"form\");",
                                             "",
                                             "",
@@ -472,7 +696,7 @@
                                             "    waitMsg: 'Saving Data...',",
                                             "    success: function(form, action) {",
                                             "        //Ext.Msg.alert('Success', action.result.msg);",
-                                            "        ",
+                                            "",
                                             "        webapp.app.getController('TomcatInstanceController').saveInstance(action.result.data);",
                                             "",
                                             "        Ext.getCmp('tomcatInstGrid').getStore().load();",
@@ -481,7 +705,7 @@
                                             "        formPanel.up('window').layout.setActiveItem(1);",
                                             "    },",
                                             "    failure: function(form, action) {",
-                                            "        ",
+                                            "",
                                             "        switch (action.failureType) {",
                                             "            case Ext.form.action.Action.CLIENT_INVALID:",
                                             "                Ext.Msg.alert('Failure', '유효하지 않은 입력값이 존재합니다.');",
@@ -495,7 +719,7 @@
                                             "                }else{",
                                             "                    Ext.Msg.alert('Failure', \"Server error.\");",
                                             "                }",
-                                            "               ",
+                                            "",
                                             "        }",
                                             "    }",
                                             "});",
