@@ -76,7 +76,7 @@ public class DollyAgent implements ClassFileTransformer {
 
         boolean verbose = config.isVerbose();
         
-        if (config.isUseEmbedded()) {
+        if (config.getClientType().equals("infinispan") && config.isUseEmbedded()) {
         	System.out.println("[Dolly] Embedded infinispan hotrod cache server will be start.");
         	
             if (verbose) {
@@ -100,13 +100,13 @@ public class DollyAgent implements ClassFileTransformer {
 	    		//configurationFile = Thread.currentThread().getContextClassLoader().getResource("jgroups-tcp.xml").getFile();
 	    		//configurationFile = this.getClass().getResource("jgroups-tcp.xml").getFile();
 	    		configurationFile = this.getClass().getResource("").getFile();
-	    		configurationFile = configurationFile.substring(5, configurationFile.indexOf("lib/athena-dolly")) + "jgroups-tcp.xml";
+	    		configurationFile = configurationFile.substring(5, configurationFile.indexOf("lib/core")) + "jgroups-tcp.xml";
     		} else {
 	    		System.setProperty("jgroups.udp.mcast_port", config.getJgroupsMulticastPort());
 	    		//configurationFile = Thread.currentThread().getContextClassLoader().getResource("jgroups-udp.xml").getFile();
 	    		//configurationFile = this.getClass().getResource("jgroups-udp.xml").getFile();
 	    		configurationFile = this.getClass().getResource("").getFile();
-	    		configurationFile = configurationFile.substring(5, configurationFile.indexOf("lib/athena-dolly")) + "jgroups-udp.xml";
+	    		configurationFile = configurationFile.substring(5, configurationFile.indexOf("lib/core")) + "jgroups-udp.xml";
     		}
     		
 			if (verbose) {
