@@ -346,7 +346,7 @@
                     "",
                     "        store.setRootNode(root);",
                     "        store1.setRootNode(root);",
-                    "        ",
+                    "",
                     "        viewTreePanel.update();",
                     "        Ext.getCmp(\"viewTreePanel1\").update();",
                     "",
