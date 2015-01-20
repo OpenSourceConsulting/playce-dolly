@@ -24,11 +24,21 @@
  */
 package com.athena.dolly.controller.ssh;
 
-import com.jcraft.jsch.*;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.io.OutputStream;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.jcraft.jsch.Channel;
+import com.jcraft.jsch.ChannelExec;
+import com.jcraft.jsch.JSch;
+import com.jcraft.jsch.JSchException;
+import com.jcraft.jsch.Session;
 
 /**
  * <pre>
@@ -38,7 +48,9 @@ import java.util.logging.Logger;
  * @version 2.0
  */
 public class SSHManager {
-	private static final Logger LOGGER = Logger.getLogger(SSHManager.class.getName());
+	//private static final Logger LOGGER = Logger.getLogger(SSHManager.class.getName());
+	static final Logger logger = LoggerFactory.getLogger(SSHManager.class);
+	
 	private JSch jsch;
 	private String strUserName;
 	private String strConnectionIP;
@@ -104,7 +116,7 @@ public class SSHManager {
 
 	private String logError(String errorMessage) {
 		if (errorMessage != null) {
-			LOGGER.log(Level.SEVERE, "{0}:{1} - {2}", new Object[] { strConnectionIP, intConnectionPort, errorMessage });
+			logger.error("{}:{} - {}", new Object[] { strConnectionIP, intConnectionPort, errorMessage });
 		}
 
 		return errorMessage;
@@ -112,7 +124,7 @@ public class SSHManager {
 
 	private String logWarning(String warnMessage) {
 		if (warnMessage != null) {
-			LOGGER.log(Level.WARNING, "{0}:{1} - {2}", new Object[] { strConnectionIP, intConnectionPort, warnMessage });
+			logger.warn("{}:{} - {}", new Object[] { strConnectionIP, intConnectionPort, warnMessage });
 		}
 
 		return warnMessage;
@@ -144,9 +156,258 @@ public class SSHManager {
 
 		return outputBuffer.toString();
 	}
+	
+	/**
+	 * 
+	 * @param remoteFile
+	 */
+	public byte[] scpDown(String remoteFile){
+		
+	    byte[] downByte = null;
+		// exec 'scp -f remoteFile' remotely
+		
+		try{
+			String command = "scp -f " + remoteFile;
+			Channel channel = session.openChannel("exec");
+			((ChannelExec) channel).setCommand(command);
+
+			// get I/O streams for remote scp
+			OutputStream out = channel.getOutputStream();
+			InputStream in = channel.getInputStream();
+
+			channel.connect();
+
+			byte[] buf = new byte[1024];
+
+			// send '\0'
+			buf[0] = 0;
+			out.write(buf, 0, 1);
+			out.flush();
+
+			while (true) {
+				int c = checkAck(in);
+				if (c != 'C') {
+					break;
+				}
+
+				// read '0644 '
+				in.read(buf, 0, 5);
+
+				long filesize = 0L;
+				while (true) {
+					if (in.read(buf, 0, 1) < 0) {
+						// error
+						break;
+					}
+					if (buf[0] == ' ')
+						break;
+					filesize = filesize * 10L + (long) (buf[0] - '0');
+				}
+
+				String file = null;
+				for (int i = 0;; i++) {
+					in.read(buf, i, 1);
+					if (buf[i] == (byte) 0x0a) {
+						file = new String(buf, 0, i);
+						break;
+					}
+				}
+
+				// System.out.println("filesize="+filesize+", file="+file);
+
+				// send '\0'
+				buf[0] = 0;
+				out.write(buf, 0, 1);
+				out.flush();
+
+				
+				// read a content of lfile
+				ByteArrayOutputStream bos = new ByteArrayOutputStream(1024);
+				//FileOutputStream fos = new FileOutputStream(prefix == null ? lfile : prefix + file);
+				int foo;
+				while (true) {
+					if (buf.length < filesize)
+						foo = buf.length;
+					else
+						foo = (int) filesize;
+					foo = in.read(buf, 0, foo);
+					if (foo < 0) {
+						// error
+						break;
+					}
+					bos.write(buf, 0, foo);
+					filesize -= foo;
+					if (filesize == 0L)
+						break;
+				}
+				downByte = bos.toByteArray();
+				bos.close();
+				bos = null;
+
+				if (checkAck(in) == 0) {
+					// send '\0'
+					buf[0] = 0;
+					out.write(buf, 0, 1);
+					out.flush();
+				}
+				
+			}
+			
+			return downByte;
+			
+		} catch (IOException ioX) {
+			logWarning(ioX.getMessage());
+			return null;
+		} catch (JSchException jschX) {
+			logWarning(jschX.getMessage());
+			return null;
+		}
+		
+		
+	}
+	
+	/**
+	 * 
+	 * @param remoteFile
+	 */
+	public void scpDown(String remoteFile, String lfile){
+		
+		String prefix=null;
+	    if(new File(lfile).isDirectory()){
+	        prefix=lfile+File.separator;
+	    }
+	      
+		// exec 'scp -f remoteFile' remotely
+		
+		try{
+			String command = "scp -f " + remoteFile;
+			Channel channel = session.openChannel("exec");
+			((ChannelExec) channel).setCommand(command);
+
+			// get I/O streams for remote scp
+			OutputStream out = channel.getOutputStream();
+			InputStream in = channel.getInputStream();
+
+			channel.connect();
+
+			byte[] buf = new byte[1024];
+
+			// send '\0'
+			buf[0] = 0;
+			out.write(buf, 0, 1);
+			out.flush();
+
+			while (true) {
+				int c = checkAck(in);
+				if (c != 'C') {
+					break;
+				}
+
+				// read '0644 '
+				in.read(buf, 0, 5);
+
+				long filesize = 0L;
+				while (true) {
+					if (in.read(buf, 0, 1) < 0) {
+						// error
+						break;
+					}
+					if (buf[0] == ' ')
+						break;
+					filesize = filesize * 10L + (long) (buf[0] - '0');
+				}
+
+				String file = null;
+				for (int i = 0;; i++) {
+					in.read(buf, i, 1);
+					if (buf[i] == (byte) 0x0a) {
+						file = new String(buf, 0, i);
+						break;
+					}
+				}
+
+				// System.out.println("filesize="+filesize+", file="+file);
+
+				// send '\0'
+				buf[0] = 0;
+				out.write(buf, 0, 1);
+				out.flush();
+
+				
+				// read a content of lfile
+				FileOutputStream fos = new FileOutputStream(prefix == null ? lfile : prefix + file);
+				int foo;
+				while (true) {
+					if (buf.length < filesize)
+						foo = buf.length;
+					else
+						foo = (int) filesize;
+					foo = in.read(buf, 0, foo);
+					if (foo < 0) {
+						// error
+						break;
+					}
+					fos.write(buf, 0, foo);
+					filesize -= foo;
+					if (filesize == 0L)
+						break;
+				}
+				fos.close();
+				fos = null;
+
+				if (checkAck(in) == 0) {
+					// send '\0'
+					buf[0] = 0;
+					out.write(buf, 0, 1);
+					out.flush();
+				}
+				
+			}
+			
+			
+		} catch (IOException ioX) {
+			logWarning(ioX.getMessage());
+		} catch (JSchException jschX) {
+			logWarning(jschX.getMessage());
+		}
+		
+		
+	}
 
 	public void close() {
 		session.disconnect();
+	}
+	
+	static int checkAck(InputStream in) throws IOException {
+		int b = in.read();
+		// b may be 0 for success,
+		// 1 for error,
+		// 2 for fatal error,
+		// -1
+		if (b == 0)
+			return b;
+		if (b == -1)
+			return b;
+
+		if (b == 1 || b == 2) {
+			StringBuffer sb = new StringBuffer();
+			int c;
+			do {
+				c = in.read();
+				sb.append((char) c);
+			} while (c != '\n');
+			
+			if (b == 1) { // error
+				//System.out.print(sb.toString());
+				logger.error(sb.toString());
+			}
+			if (b == 2) { // fatal error
+				//System.out.print(sb.toString());
+				logger.error(sb.toString());
+			}
+			
+		}
+		return b;
 	}
 	/*
 	public static void main(String[] args) {

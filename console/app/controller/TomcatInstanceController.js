@@ -70,11 +70,25 @@ Ext.define('webapp.controller.TomcatInstanceController', {
             case 10:
                 progressBar.updateProgress(0.25);
                 break;
+            case 11:
+                Ext.getCmp("loadingStatus").setText("에러 발생.");
+                envshCheckbox.setBoxLabel("env.sh 파일 로딩중 에러 발생.");
+                break;
             case 20:
                 progressBar.updateProgress(0.5);
                 break;
+            case 21:
+                Ext.getCmp("loadingStatus").setText("에러 발생.");
+                serverxmlCheckbox.setBoxLabel("server.xml 파일 로딩중 에러 발생.");
+                state = 10;
+                break;
             case 30:
                 progressBar.updateProgress(0.75);
+                break;
+            case 31:
+                Ext.getCmp("loadingStatus").setText("에러 발생.");
+                contextxmlCheckbox.setBoxLabel("context.xml 파일 로딩중 에러 발생.");
+                state = 20;
                 break;
             case 100:
                 progressBar.updateProgress(1);
@@ -111,6 +125,8 @@ Ext.define('webapp.controller.TomcatInstanceController', {
                 envshCheckbox.setBoxLabel("env.sh 파일 로딩중...");
                 break;
         }
+
+
     },
 
     init: function(application) {

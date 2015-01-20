@@ -24,10 +24,15 @@
  */
 package com.athena.dolly.controller.tomcat.instance.domain;
 
+import java.util.List;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 
 import org.hibernate.annotations.DynamicUpdate;
 
@@ -81,6 +86,9 @@ public class TomcatInstance {
 	private int applications; // application 개수
 	
 	private int state;
+	
+	@Column(columnDefinition="VARCHAR(500)")
+	private String errMsg;
 	
 	public TomcatInstance() {}
 	
@@ -195,5 +203,13 @@ public class TomcatInstance {
 	public void setState(int state) {
 		this.state = state;
 	}
-	
+
+	public String getErrMsg() {
+		return errMsg;
+	}
+
+	public void setErrMsg(String errMsg) {
+		this.errMsg = errMsg;
+	}
+
 }
