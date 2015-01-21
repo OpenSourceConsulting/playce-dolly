@@ -78,7 +78,7 @@ public class DollyClassTransformer implements ClassFileTransformer {
 		ClassPool pool = getClassPool(loader);
 		
         try {
-            if (acceptClass(className)) {
+            if (className != null && acceptClass(className)) {
                 if (verbose) {
                     System.out.println("[Dolly] Enhancing class : " + className);
                 }
