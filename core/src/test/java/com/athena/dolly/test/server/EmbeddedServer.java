@@ -66,7 +66,6 @@ public class EmbeddedServer {
 //		System.setProperty("jboss.modules.system.pkgs", "org.jboss.byteman");
 //		System.setProperty("java.awt.headless", "true");
 		
-		// -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=9999 -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.authenticate=false
 		HotRodServerConfiguration hotrodConfig = new HotRodServerConfigurationBuilder()
 				.host("127.0.0.1")
 				.port(11222)

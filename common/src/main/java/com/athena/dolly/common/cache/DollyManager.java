@@ -44,6 +44,8 @@ public class DollyManager {
 
     private static DollyClient _client;
 	private static DollyConfig config;
+	
+	private static boolean skipConnection = false;
 
     /**
      * <pre>
@@ -58,6 +60,24 @@ public class DollyManager {
         
         return _client;
     }//end of getInstance()
+
+    public static boolean isSkipConnection() {
+    	return skipConnection;
+    }
+    
+    public synchronized static void setSkipConnection() {
+    	if (!skipConnection) {
+    		skipConnection = true;
+
+    		System.out.println("[Dolly] Could not connect to session server. Connection will be blocked by the time server is running.");
+    		
+    		new ConnectionCheckThread().start();
+    	}
+    }
+    
+    public static void resetSkipConnection() {
+    	skipConnection = false;
+    }
     
     /**
      * <pre>
@@ -67,7 +87,7 @@ public class DollyManager {
      */
     private static DollyClient init() {
     	DollyClient client = null;
-    	
+
     	if (DollyConfig.properties == null || config == null) {
     		try {
                 config = new DollyConfig().load();
@@ -99,23 +119,46 @@ public class DollyManager {
 			value.put("key2", "value2");
 			value.put("key3", "value3");
 			
-			DollyManager.getClient().put("cacheKey", value);
+			try {
+				DollyManager.getClient().put("cacheKey", value);
+			} catch (Exception e) {
+			}
 			
 			value = (Map<String, String>)DollyManager.getClient().get("cacheKey");
 			System.out.println("Value => " + value);
-
+			
 			DollyManager.getClient().printAllCache();
 			
 			DollyStats stat = DollyManager.getClient().getStats();
 			System.out.println(stat);
-			
-			//DollyManager.getClient().remove("cacheKey");
-			
-			//DollyManager.getClient().getKeys();
+
+			DollyManager.getClient().remove("cacheKey");
+
+			DollyManager.getClient().getKeys(null);
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
 			DollyManager.getClient().destory();
+		}
+	}
+}
+
+class ConnectionCheckThread extends Thread {
+	
+	@Override
+	public void run() {
+		while (true) {
+			try {
+				DollyManager.getClient().get("connection_check");
+				DollyManager.resetSkipConnection();
+				break;
+			} catch (Exception e) {
+				try {
+					Thread.sleep(2000);
+				} catch (Exception e1) {
+					// ignore..
+				}
+			}
 		}
 	}
 }

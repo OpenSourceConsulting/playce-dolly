@@ -36,6 +36,7 @@ import javassist.ClassPool;
 import javassist.CtBehavior;
 import javassist.CtClass;
 import javassist.CtConstructor;
+import javassist.CtField;
 import javassist.CtMethod;
 import javassist.CtNewMethod;
 import javassist.LoaderClassPath;
@@ -91,8 +92,8 @@ public class DollyClassTransformer implements ClassFileTransformer {
                 } 
                 
                 // SSO 활성화 시 주어진 SessionID 값을 JSESSIONID로 사용하도록 변환 
-				if (enableSSO && cl.subtypeOf(pool.get("javax.servlet.http.HttpServletRequest"))) {
-					return instumentRequest(className, cl);
+				if (cl.subtypeOf(pool.get("javax.servlet.http.HttpServletRequest"))) {
+					return instumentRequest(className, cl, enableSSO);
 				}
                 
                 // Tomcat, JBoss 외의 WAS에서는 org.apache.catalina.session.ManagerBase로 타입 검사를 수행할 경우 
@@ -111,6 +112,7 @@ public class DollyClassTransformer implements ClassFileTransformer {
 						methods[i].insertAfter("System.out.println(\"" + className.replace("/", ".") + " : " + signature + returnValue + ");");
 					}
 				}
+                
 				return cl.toBytecode();
             }
         } catch (Exception e) {
@@ -144,6 +146,10 @@ public class DollyClassTransformer implements ClassFileTransformer {
 			CtMethod[] methods = cl.getDeclaredMethods();
 			CtClass[] params = null;
 			boolean isEnhanced = false;
+			
+			CtField f = CtField.make("private java.lang.String _id = null;", cl);
+			cl.addField(f);
+			
 			for (int i = 0; i < methods.length; i++) {
 				if (methods[i].isEmpty()) {
 					continue;
@@ -154,56 +160,144 @@ public class DollyClassTransformer implements ClassFileTransformer {
 				// Weblogic의 경우 sessionId는 ByhvS3mGpb5cZgn3BfmrSDN3gvQL5YVydpMdGDpCFP3xkYdM3LBS!1397924265!1387783814698 형태이며,
 				// 제일 처음 ! 앞 부분만 키로 사용한다.
 				
+				// Tomcat, JBoss의 경우 clustering 된 sessionId는 A4BBE7439E743B2E0CCD3B695E0F0DC9.node1 형태이며,
+				// 제일 처음 . 앞 부분만 키로 사용한다.
+				
 				String body = null;
 				isEnhanced = false;
 				if (methods[i].getName().equals("setAttribute")) {
 					if (params.length == 2) {		                
-						body =     "{";
+						body =		"{" +
+									"	if (_id == null) { " +
+									"		_id = getId();" +
+									"		_id = _id.split(\"!\")[0];" +
+									" 		java.lang.String[] _ids = _id.split(\"\\\\.\");" +
+									"		_id = _ids[0];" +
+									"		if (_ids.length > 1) {" +
+									"			try { com.athena.dolly.common.cache.DollyManager.getClient().put(_id, \"jvmRoute\", _ids[1]); } catch (Exception e) { e.printStackTrace(); }" +
+									"		}" + 
+									"	}";
 
 		                if (verbose) {
-							body += "	System.out.println(\"[Dolly] Session(\" + getId() + \") setAttribute(\" + $1 + \", \" + $2 + \") has called.\");";
+							body += "	System.out.println(\"[Dolly] Session(\" + _id + \") setAttribute(\" + $1 + \", \" + $2 + \") has called.\");";
 		                }
 		                
-						body +=	   "	try { com.athena.dolly.common.cache.DollyManager.getClient().put(getId().split(\"!\")[0], $1, $2); } catch (Exception e) { e.printStackTrace(); }" +
+						body +=	   "	try { com.athena.dolly.common.cache.DollyManager.getClient().put(_id, $1, $2); } catch (Exception e) { e.printStackTrace(); }" +
 								   "	try { _setAttribute($1, $2); } catch (Exception e) { e.printStackTrace(); }" + 
 								   "}";
 						isEnhanced = true;
 					}
-				} else if (methods[i].getName().equals("getAttribute")) {
-					body =     "{";
-
-	                if (verbose) {
-						body += "	System.out.println(\"[Dolly] Session(\" + getId() + \") getAttribute(\" + $1 + \") has called.\");";
+				} else if (methods[i].getName().equals("getAttribute")) {						
+					//*                
+					body =		"{" +
+								"	if (_id == null) { " +
+								"		_id = getId();" +
+								"		_id = _id.split(\"!\")[0];" +
+								" 		java.lang.String[] _ids = _id.split(\"\\\\.\");" +
+								"		_id = _ids[0];" +
+								"		if (_ids.length > 1) {" +
+								"			try { com.athena.dolly.common.cache.DollyManager.getClient().put(_id, \"jvmRoute\", _ids[1]); } catch (Exception e) { e.printStackTrace(); }" +
+								"		}" + 
+								"	}";
+					
+					if (verbose) {
+						body += "	System.out.println(\"[Dolly] Session(\" + _id + \") getAttribute(\" + $1 + \") has called.\");";
 	                }
 	                
+					// Expiration(time-out) 갱신을 위해 Session Server에서 먼저 조회한다.
 					body +=	   "	java.lang.Object obj = null;" +
-							   "	try { obj = com.athena.dolly.common.cache.DollyManager.getClient().get(getId().split(\"!\")[0], $1); } catch (Exception e) { e.printStackTrace(); }";
+							   "	try { obj = com.athena.dolly.common.cache.DollyManager.getClient().get(_id, $1); } catch (Exception e) { e.printStackTrace(); }";
 
 	                if (verbose) {
-						body += "	if (obj == null) { System.out.println(\"[Dolly] Attribute is NULL in DataGrid.\"); }";
-						body += "	else { System.out.println(\"[Dolly] Attribute is NOT NULL in DataGrid.\"); }";
+						body += "	if (obj == null) { System.out.println(\"[Dolly] Attribute does not exist in Session Server. Trying search in Local Session.\"); }";
 	                }
-	                
+
 					body +=	   "	if (obj == null) {" +
-							   "		try { obj = _getAttribute($1); } catch (Exception e) { e.printStackTrace(); }" +
+							   "		try { " +
+							   "			obj = _getAttribute($1);" +
+							   " 			if (obj != null && !com.athena.dolly.common.cache.DollyManager.isSkipConnection()) {" +
+							   "				java.util.Enumeration e = _getAttributeNames();" + 
+							   "				java.lang.String key = null;" +
+							   "				while (e.hasMoreElements()) { " +
+							   "					key = e.nextElement();" +
+					   		   "					com.athena.dolly.common.cache.DollyManager.getClient().put(_id, key, _getAttribute(key););" +
+							   "				}" +
+							   "			}" +
+							   "		} catch (Exception e) { e.printStackTrace(); }" +
 							   "	}";
 							   
 					if (verbose) {
-						body += "	System.out.println(\"[Dolly] Session(\" + getId() + \") getAttribute()'s result => \" + obj);";
+						body += "	System.out.println(\"[Dolly] Session(\" + _id + \") getAttribute()'s result => \" + obj);";
 					}
+					/*/    
+					body =		"{" +
+								"	if (_id == null) { " +
+								"		_id = getId();" +
+								"		_id = _id.split(\"!\")[0];" +
+								" 		java.lang.String[] _ids = _id.split(\"\\\\.\");" +
+								"		_id = _ids[0];" +
+								"		if (_ids.length > 1) {" +
+								"			try { com.athena.dolly.common.cache.DollyManager.getClient().put(_id, \"jvmRoute\", _ids[1]); } catch (Exception e) { e.printStackTrace(); }" +
+								"		}" + 
+								"	}";
+					
+	                if (verbose) {
+						body += "	System.out.println(\"[Dolly] Session(\" + _id + \") getAttribute(\" + $1 + \") has called.\");";
+	                }
+	                
+					body +=	   "	java.lang.Object obj = null;" +
+							   "	try { obj = _getAttribute($1); } catch (Exception e) { e.printStackTrace(); }";
+
+	                if (verbose) {
+						body += "	if (obj == null) { System.out.println(\"[Dolly] Attribute does not exist in local session. Trying search in Session Server.\"); }";
+	                }
+	                
+					body +=	   "	if (obj == null) {" +
+							   "		try { " +
+							   "			obj = com.athena.dolly.common.cache.DollyManager.getClient().get(_id, $1); " +
+							   " 			if (obj != null) {" +
+							   "				java.util.Enumeration e = com.athena.dolly.common.cache.DollyManager.getClient().getValueNames(_id);" + 
+							   "				java.lang.String key = null;" +
+							   "				while (e.hasMoreElements()) { " +
+							   "					key = e.nextElement();";
+						
+					if (className.startsWith("org/apache/catalina/session/StandardSessionFacade")) {
+						body += "					session.setAttribute(key, com.athena.dolly.common.cache.DollyManager.getClient().get(_id, key));";
+					} else {
+						body += "					attributes.put(key, com.athena.dolly.common.cache.DollyManager.getClient().get(_id, key));";
+					}
+					
+					body +=	   "				}" +
+							   "			}" +
+							   "		} catch (Exception e) { e.printStackTrace(); }" +
+							   "	}";
+							   
+					if (verbose) {
+						body += "	System.out.println(\"[Dolly] Session(\" + _id + \") getAttribute()'s result => \" + obj);";
+					}
+					//*/
 							   
 					body +=    "	return obj;" +
 							   "}";
 					isEnhanced = true;
-				} else if (methods[i].getName().equals("getAttributeNames")) {
-					body =     "{";
+				} else if (methods[i].getName().equals("getAttributeNames")) {	                 
+					body =		"{" +
+								"	if (_id == null) { " +
+								"		_id = getId();" +
+								"		_id = _id.split(\"!\")[0];" +
+								" 		java.lang.String[] _ids = _id.split(\"\\\\.\");" +
+								"		_id = _ids[0];" +
+								"		if (_ids.length > 1) {" +
+								"			try { com.athena.dolly.common.cache.DollyManager.getClient().put(_id, \"jvmRoute\", _ids[1]); } catch (Exception e) { e.printStackTrace(); }" +
+								"		}" + 
+								"	}";
 
 	                if (verbose) {
-						body += "	System.out.println(\"[Dolly] Session(\" + getId() + \") getAttributeNames() has called.\");";
+						body += "	System.out.println(\"[Dolly] Session(\" + _id + \") getAttributeNames() has called.\");";
 	                }
 	                
 					body +=	   "	java.util.Enumeration obj = null;" +
-							   "	try { obj = com.athena.dolly.common.cache.DollyManager.getClient().getValueNames(getId().split(\"!\")[0]); } catch (Exception e) { e.printStackTrace(); }" +
+							   "	try { obj = com.athena.dolly.common.cache.DollyManager.getClient().getValueNames(_id); } catch (Exception e) { e.printStackTrace(); }" +
 							   "	if (obj == null) {" +
 							   "		try { obj = _getAttributeNames(); } catch (Exception e) { e.printStackTrace(); }" +
 							   "	}" +
@@ -211,27 +305,45 @@ public class DollyClassTransformer implements ClassFileTransformer {
 							   "}";
 					isEnhanced = true;
 				} else if (methods[i].getName().equals("removeAttribute")) {
-					if (params.length == 1) {
-						body =     "{";
+					if (params.length == 1) {	                     
+						body =		"{" +
+									"	if (_id == null) { " +
+									"		_id = getId();" +
+									"		_id = _id.split(\"!\")[0];" +
+									" 		java.lang.String[] _ids = _id.split(\"\\\\.\");" +
+									"		_id = _ids[0];" +
+									"		if (_ids.length > 1) {" +
+									"			try { com.athena.dolly.common.cache.DollyManager.getClient().put(_id, \"jvmRoute\", _ids[1]); } catch (Exception e) { e.printStackTrace(); }" +
+									"		}" + 
+									"	}";
 
 		                if (verbose) {
-							body += "	System.out.println(\"[Dolly] Session(\" + getId() + \") removeAttribute(\" + $1 + \") has called.\");";
+							body += "	System.out.println(\"[Dolly] Session(\" + _id + \") removeAttribute(\" + $1 + \") has called.\");";
 		                }
 		                
-						body +=	   "	try { com.athena.dolly.common.cache.DollyManager.getClient().remove(getId().split(\"!\")[0], $1); } catch (Exception e) { e.printStackTrace(); }" +
+						body +=	   "	try { com.athena.dolly.common.cache.DollyManager.getClient().remove(_id, $1); } catch (Exception e) { e.printStackTrace(); }" +
 								   "	try { _removeAttribute($1); } catch (Exception e) { e.printStackTrace(); }" +
 								   "}";
 						isEnhanced = true;
 					}
 				} else if (methods[i].getName().equals("invalidate")) {
-					if (params.length == 0) {
-						body =     "{";
+					if (params.length == 0) {         	                
+						body =		"{" +
+									"	if (_id == null) { " +
+									"		_id = getId();" +
+									"		_id = _id.split(\"!\")[0];" +
+									" 		java.lang.String[] _ids = _id.split(\"\\\\.\");" +
+									"		_id = _ids[0];" +
+									"		if (_ids.length > 1) {" +
+									"			try { com.athena.dolly.common.cache.DollyManager.getClient().put(_id, \"jvmRoute\", _ids[1]); } catch (Exception e) { e.printStackTrace(); }" +
+									"		}" + 
+									"	}";
 
 		                if (verbose) {
-							body += "	System.out.println(\"[Dolly] Session(\" + getId() + \") invalidate() has called.\");";
+							body += "	System.out.println(\"[Dolly] Session(\" + _id + \") invalidate() has called.\");";
 		                }
 		                
-						body +=	   "	try { com.athena.dolly.common.cache.DollyManager.getClient().remove(getId().split(\"!\")[0]); } catch (Exception e) { e.printStackTrace(); }" +
+						body +=	   "	try { com.athena.dolly.common.cache.DollyManager.getClient().remove(_id); } catch (Exception e) { e.printStackTrace(); }" +
 								   "	try { _invalidate(); } catch (Exception e) { e.printStackTrace(); }" +
 								   "}";
 						isEnhanced = true;
@@ -328,10 +440,11 @@ public class DollyClassTransformer implements ClassFileTransformer {
 	 * </pre>
 	 * @param className
 	 * @param cl
+	 * @param enableSSO
 	 * @return
 	 * @throws Exception
 	 */
-	private byte[] instumentRequest(String className, CtClass cl) throws Exception {
+	private byte[] instumentRequest(String className, CtClass cl, boolean enableSSO) throws Exception {
 		byte[] redefinedClassfileBuffer = null;
 		
 		CtMethod[] methods = cl.getDeclaredMethods();
@@ -340,7 +453,7 @@ public class DollyClassTransformer implements ClassFileTransformer {
 				continue;
 			}
 
-			if (className.equals("org/apache/catalina/connector/Request") && methods[i].getName().equals("doGetSession")) {
+			if (enableSSO && className.equals("org/apache/catalina/connector/Request") && methods[i].getName().equals("doGetSession")) {
 				String body = 	"boolean ssoDomain = false;" +
 						   		"String serverName = getServerName();";
 				
@@ -363,7 +476,7 @@ public class DollyClassTransformer implements ClassFileTransformer {
 								"}";
 				
 				methods[i].insertBefore(body);
-			} else if (className.equals("weblogic/servlet/internal/ServletRequestImpl") && methods[i].getName().equals("getSession")) {
+			} else if (enableSSO && className.equals("weblogic/servlet/internal/ServletRequestImpl") && methods[i].getName().equals("getSession")) {
 				CtClass[] params = methods[i].getParameterTypes();
 				
 				if (params == null || params.length < 1) {

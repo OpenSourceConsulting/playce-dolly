@@ -241,7 +241,7 @@ public class HotrodTest {
 			e.printStackTrace();
 		}
 		
-		//test.clear();
+		test.clear();
 	}
 
 }
