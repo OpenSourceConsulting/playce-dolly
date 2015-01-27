@@ -23,6 +23,7 @@
 package com.athena.dolly.common.cache.client.impl;
 
 import java.io.IOException;
+import java.net.ConnectException;
 import java.net.SocketAddress;
 import java.net.URI;
 import java.util.ArrayList;
@@ -34,7 +35,10 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
+import org.infinispan.client.hotrod.exceptions.TransportException;
+
 import com.athena.dolly.common.cache.DollyConfig;
+import com.athena.dolly.common.cache.DollyManager;
 import com.athena.dolly.common.cache.SessionKey;
 import com.athena.dolly.common.cache.client.DollyClient;
 import com.athena.dolly.common.exception.ConfigurationException;
@@ -97,14 +101,28 @@ public class CouchbaseClient implements DollyClient {
 	 */
 	public Object get(String cacheKey) {
 		Object obj = null;
-		
-		String document = (String) client.get(cacheKey);
-		
-		if (document != null) {
-			obj = gson.fromJson(document, Object.class);
+
+		if (!DollyManager.isSkipConnection()) {
+			try {
+				String document = (String) client.get(cacheKey);
+				
+				if (document != null) {
+					obj = gson.fromJson(document, Object.class);
+				}
+				
+				client.touch(cacheKey, config.getTimeout() * 60);
+			} catch (Exception e) {
+				if (e instanceof TransportException || e instanceof ConnectException) {
+					DollyManager.setSkipConnection();
+				} else if (e instanceof com.couchbase.client.vbucket.ConfigurationException) {
+					DollyManager.setSkipConnection();
+				} else if (e instanceof RuntimeException && e.getMessage().equals("Timed out waiting for operation")) {
+					DollyManager.setSkipConnection();
+				} else {
+					e.printStackTrace();
+				}
+			}
 		}
-		
-		client.touch(cacheKey, config.getTimeout() * 60);
 		
 		return obj;
 	}//end of get()
@@ -114,20 +132,50 @@ public class CouchbaseClient implements DollyClient {
 	 */
 	@SuppressWarnings("unchecked")
 	public Object get(String cacheKey, String dataKey) {
-    	Map<String, Object> attribute = (Map<String, Object>)get(cacheKey);
-		
-		if (attribute == null) {
-			return null;
-		} else {
-			return attribute.get(dataKey);
+		if (!DollyManager.isSkipConnection()) {
+			try {
+		    	Map<String, Object> attribute = (Map<String, Object>)get(cacheKey);
+				
+				if (attribute == null) {
+					return null;
+				} else {
+					return attribute.get(dataKey);
+				}
+			} catch (Exception e) {
+				if (e instanceof TransportException || e instanceof ConnectException) {
+					DollyManager.setSkipConnection();
+				} else if (e instanceof com.couchbase.client.vbucket.ConfigurationException) {
+					DollyManager.setSkipConnection();
+				} else if (e instanceof RuntimeException && e.getMessage().equals("Timed out waiting for operation")) {
+					DollyManager.setSkipConnection();
+				} else {
+					e.printStackTrace();
+				}
+			}
 		}
+		
+		return null;
 	}//end of get()
 
 	/* (non-Javadoc)
 	 * @see com.athena.dolly.enhancer.client.DollyClient#put(java.lang.String, java.lang.Object)
 	 */
 	public synchronized void put(String cacheKey, Object value) throws Exception {
-		client.set(cacheKey, config.getTimeout() * 60, gson.toJson(value)).get();
+		if (!DollyManager.isSkipConnection()) {
+			try {
+				client.set(cacheKey, config.getTimeout() * 60, gson.toJson(value)).get();
+			} catch (Exception e) {
+				if (e instanceof TransportException || e instanceof ConnectException) {
+					DollyManager.setSkipConnection();
+				} else if (e instanceof com.couchbase.client.vbucket.ConfigurationException) {
+					DollyManager.setSkipConnection();
+				} else if (e instanceof RuntimeException && e.getMessage().equals("Timed out waiting for operation")) {
+					DollyManager.setSkipConnection();
+				} else {
+					e.printStackTrace();
+				}
+			}
+		}
 	}//end of put()
 
 	/* (non-Javadoc)
@@ -135,15 +183,29 @@ public class CouchbaseClient implements DollyClient {
 	 */
 	@SuppressWarnings("unchecked")
 	public synchronized void put(String cacheKey, String dataKey, Object value) throws Exception {
-		if (dataKey != null) {
-	    	Map<String, Object> attribute = (Map<String, Object>)get(cacheKey);
-			
-			if (attribute == null) {
-				attribute = new ConcurrentHashMap<String, Object>();
+		if (!DollyManager.isSkipConnection()) {
+			try {
+				if (dataKey != null) {
+			    	Map<String, Object> attribute = (Map<String, Object>)get(cacheKey);
+					
+					if (attribute == null) {
+						attribute = new ConcurrentHashMap<String, Object>();
+					}
+					
+					attribute.put(dataKey, value);
+					client.set(cacheKey, config.getTimeout() * 60, gson.toJson(attribute)).get();
+				}
+			} catch (Exception e) {
+				if (e instanceof TransportException || e instanceof ConnectException) {
+					DollyManager.setSkipConnection();
+				} else if (e instanceof com.couchbase.client.vbucket.ConfigurationException) {
+					DollyManager.setSkipConnection();
+				} else if (e instanceof RuntimeException && e.getMessage().equals("Timed out waiting for operation")) {
+					DollyManager.setSkipConnection();
+				} else {
+					e.printStackTrace();
+				}
 			}
-			
-			attribute.put(dataKey, value);
-			client.set(cacheKey, config.getTimeout() * 60, gson.toJson(attribute)).get();
 		}
 	}//end of put()
 
@@ -151,7 +213,21 @@ public class CouchbaseClient implements DollyClient {
 	 * @see com.athena.dolly.enhancer.client.DollyClient#remove(java.lang.String)
 	 */
 	public synchronized void remove(String cacheKey) throws Exception {
-		client.delete(cacheKey).get();
+		if (!DollyManager.isSkipConnection()) {
+			try {
+				client.delete(cacheKey).get();
+			} catch (Exception e) {
+				if (e instanceof TransportException || e instanceof ConnectException) {
+					DollyManager.setSkipConnection();
+				} else if (e instanceof com.couchbase.client.vbucket.ConfigurationException) {
+					DollyManager.setSkipConnection();
+				} else if (e instanceof RuntimeException && e.getMessage().equals("Timed out waiting for operation")) {
+					DollyManager.setSkipConnection();
+				} else {
+					e.printStackTrace();
+				}
+			}
+		}
 	}//end of remove()
 
 	/* (non-Javadoc)
@@ -159,15 +235,29 @@ public class CouchbaseClient implements DollyClient {
 	 */
 	@SuppressWarnings("unchecked")
 	public synchronized void remove(String cacheKey, String dataKey) throws Exception {
-		if (dataKey != null) {
-	    	Map<String, Object> attribute = (Map<String, Object>)get(cacheKey);
-			
-			if (attribute == null) {
-				attribute = new ConcurrentHashMap<String, Object>();
+		if (!DollyManager.isSkipConnection()) {
+			try {
+				if (dataKey != null) {
+			    	Map<String, Object> attribute = (Map<String, Object>)get(cacheKey);
+					
+					if (attribute == null) {
+						attribute = new ConcurrentHashMap<String, Object>();
+					}
+					
+					attribute.remove(dataKey);
+					client.set(cacheKey, config.getTimeout() * 60, gson.toJson(attribute)).get();
+				}
+			} catch (Exception e) {
+				if (e instanceof TransportException || e instanceof ConnectException) {
+					DollyManager.setSkipConnection();
+				} else if (e instanceof com.couchbase.client.vbucket.ConfigurationException) {
+					DollyManager.setSkipConnection();
+				} else if (e instanceof RuntimeException && e.getMessage().equals("Timed out waiting for operation")) {
+					DollyManager.setSkipConnection();
+				} else {
+					e.printStackTrace();
+				}
 			}
-			
-			attribute.remove(dataKey);
-			client.set(cacheKey, config.getTimeout() * 60, gson.toJson(attribute)).get();
 		}
 	}//end of remove()
     
@@ -176,59 +266,90 @@ public class CouchbaseClient implements DollyClient {
      */
     @SuppressWarnings("unchecked")
 	public Enumeration<String> getValueNames(String cacheKey) {
-    	Map<String, Object> attribute = (Map<String, Object>)get(cacheKey);
-		
-		if (attribute == null) {
-			return null;
-		} else {
-			return Collections.enumeration(attribute.keySet());
+		if (!DollyManager.isSkipConnection()) {
+			try {
+		    	Map<String, Object> attribute = (Map<String, Object>)get(cacheKey);
+				
+				if (attribute == null) {
+					return null;
+				} else {
+					return Collections.enumeration(attribute.keySet());
+				}
+			} catch (Exception e) {
+				if (e instanceof TransportException || e instanceof ConnectException) {
+					DollyManager.setSkipConnection();
+				} else if (e instanceof com.couchbase.client.vbucket.ConfigurationException) {
+					DollyManager.setSkipConnection();
+				} else if (e instanceof RuntimeException && e.getMessage().equals("Timed out waiting for operation")) {
+					DollyManager.setSkipConnection();
+				} else {
+					e.printStackTrace();
+				}
+			}
 		}
+		
+		return null;
     }//end of getValueNames()
 
 	/* (non-Javadoc)
 	 * @see com.athena.dolly.enhancer.client.DollyClient#getKeys()
 	 */
 	public List<SessionKey> getKeys(String viewName) {
-		View view = null;
-		
-		if (viewName == null) {
-			//DesignDocument designDoc = getDesignDocument(config.getCouchbaseBucketName());
-			DesignDocument designDoc = getDesignDocument("dolly");
-	
-	        boolean found = false;
-	        for (ViewDesign design : designDoc.getViews()) {
-	            if (design.getName().equals("getKeys")) {
-	                found = true;
-	                break;
-	            }
-	        }
-	        
-	        if (!found) {
-	            ViewDesign design = new ViewDesign("getKeys", "function (doc, meta) {\n" +
-	                    "    emit(meta.id, null);\n" +
-	                    "}");
-	            designDoc.getViews().add(design);
-	            client.createDesignDoc(designDoc);
-	        }
-	        
-			//View view = client.getView(config.getCouchbaseBucketName(), "get_all");
-        	view = client.getView("dolly", "getKeys");
-        
-		} else {
-			String[] names = viewName.split("/");
-			view = client.getView(names[0], names[1]);
-		}
-        
-		Query query = new Query().setStale(Stale.FALSE).setReduce(false).setIncludeDocs(false);
-		
-		ViewResponse response = client.query(view, query);
-
 		List<SessionKey> keyList = new ArrayList<SessionKey>();
-		SessionKey key = null;
-		for (ViewRow row : response) {
-			key = new SessionKey();
-			key.setKey(row.getKey());
-			keyList.add(key);
+
+		if (!DollyManager.isSkipConnection()) {
+			try {
+				View view = null;
+				
+				if (viewName == null) {
+					//DesignDocument designDoc = getDesignDocument(config.getCouchbaseBucketName());
+					DesignDocument designDoc = getDesignDocument("dolly");
+			
+			        boolean found = false;
+			        for (ViewDesign design : designDoc.getViews()) {
+			            if (design.getName().equals("getKeys")) {
+			                found = true;
+			                break;
+			            }
+			        }
+			        
+			        if (!found) {
+			            ViewDesign design = new ViewDesign("getKeys", "function (doc, meta) {\n" +
+			                    "    emit(meta.id, null);\n" +
+			                    "}");
+			            designDoc.getViews().add(design);
+			            client.createDesignDoc(designDoc);
+			        }
+			        
+					//View view = client.getView(config.getCouchbaseBucketName(), "get_all");
+		        	view = client.getView("dolly", "getKeys");
+		        
+				} else {
+					String[] names = viewName.split("/");
+					view = client.getView(names[0], names[1]);
+				}
+		        
+				Query query = new Query().setStale(Stale.FALSE).setReduce(false).setIncludeDocs(false);
+				
+				ViewResponse response = client.query(view, query);
+		
+				SessionKey key = null;
+				for (ViewRow row : response) {
+					key = new SessionKey();
+					key.setKey(row.getKey());
+					keyList.add(key);
+				}
+			} catch (Exception e) {
+				if (e instanceof TransportException || e instanceof ConnectException) {
+					DollyManager.setSkipConnection();
+				} else if (e instanceof com.couchbase.client.vbucket.ConfigurationException) {
+					DollyManager.setSkipConnection();
+				} else if (e instanceof RuntimeException && e.getMessage().equals("Timed out waiting for operation")) {
+					DollyManager.setSkipConnection();
+				} else {
+					e.printStackTrace();
+				}
+			}
 		}
 		
 		return keyList;
@@ -253,18 +374,6 @@ public class CouchbaseClient implements DollyClient {
 		
 		Map<String, String> stat = null;
 		stat = statMap.get(socketList.get(idx));
-		DollyStats dollyStat = new DollyStats();
-		
-		dollyStat.setSize(Integer.parseInt(stat.get("curr_items_tot")));
-		dollyStat.setCurrentNumberOfEntries(stat.get("curr_items_tot"));
-		dollyStat.setTimeSinceStart(stat.get("uptime"));
-		dollyStat.setStores(stat.get("ep_total_new_items"));
-		dollyStat.setMisses(stat.get("get_misses"));
-		dollyStat.setTotalNumberOfEntries(stat.get("ep_total_new_items"));
-		dollyStat.setRetrievals(stat.get("cmd_get"));
-		dollyStat.setRemoveHits(stat.get("delete_hits"));
-		dollyStat.setHits(stat.get("get_hits"));
-		dollyStat.setRemoveMisses(stat.get("delete_misses"));
 		
 		/*
 		for (SocketAddress addr : socketList) {
@@ -273,6 +382,18 @@ public class CouchbaseClient implements DollyClient {
 			System.out.println(addr + " : " + stat);
 		}
 		//*/
+
+		DollyStats dollyStat = new DollyStats();
+		dollyStat.setSize(Integer.parseInt((stat.get("curr_items_tot") == null ? "-1" : stat.get("curr_items_tot"))));
+		dollyStat.setCurrentNumberOfEntries((stat.get("curr_items_tot") == null ? "N/A" : stat.get("curr_items_tot")));
+		dollyStat.setTimeSinceStart(stat.get("uptime"));
+		dollyStat.setStores(stat.get("ep_total_new_items"));
+		dollyStat.setMisses(stat.get("get_misses"));
+		dollyStat.setTotalNumberOfEntries(stat.get("ep_total_new_items"));
+		dollyStat.setRetrievals(stat.get("cmd_get"));
+		dollyStat.setRemoveHits(stat.get("delete_hits"));
+		dollyStat.setHits(stat.get("get_hits"));
+		dollyStat.setRemoveMisses(stat.get("delete_misses"));
 		
 		return dollyStat;
 	}//end of getStats()
