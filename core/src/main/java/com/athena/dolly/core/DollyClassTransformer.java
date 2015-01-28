@@ -150,7 +150,8 @@ public class DollyClassTransformer implements ClassFileTransformer {
 			CtField f = CtField.make("private java.lang.String _id = null;", cl);
 			cl.addField(f);
 			
-			for (int i = 0; i < methods.length; i++) {
+			// getAttribute() 변환 시 _getAttributeNames() 메소드가 변환되어 있어야 하기 때문에 methods를 역으로 탐색한다.
+			for (int i = methods.length - 1; i >= 0; i--) {
 				if (methods[i].isEmpty()) {
 					continue;
 				}
@@ -187,7 +188,7 @@ public class DollyClassTransformer implements ClassFileTransformer {
 								   "}";
 						isEnhanced = true;
 					}
-				} else if (methods[i].getName().equals("getAttribute")) {						
+				} else if (methods[i].getName().equals("getAttribute")) {
 					//*                
 					body =		"{" +
 								"	if (_id == null) { " +
@@ -219,8 +220,8 @@ public class DollyClassTransformer implements ClassFileTransformer {
 							   "				java.util.Enumeration e = _getAttributeNames();" + 
 							   "				java.lang.String key = null;" +
 							   "				while (e.hasMoreElements()) { " +
-							   "					key = e.nextElement();" +
-					   		   "					com.athena.dolly.common.cache.DollyManager.getClient().put(_id, key, _getAttribute(key););" +
+							   "					key = (java.lang.String) e.nextElement();" +
+					   		   "					com.athena.dolly.common.cache.DollyManager.getClient().put(_id, key, _getAttribute(key));" +
 							   "				}" +
 							   "			}" +
 							   "		} catch (Exception e) { e.printStackTrace(); }" +
