@@ -41,7 +41,7 @@
 						<manifestEntries>
 							<Premain-Class>com.athena.dolly.core.DollyAgent</Premain-Class>
 							<!-- for test -->
-							<Main-Class>com.athena.dolly.common.cache.DollyManager</Main-Class>
+							<Main-Class>com.athena.dolly.InfinispanStarter</Main-Class>
 						</manifestEntries>
 					</archive>                              
                     <excludes>                                  
