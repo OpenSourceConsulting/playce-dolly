@@ -20,22 +20,24 @@ Athena-Dolly는 WAS에 비종속적인 세션 클러스터링 솔루션으로 �
    - _**dolly.client.type**_ : Infispan, Couchbase 등 세션 서버 타입
    - _**dolly.use.infinispan.embedded**_ : Infinispan Embedded 동작 여부
    - _**dolly.hotrod.host**_ : Infinispan Embedded 시 사용될 Bind Address 및 Port
-   - _**dolly.jgroups.* **_ : Infinispan Embedded 시 사용될 Clustering 설정(jgroups)
+   - _**dolly.jgroups.xxx**_ : Infinispan Embedded 시 사용될 Clustering 설정(jgroups)
    - _**dolly.enableSSO**_ : SSO 사용 여부
    - _**dolly.sso.domain.list**_ : SSO 사용 대상 도메인 목록
    - _**dolly.sso.parameter.key**_ : SSO 사용 시 다른 도메인에 Session ID를 넘겨줄 때 사용하는 Query Parameter Key
-   - _**couchbase.* **_ : Couchbase 관련 정보(uri, name, password)
+   - _**couchbase.xxx**_ : Couchbase 관련 정보(uri, name, password)
    - _**infinispan.client.hotrod.xxx**_ : Infinispan Hotrod Client 설정(기본 값으로 사용 권고)
    - _**infinispan.client.hotrod.server_list**_ : Infinispan Hotrod Server 목록
    - _**maxActive, maxTotal, maxIdle, testOnBorrow**_ : Infinispan Connection Pool 관련 설정(기본 값으로 사용 권고)
          
 4. Inifinispan Embedded / Standalone
    - WAS Embedded 형태로 구동을 원할 경우 dolly.properties 파일에 dolly.use.infinispan.embedded 값을 "true"로 설정하고, JMX 활성화를 위해 다음 System Property를 추가한다.
+   
       (eg) -Dcom.sun.management.jmxremote 
            -Dcom.sun.management.jmxremote.port=9999 
            -Dcom.sun.management.jmxremote.ssl=false 
            -Dcom.sun.management.jmxremote.authenticate=false
    - Standalone 형태로 구동을 원할 경우 다음과 같은 명령으로 실행 시킬 수 있다.
+   
       (eg) java -Ddolly.properties=/opt/dolly-agent/dolly.properties.embedded -jar core-1.0.0-SNAPSHOT.jar 9999
            - 9999는 JMX 포트 번호로써 주어지지 않을 경우 9999를 기본 값으로 사용한다.
            - "nohup java -Ddolly.properties=/home/dolly/dolly-agent/dolly.properties.embedded -jar core-1.0.0-SNAPSHOT.jar 1> /dev/null 2>1 &" 로 실행하여 Backgroud 실행할 수 있다.
