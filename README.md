@@ -37,9 +37,9 @@ Athena-Dolly는 WAS에 비종속적인 세션 클러스터링 솔루션으로 �
        - -Dcom.sun.management.jmxremote.authenticate=false
         
    - Standalone 형태로 구동을 원할 경우 다음과 같은 명령으로 실행 시킬 수 있다.
-       - java -Ddolly.properties=/opt/dolly-agent/dolly.properties.embedded -jar core-1.0.0-SNAPSHOT.jar 9999
+       - java -Ddolly.properties=/opt/dolly-agent/dolly.properties -jar core-1.0.0-SNAPSHOT.jar 9999
 	  - 9999는 JMX 포트 번호로써 주어지지 않을 경우 9999를 기본 값으로 사용한다.
-	  - "nohup java -Ddolly.properties=/home/dolly/dolly-agent/dolly.properties.embedded -jar core-1.0.0-SNAPSHOT.jar 1> /dev/null 2>1 &" 로 실행하여 Backgroud 실행할 수 있다.
+	  - "nohup java -Ddolly.properties=/opt/dolly-agent/dolly.properties -jar core-1.0.0-SNAPSHOT.jar 9999 > /dev/null 2>&1 &" 로 실행하여 Backgroud로 실행할 수 있다.
 
 5. Athena-Dolly 실행을 위한 WAS 구동 옵션 추가
    - Athena-Dolly 실행을 위해서 dolly.properties에 해당하는 System Property 및 javaagent 옵션이 필요하다.
