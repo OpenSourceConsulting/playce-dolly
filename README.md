@@ -31,12 +31,12 @@ Athena-Dolly는 WAS에 비종속적인 세션 클러스터링 솔루션으로 �
          
 4. Inifinispan Embedded / Standalone
    - WAS Embedded 형태로 구동을 원할 경우 dolly.properties 파일에 dolly.use.infinispan.embedded 값을 "true"로 설정하고, JMX 활성화를 위해 다음 System Property를 추가한다.
-   
+	```     
          (eg) -Dcom.sun.management.jmxremote
               -Dcom.sun.management.jmxremote.port=9999 
               -Dcom.sun.management.jmxremote.ssl=false 
               -Dcom.sun.management.jmxremote.authenticate=false
-    
+	```     
    - Standalone 형태로 구동을 원할 경우 다음과 같은 명령으로 실행 시킬 수 있다.
 
          (eg)  java -Ddolly.properties=/opt/dolly-agent/dolly.properties.embedded -jar core-1.0.0-SNAPSHOT.jar 9999
