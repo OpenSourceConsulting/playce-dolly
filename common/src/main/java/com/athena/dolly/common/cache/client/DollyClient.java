@@ -134,5 +134,12 @@ public interface DollyClient {
 	 * </pre>
 	 */
 	public void printAllCache();
+	
+	/**
+	 * <pre>
+	 * 캐시 서버로의 연결 상태를 체크한다.
+	 * </pre>
+	 */
+	public void healthCheck();
 }
 //end of DollyClient.java

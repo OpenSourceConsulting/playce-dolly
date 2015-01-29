@@ -116,7 +116,7 @@ public class CouchbaseClient implements DollyClient {
 					DollyManager.setSkipConnection();
 				} else if (e instanceof com.couchbase.client.vbucket.ConfigurationException) {
 					DollyManager.setSkipConnection();
-				} else if (e instanceof RuntimeException && e.getMessage().equals("Timed out waiting for operation")) {
+				} else if (e.getMessage().startsWith("Timed out waiting for")) {
 					DollyManager.setSkipConnection();
 				} else {
 					e.printStackTrace();
@@ -146,7 +146,7 @@ public class CouchbaseClient implements DollyClient {
 					DollyManager.setSkipConnection();
 				} else if (e instanceof com.couchbase.client.vbucket.ConfigurationException) {
 					DollyManager.setSkipConnection();
-				} else if (e instanceof RuntimeException && e.getMessage().equals("Timed out waiting for operation")) {
+				} else if (e.getMessage().startsWith("Timed out waiting for")) {
 					DollyManager.setSkipConnection();
 				} else {
 					e.printStackTrace();
@@ -169,7 +169,7 @@ public class CouchbaseClient implements DollyClient {
 					DollyManager.setSkipConnection();
 				} else if (e instanceof com.couchbase.client.vbucket.ConfigurationException) {
 					DollyManager.setSkipConnection();
-				} else if (e instanceof RuntimeException && e.getMessage().equals("Timed out waiting for operation")) {
+				} else if (e.getMessage().startsWith("Timed out waiting for")) {
 					DollyManager.setSkipConnection();
 				} else {
 					e.printStackTrace();
@@ -200,7 +200,7 @@ public class CouchbaseClient implements DollyClient {
 					DollyManager.setSkipConnection();
 				} else if (e instanceof com.couchbase.client.vbucket.ConfigurationException) {
 					DollyManager.setSkipConnection();
-				} else if (e instanceof RuntimeException && e.getMessage().equals("Timed out waiting for operation")) {
+				} else if (e.getMessage().startsWith("Timed out waiting for")) {
 					DollyManager.setSkipConnection();
 				} else {
 					e.printStackTrace();
@@ -221,7 +221,7 @@ public class CouchbaseClient implements DollyClient {
 					DollyManager.setSkipConnection();
 				} else if (e instanceof com.couchbase.client.vbucket.ConfigurationException) {
 					DollyManager.setSkipConnection();
-				} else if (e instanceof RuntimeException && e.getMessage().equals("Timed out waiting for operation")) {
+				} else if (e.getMessage().startsWith("Timed out waiting for")) {
 					DollyManager.setSkipConnection();
 				} else {
 					e.printStackTrace();
@@ -252,7 +252,7 @@ public class CouchbaseClient implements DollyClient {
 					DollyManager.setSkipConnection();
 				} else if (e instanceof com.couchbase.client.vbucket.ConfigurationException) {
 					DollyManager.setSkipConnection();
-				} else if (e instanceof RuntimeException && e.getMessage().equals("Timed out waiting for operation")) {
+				} else if (e.getMessage().startsWith("Timed out waiting for")) {
 					DollyManager.setSkipConnection();
 				} else {
 					e.printStackTrace();
@@ -280,7 +280,7 @@ public class CouchbaseClient implements DollyClient {
 					DollyManager.setSkipConnection();
 				} else if (e instanceof com.couchbase.client.vbucket.ConfigurationException) {
 					DollyManager.setSkipConnection();
-				} else if (e instanceof RuntimeException && e.getMessage().equals("Timed out waiting for operation")) {
+				} else if (e.getMessage().startsWith("Timed out waiting for")) {
 					DollyManager.setSkipConnection();
 				} else {
 					e.printStackTrace();
@@ -344,7 +344,7 @@ public class CouchbaseClient implements DollyClient {
 					DollyManager.setSkipConnection();
 				} else if (e instanceof com.couchbase.client.vbucket.ConfigurationException) {
 					DollyManager.setSkipConnection();
-				} else if (e instanceof RuntimeException && e.getMessage().equals("Timed out waiting for operation")) {
+				} else if (e.getMessage().startsWith("Timed out waiting for")) {
 					DollyManager.setSkipConnection();
 				} else {
 					e.printStackTrace();
@@ -383,15 +383,18 @@ public class CouchbaseClient implements DollyClient {
 		}
 		//*/
 
+		int currentSize = Integer.parseInt(stat.get("curr_items_tot"));
+		int deletedSize = Integer.parseInt(stat.get("vb_active_ops_delete"));
+
 		DollyStats dollyStat = new DollyStats();
-		dollyStat.setSize(Integer.parseInt((stat.get("curr_items_tot") == null ? "-1" : stat.get("curr_items_tot"))));
-		dollyStat.setCurrentNumberOfEntries((stat.get("curr_items_tot") == null ? "N/A" : stat.get("curr_items_tot")));
-		dollyStat.setTimeSinceStart(stat.get("uptime"));
-		dollyStat.setStores(stat.get("ep_total_new_items"));
-		dollyStat.setMisses(stat.get("get_misses"));
-		dollyStat.setTotalNumberOfEntries(stat.get("ep_total_new_items"));
-		dollyStat.setRetrievals(stat.get("cmd_get"));
+		dollyStat.setSize(currentSize);
+		dollyStat.setCurrentNumberOfEntries(Integer.toString(currentSize));
+		dollyStat.setStores(Integer.toString(currentSize + deletedSize));
+		dollyStat.setTotalNumberOfEntries(Integer.toString(currentSize + deletedSize));
 		dollyStat.setRemoveHits(stat.get("delete_hits"));
+		dollyStat.setTimeSinceStart(stat.get("uptime"));
+		dollyStat.setMisses(stat.get("get_misses"));
+		dollyStat.setRetrievals(stat.get("cmd_get"));
 		dollyStat.setHits(stat.get("get_hits"));
 		dollyStat.setRemoveMisses(stat.get("delete_misses"));
 		
@@ -436,6 +439,13 @@ public class CouchbaseClient implements DollyClient {
 			System.out.println(row.getKey() + ":" + obj);
 		}
 	}//end of printAllCache()
+	
+	/* (non-Javadoc)
+	 * @see com.athena.dolly.common.cache.client.DollyClient#healthCheck()
+	 */
+	public void healthCheck() {
+		client.get("healthCheck");
+	}//end of healthCheck()
 	
 	/**
 	 * <pre>

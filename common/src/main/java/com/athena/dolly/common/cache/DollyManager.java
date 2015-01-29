@@ -110,6 +110,16 @@ public class DollyManager {
     	
     	return client;
     }//end of init()
+    
+    /**
+     * <pre>
+     * Cache Client 객체를 초기화 한다.
+     * </pre>
+     * @return
+     */
+    public static void resetClient() {
+    	_client = init();
+    }//end of resetClient()
 	
 	@SuppressWarnings("unchecked")
 	public static void main(String[] args) {
@@ -149,7 +159,8 @@ class ConnectionCheckThread extends Thread {
 	public void run() {
 		while (true) {
 			try {
-				DollyManager.getClient().get("connection_check");
+				DollyManager.getClient().healthCheck();
+				DollyManager.resetClient();
 				DollyManager.resetSkipConnection();
 				break;
 			} catch (Exception e) {
