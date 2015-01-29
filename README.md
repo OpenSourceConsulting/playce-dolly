@@ -31,33 +31,33 @@ Athena-Dolly는 WAS에 비종속적인 세션 클러스터링 솔루션으로 �
          
 4. Inifinispan Embedded / Standalone
    - WAS Embedded 형태로 구동을 원할 경우 dolly.properties 파일에 dolly.use.infinispan.embedded 값을 "true"로 설정하고, JMX 활성화를 위해 다음 System Property를 추가한다.
-   		```
-        	-Dcom.sun.management.jmxremote
-        	-Dcom.sun.management.jmxremote.port=9999 
-        	-Dcom.sun.management.jmxremote.ssl=false 
-        	-Dcom.sun.management.jmxremote.authenticate=false
-        	```
+   	```
+        -Dcom.sun.management.jmxremote
+        -Dcom.sun.management.jmxremote.port=9999 
+        -Dcom.sun.management.jmxremote.ssl=false 
+        -Dcom.sun.management.jmxremote.authenticate=false
+        ```
    - Standalone 형태로 구동을 원할 경우 다음과 같은 명령으로 실행 시킬 수 있다.
-		```
-		java -Ddolly.properties=/opt/dolly-agent/dolly.properties.embedded -jar core-1.0.0-SNAPSHOT.jar 9999
-		- 9999는 JMX 포트 번호로써 주어지지 않을 경우 9999를 기본 값으로 사용한다.
-		- "nohup java -Ddolly.properties=/home/dolly/dolly-agent/dolly.properties.embedded -jar core-1.0.0-SNAPSHOT.jar 1> /dev/null 2>1 &" 로 실행하여 Backgroud 실행할 수 있다.
-   		```
+	```
+	java -Ddolly.properties=/opt/dolly-agent/dolly.properties.embedded -jar core-1.0.0-SNAPSHOT.jar 9999
+	  - 9999는 JMX 포트 번호로써 주어지지 않을 경우 9999를 기본 값으로 사용한다.
+	  - "nohup java -Ddolly.properties=/home/dolly/dolly-agent/dolly.properties.embedded -jar core-1.0.0-SNAPSHOT.jar 1> /dev/null 2>1 &" 로 실행하여 Backgroud 실행할 수 있다.
+   	```
 
 5. Athena-Dolly 실행을 위한 WAS 구동 옵션 추가
    - Athena-Dolly 실행을 위해서 dolly.properties에 해당하는 System Property 및 javaagent 옵션이 필요하다.
-   		```
-	     	-Ddolly.properties=/opt/dolly-agent/dolly.properties 
-       		-javaagent:/opt/dolly-agent/lib/core-0.0.1-SNAPSHOT.jar
-   		```
+   	```
+	-Ddolly.properties=/opt/dolly-agent/dolly.properties 
+	-javaagent:/opt/dolly-agent/lib/core-0.0.1-SNAPSHOT.jar
+	```
    - JBoss EAP 6 버전에서는 jboss.modules.system.pkgs 옵션에 com.athena.dolly 추가
-   		```
-     		-Djboss.modules.system.pkgs=org.jboss.byteman,com.athena.dolly
-   		```
+	```
+	-Djboss.modules.system.pkgs=org.jboss.byteman,com.athena.dolly
+	```
    - Weblogic 11 버전에서는 commons-pool 라이브러리의 충돌로 boot classpath를 지정한다.
-   		```
-	     	-Xbootclasspath/p:/opt/dolly-agent/lib/commons-pool-1.6.jar 
-   		```
+	```
+	-Xbootclasspath/p:/opt/dolly-agent/lib/commons-pool-1.6.jar 
+	```
      
 6. Infinispan file-store 활성화(Embedded 및 Standalone 동작 시 제외)
    - Infinispan 서버에 Eviction과 Expiration 관련 옵션이 주어지지 않을 경우 데이터가 무한 적재되면서 OutOfMemory가 발생할 가능성이 있기 때문에 다음과 같이 캐시에 eviction 설정을 추가하고 evict 된 데이터를 파일로 저장할 수 있도록 file-store 설정을 추가한다.
