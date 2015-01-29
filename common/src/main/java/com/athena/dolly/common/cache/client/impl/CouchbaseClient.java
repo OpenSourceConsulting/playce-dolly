@@ -385,14 +385,13 @@ public class CouchbaseClient implements DollyClient {
 
 		int currentSize = Integer.parseInt(stat.get("curr_items_tot"));
 		int deletedSize = Integer.parseInt(stat.get("vb_active_ops_delete"));
-		int deleteHits = Integer.parseInt(stat.get("delete_hits"));
 
 		DollyStats dollyStat = new DollyStats();
 		dollyStat.setSize(currentSize);
 		dollyStat.setCurrentNumberOfEntries(Integer.toString(currentSize));
 		dollyStat.setStores(Integer.toString(currentSize + deletedSize));
 		dollyStat.setTotalNumberOfEntries(Integer.toString(currentSize + deletedSize));
-		dollyStat.setRemoveHits(Integer.toString(deletedSize + deleteHits));
+		dollyStat.setRemoveHits(stat.get("delete_hits"));
 		dollyStat.setTimeSinceStart(stat.get("uptime"));
 		dollyStat.setMisses(stat.get("get_misses"));
 		dollyStat.setRetrievals(stat.get("cmd_get"));
