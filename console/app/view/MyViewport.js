@@ -33,6 +33,7 @@ Ext.define('webapp.view.MyViewport', {
         'Ext.grid.Panel',
         'Ext.grid.RowNumberer',
         'Ext.grid.column.Action',
+        'Ext.toolbar.TextItem',
         'Ext.form.field.TextArea',
         'Ext.layout.container.Border',
         'Ext.layout.container.Card',
@@ -430,64 +431,97 @@ Ext.define('webapp.view.MyViewport', {
                                             })
                                         },
                                         {
-                                            xtype: 'gridpanel',
-                                            flex: 1,
+                                            xtype: 'panel',
                                             region: 'center',
-                                            id: 'sessionDataGrid',
-                                            itemId: 'sessionDataGrid',
-                                            autoScroll: true,
-                                            emptyText: 'No Cache Keys',
-                                            forceFit: true,
-                                            store: 'sessionDataStore',
-                                            columns: [
+                                            layout: {
+                                                type: 'vbox',
+                                                align: 'stretch'
+                                            },
+                                            items: [
                                                 {
-                                                    xtype: 'rownumberer',
-                                                    width: 45,
-                                                    text: 'No'
-                                                },
-                                                {
-                                                    xtype: 'gridcolumn',
-                                                    dataIndex: 'key',
-                                                    text: 'Key',
-                                                    flex: 1
-                                                },
-                                                {
-                                                    xtype: 'actioncolumn',
-                                                    width: 50,
-                                                    align: 'center',
-                                                    menuDisabled: true,
-                                                    items: [
+                                                    xtype: 'gridpanel',
+                                                    flex: 1,
+                                                    id: 'sessionDataGrid',
+                                                    itemId: 'sessionDataGrid',
+                                                    autoScroll: true,
+                                                    emptyText: 'No Cache Keys',
+                                                    forceFit: true,
+                                                    store: 'sessionDataStore',
+                                                    columns: [
                                                         {
-                                                            handler: function(view, rowIndex, colIndex, item, e, record, row) {
-                                                                var sessionDataGrid = Ext.getCmp('sessionDataGrid'),
-                                                                    detailPanel = Ext.getCmp('detailPanel');
+                                                            xtype: 'rownumberer',
+                                                            width: 45,
+                                                            text: 'No'
+                                                        },
+                                                        {
+                                                            xtype: 'gridcolumn',
+                                                            dataIndex: 'key',
+                                                            text: 'Key',
+                                                            flex: 1
+                                                        },
+                                                        {
+                                                            xtype: 'actioncolumn',
+                                                            width: 50,
+                                                            align: 'center',
+                                                            menuDisabled: true,
+                                                            items: [
+                                                                {
+                                                                    handler: function(view, rowIndex, colIndex, item, e, record, row) {
+                                                                        var sessionDataGrid = Ext.getCmp('sessionDataGrid'),
+                                                                            detailPanel = Ext.getCmp('detailPanel');
 
-                                                                Ext.Msg.confirm('Confirm', 'Are you sure you want to delete this session?', function(btn) {
-                                                                    if (btn == 'yes') {
-                                                                        sessionDataGrid.setLoading(true);
+                                                                        Ext.Msg.confirm('Confirm', 'Are you sure you want to delete this session?', function(btn) {
+                                                                            if (btn == 'yes') {
+                                                                                sessionDataGrid.setLoading(true);
 
-                                                                        Ext.Ajax.request({
-                                                                            url: GlobalData.urlPrefix + 'deleteSessionData?key=' + record.get('key'),
-                                                                            params: {
-                                                                            },
-                                                                            success: function(response, opts){
-                                                                                sessionDataGrid.setLoading(false);
+                                                                                Ext.Ajax.request({
+                                                                                    url: GlobalData.urlPrefix + 'deleteSessionData?key=' + record.get('key'),
+                                                                                    params: {
+                                                                                    },
+                                                                                    success: function(response, opts){
+                                                                                        sessionDataGrid.setLoading(false);
 
-                                                                                var store = Ext.data.StoreManager.lookup('sessionDataStore');
-                                                                                store.removeAt(rowIndex);
+                                                                                        var store = Ext.data.StoreManager.lookup('sessionDataStore');
+                                                                                        store.removeAt(rowIndex);
 
-                                                                                //Ext.getCmp('refreshTool').fireEvent('click');
-                                                                            },
-                                                                            failure: function(response, opts) {
-                                                                                sessionDataGrid.setLoading(false);
-                                                                                Ext.Msg.alert('Error', 'Server-side failure with status code ' + response.status);
+                                                                                        //Ext.getCmp('refreshTool').fireEvent('click');
+                                                                                    },
+                                                                                    failure: function(response, opts) {
+                                                                                        sessionDataGrid.setLoading(false);
+                                                                                        Ext.Msg.alert('Error', 'Server-side failure with status code ' + response.status);
+                                                                                    }
+                                                                                });
                                                                             }
                                                                         });
-                                                                    }
-                                                                });
-                                                            },
-                                                            icon: 'resources/images/icon/delete.png',
-                                                            tooltip: 'Delete Session Data'
+                                                                    },
+                                                                    icon: 'resources/images/icon/delete.png',
+                                                                    tooltip: 'Delete Session Data'
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    xtype: 'panel',
+                                                    height: 30,
+                                                    dockedItems: [
+                                                        {
+                                                            xtype: 'toolbar',
+                                                            dock: 'top',
+                                                            height: 30,
+                                                            items: [
+                                                                {
+                                                                    xtype: 'tbspacer',
+                                                                    flex: 1
+                                                                },
+                                                                {
+                                                                    xtype: 'tbtext',
+                                                                    margins: '2 10 0 0',
+                                                                    id: 'sessionCountText',
+                                                                    itemId: 'sessionCountText',
+                                                                    text: '<b>Total Count : N/A</b> '
+                                                                }
+                                                            ]
                                                         }
                                                     ]
                                                 }
@@ -666,6 +700,7 @@ Ext.define('webapp.view.MyViewport', {
 
     onRowModelSelect: function(rowmodel, record, index, eOpts) {
         if (record.data.leaf === true) {
+            var sessionDataPanel = Ext.getCmp("sessionDataPanel");
             var sessionDataGrid = Ext.getCmp("sessionDataGrid");
             var detailPanel = Ext.getCmp("detailPanel");
 
@@ -673,19 +708,25 @@ Ext.define('webapp.view.MyViewport', {
                 detailPanel.toggleCollapse();
             }
 
+            sessionDataPanel.setLoading(true);
+
             Ext.Ajax.request({
                 url: GlobalData.urlPrefix + 'getSessionKeyList?viewName=' + record.data.id,
                 params: {
                 },
                 success: function(response, opts) {
-                    sessionDataGrid.setLoading(false);
+                    sessionDataPanel.setLoading(false);
                     var obj = Ext.decode(response.responseText);
                     var store = Ext.data.StoreManager.lookup('sessionDataStore');
                     store.loadData(obj);
+
+                    Ext.getCmp("sessionCountText").setText("<b>Total Count : " + obj.length + "</b>");
+
                     sessionDataGrid.update();
                 },
                 failure: function(response, opts) {
-                    sessionDataGrid.setLoading(false);
+                    sessionDataPanel.setLoading(false);
+                    Ext.getCmp("sessionCountText").setText("<b>Total Count : N/A</b>");
                     Ext.Msg.alert('Error', 'Server-side failure with status code ' + response.status);
                 }
             });

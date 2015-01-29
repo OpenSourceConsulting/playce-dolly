@@ -217,6 +217,7 @@ public class DollyClassTransformer implements ClassFileTransformer {
 							   "		try { " +
 							   "			obj = _getAttribute($1);" +
 							   " 			if (obj != null && !com.athena.dolly.common.cache.DollyManager.isSkipConnection()) {" +
+							   "				System.out.println(\"[Dolly] Attribute exists in Local Session and copy to Session Server.\");" + 
 							   "				java.util.Enumeration e = _getAttributeNames();" + 
 							   "				java.lang.String key = null;" +
 							   "				while (e.hasMoreElements()) { " +

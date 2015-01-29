@@ -811,26 +811,33 @@
                                                         "fn": "onRowModelSelect",
                                                         "implHandler": [
                                                             "if (record.data.leaf === true) {",
+                                                            "    var sessionDataPanel = Ext.getCmp(\"sessionDataPanel\");",
                                                             "    var sessionDataGrid = Ext.getCmp(\"sessionDataGrid\");",
                                                             "    var detailPanel = Ext.getCmp(\"detailPanel\");",
                                                             "",
                                                             "    if (detailPanel.collapsed === false) {",
                                                             "        detailPanel.toggleCollapse();",
                                                             "    }",
+                                                            "    ",
+                                                            "    sessionDataPanel.setLoading(true);",
                                                             "",
                                                             "    Ext.Ajax.request({",
                                                             "        url: GlobalData.urlPrefix + 'getSessionKeyList?viewName=' + record.data.id,",
                                                             "        params: {",
                                                             "        },",
                                                             "        success: function(response, opts) {",
-                                                            "            sessionDataGrid.setLoading(false);",
+                                                            "            sessionDataPanel.setLoading(false);",
                                                             "            var obj = Ext.decode(response.responseText);",
                                                             "            var store = Ext.data.StoreManager.lookup('sessionDataStore');",
                                                             "            store.loadData(obj);",
+                                                            "        ",
+                                                            "            Ext.getCmp(\"sessionCountText\").setText(\"<b>Total Count : \" + obj.length + \"</b>\");",
+                                                            "        ",
                                                             "            sessionDataGrid.update();",
                                                             "        },",
                                                             "        failure: function(response, opts) {",
-                                                            "            sessionDataGrid.setLoading(false);",
+                                                            "            sessionDataPanel.setLoading(false);",
+                                                            "            Ext.getCmp(\"sessionCountText\").setText(\"<b>Total Count : N/A</b>\");",
                                                             "            Ext.Msg.alert('Error', 'Server-side failure with status code ' + response.status);",
                                                             "        }",
                                                             "    });",
@@ -847,132 +854,207 @@
                                     ]
                                 },
                                 {
-                                    "type": "Ext.grid.Panel",
+                                    "type": "Ext.panel.Panel",
                                     "reference": {
                                         "name": "items",
                                         "type": "array"
                                     },
                                     "codeClass": null,
                                     "userConfig": {
-                                        "autoScroll": true,
-                                        "dock": null,
-                                        "emptyText": "No Cache Keys",
-                                        "forceFit": true,
-                                        "id": "sessionDataGrid",
-                                        "itemId": "sessionDataGrid",
-                                        "layout|flex": 1,
+                                        "container|align": "stretch",
+                                        "layout": "vbox",
                                         "layout|region": "center",
-                                        "store": "sessionDataStore",
                                         "title": null
                                     },
-                                    "designerId": "fe25bb30-6dbf-48fd-810c-281e9ae8cdd1",
+                                    "designerId": "397e11ec-5026-4dd2-9c26-643b6d59b2a7",
                                     "cn": [
                                         {
-                                            "type": "Ext.grid.RowNumberer",
+                                            "type": "Ext.grid.Panel",
                                             "reference": {
-                                                "name": "columns",
+                                                "name": "items",
                                                 "type": "array"
                                             },
                                             "codeClass": null,
                                             "userConfig": {
-                                                "text": "No",
-                                                "width": 45
+                                                "autoScroll": true,
+                                                "dock": null,
+                                                "emptyText": "No Cache Keys",
+                                                "forceFit": true,
+                                                "id": "sessionDataGrid",
+                                                "itemId": "sessionDataGrid",
+                                                "layout|flex": 1,
+                                                "store": "sessionDataStore",
+                                                "title": null
                                             },
-                                            "designerId": "eff13026-2cab-496b-8cfc-1a33019f16e2"
-                                        },
-                                        {
-                                            "type": "Ext.grid.column.Column",
-                                            "reference": {
-                                                "name": "columns",
-                                                "type": "array"
-                                            },
-                                            "codeClass": null,
-                                            "userConfig": {
-                                                "dataIndex": "key",
-                                                "flex": 1,
-                                                "text": "Key"
-                                            },
-                                            "designerId": "616152f0-8fae-4e27-9bd8-7d24955bb84d"
-                                        },
-                                        {
-                                            "type": "Ext.grid.column.Action",
-                                            "reference": {
-                                                "name": "columns",
-                                                "type": "array"
-                                            },
-                                            "codeClass": null,
-                                            "userConfig": {
-                                                "align": "center",
-                                                "altText": null,
-                                                "defaultWidth": null,
-                                                "emptyCellText": null,
-                                                "menuDisabled": true,
-                                                "menuText": null,
-                                                "width": 50
-                                            },
-                                            "designerId": "c273e525-3e8b-4661-b451-43ef2a651deb",
+                                            "designerId": "fe25bb30-6dbf-48fd-810c-281e9ae8cdd1",
                                             "cn": [
                                                 {
-                                                    "type": "actioncolumnitem",
+                                                    "type": "Ext.grid.RowNumberer",
                                                     "reference": {
-                                                        "name": "items",
+                                                        "name": "columns",
                                                         "type": "array"
                                                     },
                                                     "codeClass": null,
                                                     "userConfig": {
-                                                        "icon": "resources/images/icon/delete.png",
-                                                        "tooltip": "Delete Session Data"
+                                                        "text": "No",
+                                                        "width": 45
                                                     },
-                                                    "designerId": "2cd83547-e47c-4923-91e0-c9b3e8805e8b",
+                                                    "designerId": "eff13026-2cab-496b-8cfc-1a33019f16e2"
+                                                },
+                                                {
+                                                    "type": "Ext.grid.column.Column",
+                                                    "reference": {
+                                                        "name": "columns",
+                                                        "type": "array"
+                                                    },
+                                                    "codeClass": null,
+                                                    "userConfig": {
+                                                        "dataIndex": "key",
+                                                        "flex": 1,
+                                                        "text": "Key"
+                                                    },
+                                                    "designerId": "616152f0-8fae-4e27-9bd8-7d24955bb84d"
+                                                },
+                                                {
+                                                    "type": "Ext.grid.column.Action",
+                                                    "reference": {
+                                                        "name": "columns",
+                                                        "type": "array"
+                                                    },
+                                                    "codeClass": null,
+                                                    "userConfig": {
+                                                        "align": "center",
+                                                        "altText": null,
+                                                        "defaultWidth": null,
+                                                        "emptyCellText": null,
+                                                        "menuDisabled": true,
+                                                        "menuText": null,
+                                                        "width": 50
+                                                    },
+                                                    "designerId": "c273e525-3e8b-4661-b451-43ef2a651deb",
                                                     "cn": [
                                                         {
-                                                            "type": "fixedfunction",
+                                                            "type": "actioncolumnitem",
                                                             "reference": {
                                                                 "name": "items",
                                                                 "type": "array"
                                                             },
                                                             "codeClass": null,
                                                             "userConfig": {
-                                                                "designer|params": [
-                                                                    "view",
-                                                                    "rowIndex",
-                                                                    "colIndex",
-                                                                    "item",
-                                                                    "e",
-                                                                    "record",
-                                                                    "row"
-                                                                ],
-                                                                "fn": "handler",
-                                                                "implHandler": [
-                                                                    "var sessionDataGrid = Ext.getCmp('sessionDataGrid'),",
-                                                                    "    detailPanel = Ext.getCmp('detailPanel');",
-                                                                    "",
-                                                                    "Ext.Msg.confirm('Confirm', 'Are you sure you want to delete this session?', function(btn) {",
-                                                                    "    if (btn == 'yes') {",
-                                                                    "        sessionDataGrid.setLoading(true);",
-                                                                    "",
-                                                                    "        Ext.Ajax.request({",
-                                                                    "            url: GlobalData.urlPrefix + 'deleteSessionData?key=' + record.get('key'),",
-                                                                    "            params: {",
-                                                                    "            },",
-                                                                    "            success: function(response, opts){",
-                                                                    "                sessionDataGrid.setLoading(false);",
-                                                                    "",
-                                                                    "                var store = Ext.data.StoreManager.lookup('sessionDataStore');",
-                                                                    "                store.removeAt(rowIndex);",
-                                                                    "",
-                                                                    "                //Ext.getCmp('refreshTool').fireEvent('click');",
-                                                                    "            },",
-                                                                    "            failure: function(response, opts) {",
-                                                                    "                sessionDataGrid.setLoading(false);",
-                                                                    "                Ext.Msg.alert('Error', 'Server-side failure with status code ' + response.status);",
-                                                                    "            }",
-                                                                    "        });",
-                                                                    "    }",
-                                                                    "});"
-                                                                ]
+                                                                "icon": "resources/images/icon/delete.png",
+                                                                "tooltip": "Delete Session Data"
                                                             },
-                                                            "designerId": "c0070aa2-d086-484b-94b0-64ea634fc436"
+                                                            "designerId": "2cd83547-e47c-4923-91e0-c9b3e8805e8b",
+                                                            "cn": [
+                                                                {
+                                                                    "type": "fixedfunction",
+                                                                    "reference": {
+                                                                        "name": "items",
+                                                                        "type": "array"
+                                                                    },
+                                                                    "codeClass": null,
+                                                                    "userConfig": {
+                                                                        "designer|params": [
+                                                                            "view",
+                                                                            "rowIndex",
+                                                                            "colIndex",
+                                                                            "item",
+                                                                            "e",
+                                                                            "record",
+                                                                            "row"
+                                                                        ],
+                                                                        "fn": "handler",
+                                                                        "implHandler": [
+                                                                            "var sessionDataGrid = Ext.getCmp('sessionDataGrid'),",
+                                                                            "    detailPanel = Ext.getCmp('detailPanel');",
+                                                                            "",
+                                                                            "Ext.Msg.confirm('Confirm', 'Are you sure you want to delete this session?', function(btn) {",
+                                                                            "    if (btn == 'yes') {",
+                                                                            "        sessionDataGrid.setLoading(true);",
+                                                                            "",
+                                                                            "        Ext.Ajax.request({",
+                                                                            "            url: GlobalData.urlPrefix + 'deleteSessionData?key=' + record.get('key'),",
+                                                                            "            params: {",
+                                                                            "            },",
+                                                                            "            success: function(response, opts){",
+                                                                            "                sessionDataGrid.setLoading(false);",
+                                                                            "",
+                                                                            "                var store = Ext.data.StoreManager.lookup('sessionDataStore');",
+                                                                            "                store.removeAt(rowIndex);",
+                                                                            "",
+                                                                            "                //Ext.getCmp('refreshTool').fireEvent('click');",
+                                                                            "            },",
+                                                                            "            failure: function(response, opts) {",
+                                                                            "                sessionDataGrid.setLoading(false);",
+                                                                            "                Ext.Msg.alert('Error', 'Server-side failure with status code ' + response.status);",
+                                                                            "            }",
+                                                                            "        });",
+                                                                            "    }",
+                                                                            "});"
+                                                                        ]
+                                                                    },
+                                                                    "designerId": "c0070aa2-d086-484b-94b0-64ea634fc436"
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "type": "Ext.panel.Panel",
+                                            "reference": {
+                                                "name": "items",
+                                                "type": "array"
+                                            },
+                                            "codeClass": null,
+                                            "userConfig": {
+                                                "height": 30,
+                                                "layout|flex": null,
+                                                "title": null
+                                            },
+                                            "designerId": "5e391110-4a76-4cf1-9180-0952e8864c7d",
+                                            "cn": [
+                                                {
+                                                    "type": "Ext.toolbar.Toolbar",
+                                                    "reference": {
+                                                        "name": "dockedItems",
+                                                        "type": "array"
+                                                    },
+                                                    "codeClass": null,
+                                                    "userConfig": {
+                                                        "dock": "top",
+                                                        "height": 30
+                                                    },
+                                                    "designerId": "2aa7c5fa-07ad-4a20-8918-6fd79dc44496",
+                                                    "cn": [
+                                                        {
+                                                            "type": "Ext.toolbar.Spacer",
+                                                            "reference": {
+                                                                "name": "items",
+                                                                "type": "array"
+                                                            },
+                                                            "codeClass": null,
+                                                            "userConfig": {
+                                                                "layout|flex": 1
+                                                            },
+                                                            "designerId": "210f1487-75b0-4b01-864a-dcc0929f919f"
+                                                        },
+                                                        {
+                                                            "type": "Ext.toolbar.TextItem",
+                                                            "reference": {
+                                                                "name": "items",
+                                                                "type": "array"
+                                                            },
+                                                            "codeClass": null,
+                                                            "userConfig": {
+                                                                "id": "sessionCountText",
+                                                                "itemId": "sessionCountText",
+                                                                "layout|flex": null,
+                                                                "layout|margins": "2 10 0 0",
+                                                                "text": "<b>Total Count : N/A</b> "
+                                                            },
+                                                            "designerId": "04a4aa65-3aeb-4baf-bfdb-29dba2abb5a1"
                                                         }
                                                     ]
                                                 }

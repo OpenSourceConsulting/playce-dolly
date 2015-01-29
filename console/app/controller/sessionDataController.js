@@ -44,6 +44,10 @@ Ext.define('webapp.controller.sessionDataController', {
         {
             ref: 'sessionDataField',
             selector: '#sessionDataField'
+        },
+        {
+            ref: 'sessionDataPanel',
+            selector: '#sessionDataPanel'
         }
     ],
 
@@ -143,6 +147,7 @@ Ext.define('webapp.controller.sessionDataController', {
          * Session Data List를 refresh 하기 위한 function
          */
         var sessionDataGrid = this.getSessionDataGrid(),
+            sessionDataPanel = this.getSessionDataPanel(),
             detailPanel = this.getDetailPanel(),
             treePanel1 = Ext.getCmp('viewTreePanel1'),
             treeView1 = Ext.getCmp('viewTreeView1');
@@ -151,7 +156,7 @@ Ext.define('webapp.controller.sessionDataController', {
             detailPanel.toggleCollapse();
         }
 
-        sessionDataGrid.setLoading(true);
+        sessionDataPanel.setLoading(true);
 
         if (GlobalData.cacheType === 'couchbase') {
             this.getController("viewListController").getDdocs();
@@ -323,14 +328,18 @@ Ext.define('webapp.controller.sessionDataController', {
             params: {
             },
             success: function(response, opts) {
-                sessionDataGrid.setLoading(false);
+                sessionDataPanel.setLoading(false);
                 var obj = Ext.decode(response.responseText);
                 var store = Ext.data.StoreManager.lookup('sessionDataStore');
                 store.loadData(obj);
+
+                Ext.getCmp("sessionCountText").setText("<b>Total Count : " + obj.length + "</b>");
+
                 sessionDataGrid.update();
             },
             failure: function(response, opts) {
-                sessionDataGrid.setLoading(false);
+                sessionDataPanel.setLoading(false);
+                Ext.getCmp("sessionCountText").setText("<b>Total Count : N/A</b>");
                 Ext.Msg.alert('Error', 'Server-side failure with status code ' + response.status);
             }
         });

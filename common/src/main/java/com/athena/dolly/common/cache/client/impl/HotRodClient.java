@@ -87,7 +87,7 @@ public class HotRodClient implements DollyClient {
 					DollyManager.setSkipConnection();
 				} else if (e instanceof com.couchbase.client.vbucket.ConfigurationException) {
 					DollyManager.setSkipConnection();
-				} else if (e instanceof RuntimeException && e.getMessage().equals("Timed out waiting for operation")) {
+				} else if (e.getMessage().startsWith("Timed out waiting for")) {
 					DollyManager.setSkipConnection();
 				} else {
 					e.printStackTrace();
@@ -116,7 +116,7 @@ public class HotRodClient implements DollyClient {
 					DollyManager.setSkipConnection();
 				} else if (e instanceof com.couchbase.client.vbucket.ConfigurationException) {
 					DollyManager.setSkipConnection();
-				} else if (e instanceof RuntimeException && e.getMessage().equals("Timed out waiting for operation")) {
+				} else if (e.getMessage().startsWith("Timed out waiting for")) {
 					DollyManager.setSkipConnection();
 				} else {
 					e.printStackTrace();
@@ -139,7 +139,7 @@ public class HotRodClient implements DollyClient {
 					DollyManager.setSkipConnection();
 				} else if (e instanceof com.couchbase.client.vbucket.ConfigurationException) {
 					DollyManager.setSkipConnection();
-				} else if (e instanceof RuntimeException && e.getMessage().equals("Timed out waiting for operation")) {
+				} else if (e.getMessage().startsWith("Timed out waiting for")) {
 					DollyManager.setSkipConnection();
 				} else {
 					e.printStackTrace();
@@ -170,7 +170,7 @@ public class HotRodClient implements DollyClient {
 					DollyManager.setSkipConnection();
 				} else if (e instanceof com.couchbase.client.vbucket.ConfigurationException) {
 					DollyManager.setSkipConnection();
-				} else if (e instanceof RuntimeException && e.getMessage().equals("Timed out waiting for operation")) {
+				} else if (e.getMessage().startsWith("Timed out waiting for")) {
 					DollyManager.setSkipConnection();
 				} else {
 					e.printStackTrace();
@@ -191,7 +191,7 @@ public class HotRodClient implements DollyClient {
 					DollyManager.setSkipConnection();
 				} else if (e instanceof com.couchbase.client.vbucket.ConfigurationException) {
 					DollyManager.setSkipConnection();
-				} else if (e instanceof RuntimeException && e.getMessage().equals("Timed out waiting for operation")) {
+				} else if (e.getMessage().startsWith("Timed out waiting for")) {
 					DollyManager.setSkipConnection();
 				} else {
 					e.printStackTrace();
@@ -219,7 +219,7 @@ public class HotRodClient implements DollyClient {
 					DollyManager.setSkipConnection();
 				} else if (e instanceof com.couchbase.client.vbucket.ConfigurationException) {
 					DollyManager.setSkipConnection();
-				} else if (e instanceof RuntimeException && e.getMessage().equals("Timed out waiting for operation")) {
+				} else if (e.getMessage().startsWith("Timed out waiting for")) {
 					DollyManager.setSkipConnection();
 				} else {
 					e.printStackTrace();
@@ -247,7 +247,7 @@ public class HotRodClient implements DollyClient {
 					DollyManager.setSkipConnection();
 				} else if (e instanceof com.couchbase.client.vbucket.ConfigurationException) {
 					DollyManager.setSkipConnection();
-				} else if (e instanceof RuntimeException && e.getMessage().equals("Timed out waiting for operation")) {
+				} else if (e.getMessage().startsWith("Timed out waiting for")) {
 					DollyManager.setSkipConnection();
 				} else {
 					e.printStackTrace();
@@ -278,7 +278,7 @@ public class HotRodClient implements DollyClient {
 					DollyManager.setSkipConnection();
 				} else if (e instanceof com.couchbase.client.vbucket.ConfigurationException) {
 					DollyManager.setSkipConnection();
-				} else if (e instanceof RuntimeException && e.getMessage().equals("Timed out waiting for operation")) {
+				} else if (e.getMessage().startsWith("Timed out waiting for")) {
 					DollyManager.setSkipConnection();
 				} else {
 					e.printStackTrace();
@@ -354,5 +354,12 @@ public class HotRodClient implements DollyClient {
     		i++;  
 	    }
     }//end of printAllCache()
+	
+	/* (non-Javadoc)
+	 * @see com.athena.dolly.common.cache.client.DollyClient#healthCheck()
+	 */
+	public void healthCheck() {
+		cache.get("healthCheck");
+	}//end of healthCheck()
 }
 //end of HotRodClient.java
