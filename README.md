@@ -66,7 +66,6 @@ Athena-Dolly는 WAS에 비종속적인 세션 클러스터링 솔루션으로 �
 ```
 
    - file-store에 포함될 수 있는 Attributes는 다음과 같다.
-    
        -  _**max-entries**_ : Sets the maximum number of in-memory mappings between keys and their position in the store. Normally this is unlimited, but to avoid excess memory usage, an upper bound can be configured. If this limit is exceeded, entries are removed permanently using the LRU algorithm both from the in-memory index and the underlying file based cache store. Warning: setting this value may cause data loss.
        -  _**relative-to**_ : The base directory in which to store the cache state.
        -  _**path**_ : The path within "relative-to" in which to store the cache state. If undefined, the path defaults to the cache container name.
@@ -136,9 +135,10 @@ B. SSO 사용 시 Internet Explorer 설정 : IE는 기본적으로 개인정보�
    1. 도구 - 인터넷 옵션을 선택한다.
    2. 개인정보 탭을 선택한다.
    3. 설정 필드의 사이트 버튼을 클릭한다.
-   ![ScreenShot](https://raw.githubusercontent.com/OpenSourceConsulting/athena-dolly/master/img/ie1.png?token=2142732__eyJzY29wZSI6IlJhd0Jsb2I6T3BlblNvdXJjZUNvbnN1bHRpbmcvYXRoZW5hLWRvbGx5L21hc3Rlci9pbWcvaWUxLnBuZyIsImV4cGlyZXMiOjE0MDE3NTU4Mzd9--5712ddbe4d24c2f69a49cd97c53cc85f583ce6db)
+	![ScreenShot](https://raw.githubusercontent.com/OpenSourceConsulting/athena-dolly/master/img/ie1.png?token=2142732__eyJzY29wZSI6IlJhd0Jsb2I6T3BlblNvdXJjZUNvbnN1bHRpbmcvYXRoZW5hLWRvbGx5L21hc3Rlci9pbWcvaWUxLnBuZyIsImV4cGlyZXMiOjE0MDE3NTU4Mzd9--5712ddbe4d24c2f69a49cd97c53cc85f583ce6db)
+
    4. SSO 대상 각각의 도메인을 입력하고 허용 버튼을 클릭한다.
-   ![ScreenShot](https://raw.githubusercontent.com/OpenSourceConsulting/athena-dolly/master/img/ie2.png?token=2142732__eyJzY29wZSI6IlJhd0Jsb2I6T3BlblNvdXJjZUNvbnN1bHRpbmcvYXRoZW5hLWRvbGx5L21hc3Rlci9pbWcvaWUyLnBuZyIsImV4cGlyZXMiOjE0MDE3NTU4ODh9--57ced5c0dad3c4aecec7f4eda48cae8e68a91542)
+	![ScreenShot](https://raw.githubusercontent.com/OpenSourceConsulting/athena-dolly/master/img/ie2.png?token=2142732__eyJzY29wZSI6IlJhd0Jsb2I6T3BlblNvdXJjZUNvbnN1bHRpbmcvYXRoZW5hLWRvbGx5L21hc3Rlci9pbWcvaWUyLnBuZyIsImV4cGlyZXMiOjE0MDE3NTU4ODh9--57ced5c0dad3c4aecec7f4eda48cae8e68a91542)
       - 주의 : 포트 번호는 입력하지 않는다.
    5. 확인 버튼을 클릭한다.
    
@@ -146,4 +146,4 @@ C. SSO 사용 시 Safari 설정 : IE와 마찬가지로 타 도메인에 대한 
    1. Safari - 환경설정을 선택한다.
    2. 개인 정보 탭을 선택한다.
    3. 쿠키 및 웹사이트 데이터 차단 항목을 "안함"으로 선택한다.
-   ![ScreenShot](https://raw.githubusercontent.com/OpenSourceConsulting/athena-dolly/master/img/safari.png?token=2142732__eyJzY29wZSI6IlJhd0Jsb2I6T3BlblNvdXJjZUNvbnN1bHRpbmcvYXRoZW5hLWRvbGx5L21hc3Rlci9pbWcvc2FmYXJpLnBuZyIsImV4cGlyZXMiOjE0MDE3NTU5MDJ9--37b6130df1c71fddfc209e4d92543b2074f02fe4)
+	![ScreenShot](https://raw.githubusercontent.com/OpenSourceConsulting/athena-dolly/master/img/safari.png?token=2142732__eyJzY29wZSI6IlJhd0Jsb2I6T3BlblNvdXJjZUNvbnN1bHRpbmcvYXRoZW5hLWRvbGx5L21hc3Rlci9pbWcvc2FmYXJpLnBuZyIsImV4cGlyZXMiOjE0MDE3NTU5MDJ9--37b6130df1c71fddfc209e4d92543b2074f02fe4)
