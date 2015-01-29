@@ -1,37 +1,55 @@
 athena-dolly
 ============
-Athena-Dolly는 Infinispan Data Grid를 이용한 WAS에 비종속적인 세션 클러스터링 솔루션으로 현재 Apache Tomcat 6/7, JBoss EAP 6, WebLogic 11이 지원 가능하며 추후 Jeus, WebSphere등 다양한 WAS로도 지원을 확대할 계획이다.
+Athena-Dolly는 WAS에 비종속적인 세션 클러스터링 솔루션으로 현재 Apache Tomcat 6/7, JBoss EAP 6, WebLogic 11이 지원 가능하며 추후 Jeus, WebSphere등 다양한 WAS로도 지원을 확대할 계획이다.
 
-1. Athena-Dolly의 설치
-   - mvn install을 수행하게 되면 target 디렉토리에 athena-dolly-0.0.1-SNAPSHOT-bin.zip 파일이 생성되며, 해당 파일을 설치하고자 하는 서버로 복사한다.
-   - athena-dolly-0.0.1-SNAPSHOT-bin.zip 파일을 압축 해제하게 되면 dolly-agent 라는 디렉토리가 생성되고, 하위에 dolly.properties 파일 및 lib 디렉토리가 존재하며 lib 디렉토리 안에 관련 라이브러리 파일들이 존재한다.
-   - dolly.properties 파일에는 BCI를 위한 타깃 클래스 목록 및 Infinispan 관련 설정이 포함되며, infinispan.client.hotrod.server_list 항목은 ";" 구분자를 이용하여 현재 동작하고 있는 Infinispan hotrod 서버 목록으로 수정해야 한다.
+1. Athena-Dolly의 특징
+   - 이기종 WAS 간의 세션 클러스터링이 가능할 뿐만 아니라 기존 웹 애플리케이션의 수정이 전혀 필요하지 않다. 
+   - 세션 클러스터링을 위한 캐시 서버로 JBoss Data Grid(Infinispan)과 Couchbase를 지원하고 있으며 추후 Redis를 추가적으로 지원할 계획이다.
+   - 캐시 서버 구축에 부담이 있다면 Infinispan을 WAS 구동 시 내장되어 동작하도록 Embedded 모드로 동작시키거나, 별도의 Standalone Application으로 동작시킬 수 있다.
+   - 순수 서버사이드 SSO(Single Sign On) 기능을 지원하고 있어 에어전트 설치 없이 여러 도메인 간 로그인 상태를 유지시킬 수 있다.
+   - 캐시 서버의 CPU, Memory 모니터링과 세션 데이터 조회 및 통계정보를 확인할 수 있는 웹 애플리케이션을 제공한다.
+
+2. Athena-Dolly의 설치
+   - mvn install을 수행하게 되면 athena-dolly/core/target 디렉토리에 core-0.0.1-SNAPSHOT-bin.zip 파일이 생성되며, 해당 파일을 설치하고자 하는 서버로 복사한다.
+   - core-0.0.1-SNAPSHOT-bin.zip 파일을 압축 해제하게 되면 dolly-agent 라는 디렉토리가 생성되고, 하위에 dolly.properties 파일 및 lib 디렉토리가 존재하며 lib 디렉토리 안에 관련 라이브러리 파일들이 존재한다.
+   - dolly.properties 파일에는 Athena Dolly 관련 설정이 포함되며, 아래의 각 항목을 용도에 맞게 수정한다.
      
-2. dolly.properties 수정
+3. dolly.properties 수정
    - _**dolly.verbose**_ : Verbosity 여부
    - _**dolly.session.timeout**_ : 세션 만료 시간 설정(분)
+   - _**dolly.client.type**_ : Infispan, Couchbase 등 세션 서버 타입
+   - _**dolly.use.infinispan.embedded**_ : Infinispan Embedded 동작 여부
+   - _**dolly.hotrod.host**_ : Infinispan Embedded 시 사용될 Bind Address 및 Port
+   - _**dolly.jgroups.* **_ : Infinispan Embedded 시 사용될 Clustering 설정(jgroups)
    - _**dolly.enableSSO**_ : SSO 사용 여부
    - _**dolly.sso.domain.list**_ : SSO 사용 대상 도메인 목록
    - _**dolly.sso.parameter.key**_ : SSO 사용 시 다른 도메인에 Session ID를 넘겨줄 때 사용하는 Query Parameter Key
-   - _**dolly.instrument.target.class**_ : WAS 및 SSO 사용 여부에 따라 선택하여 주석 해제
+   - _**couchbase.* **_ : Couchbase 관련 정보(uri, name, password)
    - _**infinispan.client.hotrod.xxx**_ : Infinispan Hotrod Client 설정(기본 값으로 사용 권고)
    - _**infinispan.client.hotrod.server_list**_ : Infinispan Hotrod Server 목록
    - _**maxActive, maxTotal, maxIdle, testOnBorrow**_ : Infinispan Connection Pool 관련 설정(기본 값으로 사용 권고)
-     
-3. Athena-Dolly 실행을 위한 WAS 구동 옵션 추가
+         
+4. Inifinispan Embedded / Standalone
+   - WAS Embedded 형태로 구동을 원할 경우 dolly.properties 파일에 dolly.use.infinispan.embedded 값을 "true"로 설정하고, JMX 활성화를 위해 다음 System Property를 추가한다.
+      (eg) -Dcom.sun.management.jmxremote 
+           -Dcom.sun.management.jmxremote.port=9999 
+           -Dcom.sun.management.jmxremote.ssl=false 
+           -Dcom.sun.management.jmxremote.authenticate=false
+   - Standalone 형태로 구동을 원할 경우 다음과 같은 명령으로 실행 시킬 수 있다.
+      (eg) java -Ddolly.properties=/opt/dolly-agent/dolly.properties.embedded -jar core-1.0.0-SNAPSHOT.jar 9999
+           - 9999는 JMX 포트 번호로써 주어지지 않을 경우 9999를 기본 값으로 사용한다.
+           - "nohup java -Ddolly.properties=/home/dolly/dolly-agent/dolly.properties.embedded -jar core-1.0.0-SNAPSHOT.jar 1> /dev/null 2>1 &" 로 실행하여 Backgroud 실행할 수 있다.
+
+5. Athena-Dolly 실행을 위한 WAS 구동 옵션 추가
    - Athena-Dolly 실행을 위해서 dolly.properties에 해당하는 System Property 및 javaagent 옵션이 필요하다.
      (eg) -Ddolly.properties=/opt/dolly-agent/dolly.properties 
-          -javaagent:/opt/dolly-agent/lib/athena-dolly-0.0.1-SNAPSHOT.jar
+          -javaagent:/opt/dolly-agent/lib/core-0.0.1-SNAPSHOT.jar
    - JBoss EAP 6 버전에서는 jboss.modules.system.pkgs 옵션에 com.athena.dolly 추가
      (eg) -Djboss.modules.system.pkgs=org.jboss.byteman,com.athena.dolly
    - Weblogic 11 버전에서는 commons-pool 라이브러리의 충돌로 boot classpath를 지정한다.
      (eg) -Xbootclasspath/p:/opt/dolly-agent/lib/commons-pool-1.6.jar 
-        
-4. 상태정보 확인
-   - WAS 구동 후 http://${SERVER_IP}:${SERVER_PORT}/${CONTEXT}/dolly_stats.jsp 파일을 호출하면 Infinispan Properties, Infinispan Stats, Cache Data List 조회 화면이 표시된다.
-     단, WAS에 따라서 표시가 되지 않을 수 있으며 athena-dolly-0.0.1-SNAPSHOT.jar 파일 내의 /META-INF/resources/dolly_stats.jsp 파일을 WebRoot로 복사하면 호출 가능하다.
      
-5. Infinispan file-store 활성화
+6. Infinispan file-store 활성화(Embedded 및 Standalone 동작 시 제외)
    - Infinispan 서버에 Eviction과 Expiration 관련 옵션이 주어지지 않을 경우 데이터가 무한 적재되면서 OutOfMemory가 발생할 가능성이 있기 때문에 다음과 같이 캐시에 eviction 설정을 추가하고 evict 된 데이터를 파일로 저장할 수 있도록 file-store 설정을 추가한다.
 
 ```     
