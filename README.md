@@ -37,6 +37,7 @@ Athena-Dolly는 WAS에 비종속적인 세션 클러스터링 솔루션으로 �
         -Dcom.sun.management.jmxremote.ssl=false 
         -Dcom.sun.management.jmxremote.authenticate=false
         ```
+        
    - Standalone 형태로 구동을 원할 경우 다음과 같은 명령으로 실행 시킬 수 있다.
 	```
 	java -Ddolly.properties=/opt/dolly-agent/dolly.properties.embedded -jar core-1.0.0-SNAPSHOT.jar 9999
@@ -50,10 +51,12 @@ Athena-Dolly는 WAS에 비종속적인 세션 클러스터링 솔루션으로 �
 	-Ddolly.properties=/opt/dolly-agent/dolly.properties 
 	-javaagent:/opt/dolly-agent/lib/core-0.0.1-SNAPSHOT.jar
 	```
+	
    - JBoss EAP 6 버전에서는 jboss.modules.system.pkgs 옵션에 com.athena.dolly 추가
 	```
 	-Djboss.modules.system.pkgs=org.jboss.byteman,com.athena.dolly
 	```
+	
    - Weblogic 11 버전에서는 commons-pool 라이브러리의 충돌로 boot classpath를 지정한다.
 	```
 	-Xbootclasspath/p:/opt/dolly-agent/lib/commons-pool-1.6.jar 
