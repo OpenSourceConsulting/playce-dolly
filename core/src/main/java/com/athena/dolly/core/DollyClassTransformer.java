@@ -76,10 +76,12 @@ public class DollyClassTransformer implements ClassFileTransformer {
 	@Override
 	public byte[] transform(ClassLoader loader, String className, Class<?> classBeingRedefined, ProtectionDomain protectionDomain, byte[] classfileBuffer) throws IllegalClassFormatException {
         CtClass cl = null;
-		ClassPool pool = getClassPool(loader);
 		
         try {
             if (className != null && acceptClass(className)) {
+            	
+        		ClassPool pool = getClassPool(loader);
+        		
                 if (verbose) {
                     System.out.println("[Dolly] Enhancing class : " + className);
                 }
@@ -680,7 +682,7 @@ public class DollyClassTransformer implements ClassFileTransformer {
 	 * @param loader
 	 * @return
 	 */
-	private ClassPool getClassPool(ClassLoader loader) {
+	private synchronized ClassPool getClassPool(ClassLoader loader) {
 		ClassPool pool = pools.get(loader);
 		
 		if (pool == null) {
