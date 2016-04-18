@@ -174,8 +174,9 @@ public class DollyConfig {
     		"org.apache.catalina.session.StandardSessionFacade",
     		"org.apache.catalina.session.ManagerBase",
     		"org.apache.catalina.connector.Request",
+    		"jeus.sessionmanager.session.HttpSessionWrapper",
     		"weblogic.servlet.internal.session.SessionData",
-    		"weblogic.servlet.internal.ServletRequestImpl",
+    		"weblogic.servlet.internal.ServletRequestImpl"
     	};
     	
     	//String[] classNames = config.getProperty(TARGET_CLASS_PROPERTY, "").split(",");
