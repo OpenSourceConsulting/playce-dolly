@@ -63,6 +63,7 @@ public class CouchbaseClient implements DollyClient {
 
 	private DollyConfig config;
 	private com.couchbase.client.CouchbaseClient client;
+	private String name;
 	
 	final Gson gson = new Gson();
 	
@@ -74,7 +75,7 @@ public class CouchbaseClient implements DollyClient {
 	 * </pre>
 	 */
 	public CouchbaseClient() {
-		if (DollyConfig.properties == null || config == null) {
+		if (config == null) {
 			try {
 	            config = new DollyConfig().load();
 			} catch (ConfigurationException e) {
@@ -83,17 +84,7 @@ public class CouchbaseClient implements DollyClient {
 			}
 		}
 		
-		String[] uris = config.getCouchbaseUris().split(";");
-		List<URI> uriList = new LinkedList<URI>();
-		for (String uri : uris) {
-			uriList.add(URI.create(uri));
-		}
-		
-		try {
-			client = new com.couchbase.client.CouchbaseClient(uriList, config.getCouchbaseBucketName(), config.getCouchbaseBucketPasswd());
-		} catch (IOException e) {
-			System.err.println("Error connecting to Couchbase: " + e.getMessage());
-		}
+		initClient();
 	}//end of Default Contructor()
 
 	/* (non-Javadoc)
@@ -113,11 +104,11 @@ public class CouchbaseClient implements DollyClient {
 				client.touch(cacheKey, config.getTimeout() * 60);
 			} catch (Exception e) {
 				if (e instanceof TransportException || e instanceof ConnectException) {
-					DollyManager.setSkipConnection();
+					DollyManager.setSkipConnection(this.name);
 				} else if (e instanceof com.couchbase.client.vbucket.ConfigurationException) {
-					DollyManager.setSkipConnection();
+					DollyManager.setSkipConnection(this.name);
 				} else if (e.getMessage().startsWith("Timed out waiting for")) {
-					DollyManager.setSkipConnection();
+					DollyManager.setSkipConnection(this.name);
 				} else {
 					e.printStackTrace();
 				}
@@ -143,11 +134,11 @@ public class CouchbaseClient implements DollyClient {
 				}
 			} catch (Exception e) {
 				if (e instanceof TransportException || e instanceof ConnectException) {
-					DollyManager.setSkipConnection();
+					DollyManager.setSkipConnection(this.name);
 				} else if (e instanceof com.couchbase.client.vbucket.ConfigurationException) {
-					DollyManager.setSkipConnection();
+					DollyManager.setSkipConnection(this.name);
 				} else if (e.getMessage().startsWith("Timed out waiting for")) {
-					DollyManager.setSkipConnection();
+					DollyManager.setSkipConnection(this.name);
 				} else {
 					e.printStackTrace();
 				}
@@ -166,11 +157,11 @@ public class CouchbaseClient implements DollyClient {
 				client.set(cacheKey, config.getTimeout() * 60, gson.toJson(value)).get();
 			} catch (Exception e) {
 				if (e instanceof TransportException || e instanceof ConnectException) {
-					DollyManager.setSkipConnection();
+					DollyManager.setSkipConnection(this.name);
 				} else if (e instanceof com.couchbase.client.vbucket.ConfigurationException) {
-					DollyManager.setSkipConnection();
+					DollyManager.setSkipConnection(this.name);
 				} else if (e.getMessage().startsWith("Timed out waiting for")) {
-					DollyManager.setSkipConnection();
+					DollyManager.setSkipConnection(this.name);
 				} else {
 					e.printStackTrace();
 				}
@@ -197,11 +188,11 @@ public class CouchbaseClient implements DollyClient {
 				}
 			} catch (Exception e) {
 				if (e instanceof TransportException || e instanceof ConnectException) {
-					DollyManager.setSkipConnection();
+					DollyManager.setSkipConnection(this.name);
 				} else if (e instanceof com.couchbase.client.vbucket.ConfigurationException) {
-					DollyManager.setSkipConnection();
+					DollyManager.setSkipConnection(this.name);
 				} else if (e.getMessage().startsWith("Timed out waiting for")) {
-					DollyManager.setSkipConnection();
+					DollyManager.setSkipConnection(this.name);
 				} else {
 					e.printStackTrace();
 				}
@@ -218,11 +209,11 @@ public class CouchbaseClient implements DollyClient {
 				client.delete(cacheKey).get();
 			} catch (Exception e) {
 				if (e instanceof TransportException || e instanceof ConnectException) {
-					DollyManager.setSkipConnection();
+					DollyManager.setSkipConnection(this.name);
 				} else if (e instanceof com.couchbase.client.vbucket.ConfigurationException) {
-					DollyManager.setSkipConnection();
+					DollyManager.setSkipConnection(this.name);
 				} else if (e.getMessage().startsWith("Timed out waiting for")) {
-					DollyManager.setSkipConnection();
+					DollyManager.setSkipConnection(this.name);
 				} else {
 					e.printStackTrace();
 				}
@@ -249,11 +240,11 @@ public class CouchbaseClient implements DollyClient {
 				}
 			} catch (Exception e) {
 				if (e instanceof TransportException || e instanceof ConnectException) {
-					DollyManager.setSkipConnection();
+					DollyManager.setSkipConnection(this.name);
 				} else if (e instanceof com.couchbase.client.vbucket.ConfigurationException) {
-					DollyManager.setSkipConnection();
+					DollyManager.setSkipConnection(this.name);
 				} else if (e.getMessage().startsWith("Timed out waiting for")) {
-					DollyManager.setSkipConnection();
+					DollyManager.setSkipConnection(this.name);
 				} else {
 					e.printStackTrace();
 				}
@@ -277,11 +268,11 @@ public class CouchbaseClient implements DollyClient {
 				}
 			} catch (Exception e) {
 				if (e instanceof TransportException || e instanceof ConnectException) {
-					DollyManager.setSkipConnection();
+					DollyManager.setSkipConnection(this.name);
 				} else if (e instanceof com.couchbase.client.vbucket.ConfigurationException) {
-					DollyManager.setSkipConnection();
+					DollyManager.setSkipConnection(this.name);
 				} else if (e.getMessage().startsWith("Timed out waiting for")) {
-					DollyManager.setSkipConnection();
+					DollyManager.setSkipConnection(this.name);
 				} else {
 					e.printStackTrace();
 				}
@@ -341,11 +332,11 @@ public class CouchbaseClient implements DollyClient {
 				}
 			} catch (Exception e) {
 				if (e instanceof TransportException || e instanceof ConnectException) {
-					DollyManager.setSkipConnection();
+					DollyManager.setSkipConnection(this.name);
 				} else if (e instanceof com.couchbase.client.vbucket.ConfigurationException) {
-					DollyManager.setSkipConnection();
+					DollyManager.setSkipConnection(this.name);
 				} else if (e.getMessage().startsWith("Timed out waiting for")) {
-					DollyManager.setSkipConnection();
+					DollyManager.setSkipConnection(this.name);
 				} else {
 					e.printStackTrace();
 				}
@@ -461,5 +452,32 @@ public class CouchbaseClient implements DollyClient {
 			return new DesignDocument(name);
 		}
 	}//end of getDesignDocument()
+	
+	@Override
+	public DollyConfig getConfig() {
+		return config;
+	}
+
+	@Override
+	public void initClient() {
+		
+		String[] uris = config.getCouchbaseUris().split(";");
+		List<URI> uriList = new LinkedList<URI>();
+		for (String uri : uris) {
+			uriList.add(URI.create(uri));
+		}
+		
+		try {
+			client = new com.couchbase.client.CouchbaseClient(uriList, config.getCouchbaseBucketName(), config.getCouchbaseBucketPasswd());
+		} catch (IOException e) {
+			System.err.println("Error connecting to Couchbase: " + e.getMessage());
+		}
+		
+	}
+
+	@Override
+	public String getName() {
+		return name;
+	}
 }
 //end of CouchbaseClient.java

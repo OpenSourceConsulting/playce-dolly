@@ -25,6 +25,7 @@ package com.athena.dolly.common.cache.client;
 import java.util.Enumeration;
 import java.util.List;
 
+import com.athena.dolly.common.cache.DollyConfig;
 import com.athena.dolly.common.cache.SessionKey;
 import com.athena.dolly.common.stats.DollyStats;
 
@@ -141,5 +142,29 @@ public interface DollyClient {
 	 * </pre>
 	 */
 	public void healthCheck();
+	
+	
+	/**
+	 * <pre>
+	 * client name 을 반환한다.
+	 * </pre>
+	 * @return
+	 */
+	public String getName();
+	
+	/**
+	 * <pre>
+	 * 설정 정보를 가져온다.
+	 * </pre>
+	 * @return
+	 */
+	public DollyConfig getConfig();
+	
+	/**
+	 * <pre>
+	 * client 를 사용가능하도록 초기화 한다.
+	 * </pre>
+	 */
+	public void initClient();
 }
 //end of DollyClient.java

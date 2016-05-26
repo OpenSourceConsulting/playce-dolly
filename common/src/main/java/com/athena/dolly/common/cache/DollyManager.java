@@ -26,6 +26,7 @@ package com.athena.dolly.common.cache;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 import com.athena.dolly.common.cache.client.DollyClient;
 import com.athena.dolly.common.cache.client.impl.CouchbaseClient;
@@ -41,11 +42,80 @@ import com.athena.dolly.common.stats.DollyStats;
  * @version 1.0
  */
 public class DollyManager {
-
+	
+	private static Map<String, DollyClient> clientMap = new HashMap<String, DollyClient>();
     private static DollyClient _client;
 	private static DollyConfig config;
 	
 	private static boolean skipConnection = false;
+	
+	/**
+	 * <pre>
+	 * get DollyClient by name.
+	 * </pre>
+	 * @param name
+	 * @return
+	 */
+	public static DollyClient getClient(String name) {
+		
+		return clientMap.get(name);
+    }
+	
+	/**
+	 * <pre>
+	 * create DollyClient.
+	 * </pre>
+	 * @param name
+	 * @param prop
+	 * @return
+	 */
+	public static DollyClient createClient(String name, Properties prop) {
+    	
+		DollyClient client = clientMap.get(name);
+    	
+    	if (client != null) {
+			return client;
+		}
+    	
+    	synchronized (clientMap) {
+    		
+    		client = clientMap.get(name);
+        	
+        	if (client != null) {
+    			return client;
+    		}
+    		
+    		try {
+        		DollyConfig dollyConfig = new DollyConfig().load(prop);
+        		
+        		if (dollyConfig.isVerbose()) {
+            		System.out.println("[Dolly] Properties : ");
+            		System.out.println(config.getProperties().toString().replaceAll(", ",  "\n"));
+            	}
+            	
+            	if (dollyConfig.getClientType().equals("infinispan")) {
+                	client = new HotRodClient(name, dollyConfig);
+            	} else if (dollyConfig.getClientType().equals("couchbase")) {
+                	client = new CouchbaseClient();
+            	}
+            	
+    		} catch (ConfigurationException e) {
+                System.err.println("[Dolly] Configuration error : " + e.getMessage());
+                throw new RuntimeException(e);
+    		}
+        	
+        	if (client == null) {
+    			throw new RuntimeException("DollyClient create failed.");
+    		}
+        	
+        	clientMap.put(name, client);
+		}
+    	
+    	
+    	
+    	return client;
+    }
+	
 
     /**
      * <pre>
@@ -65,13 +135,13 @@ public class DollyManager {
     	return skipConnection;
     }
     
-    public synchronized static void setSkipConnection() {
+    public synchronized static void setSkipConnection(String name) {
     	if (!skipConnection) {
     		skipConnection = true;
 
     		System.out.println("[Dolly] Could not connect to session server. Connection will be blocked by the time server is running.");
     		
-    		new ConnectionCheckThread().start();
+    		new ConnectionCheckThread(name).start();
     	}
     }
     
@@ -88,7 +158,7 @@ public class DollyManager {
     private static DollyClient init() {
     	DollyClient client = null;
 
-    	if (DollyConfig.properties == null || config == null) {
+    	if (config == null) {
     		try {
                 config = new DollyConfig().load();
 			} catch (ConfigurationException e) {
@@ -99,7 +169,7 @@ public class DollyManager {
     	
     	if (config.isVerbose()) {
     		System.out.println("[Dolly] Properties : ");
-    		System.out.println(DollyConfig.properties.toString().replaceAll(", ",  "\n"));
+    		System.out.println(config.getProperties().toString().replaceAll(", ",  "\n"));
     	}
     	
     	if (config.getClientType().equals("infinispan")) {
@@ -120,6 +190,7 @@ public class DollyManager {
     public static void resetClient() {
     	_client = init();
     }//end of resetClient()
+
 	
 	@SuppressWarnings("unchecked")
 	public static void main(String[] args) {
@@ -155,15 +226,33 @@ public class DollyManager {
 
 class ConnectionCheckThread extends Thread {
 	
+	private String name;
+	
+	public ConnectionCheckThread(String name) {
+		this.name = name;
+	}
+
 	@Override
 	public void run() {
 		while (true) {
 			try {
-				DollyManager.getClient().healthCheck();
-				DollyManager.resetClient();
-				DollyManager.resetSkipConnection();
+				
+				if (name == null) {
+					DollyManager.getClient().healthCheck();
+					DollyManager.resetClient();
+					DollyManager.resetSkipConnection();
+				} else {
+					DollyClient client = DollyManager.getClient(name);
+					client.healthCheck();
+					client.initClient();
+					DollyManager.resetSkipConnection();
+				}
+				
+				System.out.println("client init success.");
 				break;
 			} catch (Exception e) {
+				System.out.println(e.toString());
+				
 				try {
 					Thread.sleep(2000);
 				} catch (Exception e1) {

@@ -74,7 +74,7 @@ public class DollyConfig {
 	private static final String JMX_USER 					= "infinispan.jmx.user.list";
     private static final String JMX_PASSWD 					= "infinispan.jmx.passwd.list";
     
-    public static Properties properties;
+    public Properties properties;
 
     private boolean verbose;
     private String clientType;
@@ -101,6 +101,20 @@ public class DollyConfig {
     private String[] jmxServers;
     private String[] users;
     private String[] passwds;
+    
+    /**
+     * <pre>
+     * 프로퍼티 객체를 로드하고 파싱한다.
+     * </pre>
+     * @param prop
+     * @return
+     * @throws ConfigurationException
+     */
+    public DollyConfig load(Properties prop) throws ConfigurationException {
+		properties = prop;
+        parseConfigFile(properties);
+        return this;
+    }
     
 	/**
 	 * <pre>
@@ -250,6 +264,10 @@ public class DollyConfig {
     		this.passwds = list.split(";");
     	}
     }//end of extractOthers()
+    
+	public Properties getProperties() {
+		return properties;
+	}
 
 	/**
 	 * @return the classList

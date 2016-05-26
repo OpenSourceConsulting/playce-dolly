@@ -28,6 +28,7 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
@@ -55,6 +56,16 @@ public class HotRodClient implements DollyClient {
 
 	private DollyConfig config;
 	private RemoteCache<String, Object> cache;
+	private String name;
+	
+	public HotRodClient(String name, DollyConfig dollyConfig) {
+		
+		this.name = name;
+		this.config = dollyConfig;
+
+		initClient();
+	}
+	
 
     /**
      * <pre>
@@ -62,7 +73,7 @@ public class HotRodClient implements DollyClient {
      * </pre>
      */
 	public HotRodClient() {
-		if (DollyConfig.properties == null || config == null) {
+		if (config == null) {
 			try {
 	            config = new DollyConfig().load();
 			} catch (ConfigurationException e) {
@@ -71,9 +82,7 @@ public class HotRodClient implements DollyClient {
 			}
 		}
 
-    	//https://issues.jboss.org/browse/ISPN-4468
-		ConfigurationBuilder builder = new ConfigurationBuilder();
-	    cache = new RemoteCacheManager(builder.withProperties(DollyConfig.properties).build()).getCache();
+		initClient();
 	}//end of Default Contructor()
 
 	public Object get(String cacheKey) {
@@ -84,11 +93,11 @@ public class HotRodClient implements DollyClient {
 				obj = cache.get(cacheKey);
 			} catch (Exception e) {
 				if (e instanceof TransportException || e instanceof ConnectException) {
-					DollyManager.setSkipConnection();
+					DollyManager.setSkipConnection(this.name);
 				} else if (e instanceof com.couchbase.client.vbucket.ConfigurationException) {
-					DollyManager.setSkipConnection();
+					DollyManager.setSkipConnection(this.name);
 				} else if (e.getMessage().startsWith("Timed out waiting for")) {
-					DollyManager.setSkipConnection();
+					DollyManager.setSkipConnection(this.name);
 				} else {
 					e.printStackTrace();
 				}
@@ -113,11 +122,11 @@ public class HotRodClient implements DollyClient {
 				}
 			} catch (Exception e) {
 				if (e instanceof TransportException || e instanceof ConnectException) {
-					DollyManager.setSkipConnection();
+					DollyManager.setSkipConnection(this.name);
 				} else if (e instanceof com.couchbase.client.vbucket.ConfigurationException) {
-					DollyManager.setSkipConnection();
+					DollyManager.setSkipConnection(this.name);
 				} else if (e.getMessage().startsWith("Timed out waiting for")) {
-					DollyManager.setSkipConnection();
+					DollyManager.setSkipConnection(this.name);
 				} else {
 					e.printStackTrace();
 				}
@@ -136,11 +145,11 @@ public class HotRodClient implements DollyClient {
 				cache.put(cacheKey, value, -1, TimeUnit.SECONDS, config.getTimeout() * 60, TimeUnit.SECONDS);
 			} catch (Exception e) {
 				if (e instanceof TransportException || e instanceof ConnectException) {
-					DollyManager.setSkipConnection();
+					DollyManager.setSkipConnection(this.name);
 				} else if (e instanceof com.couchbase.client.vbucket.ConfigurationException) {
-					DollyManager.setSkipConnection();
+					DollyManager.setSkipConnection(this.name);
 				} else if (e.getMessage().startsWith("Timed out waiting for")) {
-					DollyManager.setSkipConnection();
+					DollyManager.setSkipConnection(this.name);
 				} else {
 					e.printStackTrace();
 				}
@@ -167,11 +176,11 @@ public class HotRodClient implements DollyClient {
 				}
 			} catch (Exception e) {
 				if (e instanceof TransportException || e instanceof ConnectException) {
-					DollyManager.setSkipConnection();
+					DollyManager.setSkipConnection(this.name);
 				} else if (e instanceof com.couchbase.client.vbucket.ConfigurationException) {
-					DollyManager.setSkipConnection();
+					DollyManager.setSkipConnection(this.name);
 				} else if (e.getMessage().startsWith("Timed out waiting for")) {
-					DollyManager.setSkipConnection();
+					DollyManager.setSkipConnection(this.name);
 				} else {
 					e.printStackTrace();
 				}
@@ -188,11 +197,11 @@ public class HotRodClient implements DollyClient {
 				cache.remove(cacheKey);
 			} catch (Exception e) {
 				if (e instanceof TransportException || e instanceof ConnectException) {
-					DollyManager.setSkipConnection();
+					DollyManager.setSkipConnection(this.name);
 				} else if (e instanceof com.couchbase.client.vbucket.ConfigurationException) {
-					DollyManager.setSkipConnection();
+					DollyManager.setSkipConnection(this.name);
 				} else if (e.getMessage().startsWith("Timed out waiting for")) {
-					DollyManager.setSkipConnection();
+					DollyManager.setSkipConnection(this.name);
 				} else {
 					e.printStackTrace();
 				}
@@ -216,11 +225,11 @@ public class HotRodClient implements DollyClient {
 				cache.put(cacheKey, attribute, -1, TimeUnit.SECONDS, config.getTimeout() * 60, TimeUnit.SECONDS);
 			} catch (Exception e) {
 				if (e instanceof TransportException || e instanceof ConnectException) {
-					DollyManager.setSkipConnection();
+					DollyManager.setSkipConnection(this.name);
 				} else if (e instanceof com.couchbase.client.vbucket.ConfigurationException) {
-					DollyManager.setSkipConnection();
+					DollyManager.setSkipConnection(this.name);
 				} else if (e.getMessage().startsWith("Timed out waiting for")) {
-					DollyManager.setSkipConnection();
+					DollyManager.setSkipConnection(this.name);
 				} else {
 					e.printStackTrace();
 				}
@@ -244,11 +253,11 @@ public class HotRodClient implements DollyClient {
 				}
 			} catch (Exception e) {
 				if (e instanceof TransportException || e instanceof ConnectException) {
-					DollyManager.setSkipConnection();
+					DollyManager.setSkipConnection(this.name);
 				} else if (e instanceof com.couchbase.client.vbucket.ConfigurationException) {
-					DollyManager.setSkipConnection();
+					DollyManager.setSkipConnection(this.name);
 				} else if (e.getMessage().startsWith("Timed out waiting for")) {
-					DollyManager.setSkipConnection();
+					DollyManager.setSkipConnection(this.name);
 				} else {
 					e.printStackTrace();
 				}
@@ -275,11 +284,11 @@ public class HotRodClient implements DollyClient {
 			    }
 			} catch (Exception e) {
 				if (e instanceof TransportException || e instanceof ConnectException) {
-					DollyManager.setSkipConnection();
+					DollyManager.setSkipConnection(this.name);
 				} else if (e instanceof com.couchbase.client.vbucket.ConfigurationException) {
-					DollyManager.setSkipConnection();
+					DollyManager.setSkipConnection(this.name);
 				} else if (e.getMessage().startsWith("Timed out waiting for")) {
-					DollyManager.setSkipConnection();
+					DollyManager.setSkipConnection(this.name);
 				} else {
 					e.printStackTrace();
 				}
@@ -361,5 +370,22 @@ public class HotRodClient implements DollyClient {
 	public void healthCheck() {
 		cache.get("healthCheck");
 	}//end of healthCheck()
+
+	@Override
+	public DollyConfig getConfig() {
+		return config;
+	}
+
+	@Override
+	public void initClient() {
+		//https://issues.jboss.org/browse/ISPN-4468
+		ConfigurationBuilder builder = new ConfigurationBuilder();
+	    cache = new RemoteCacheManager(builder.withProperties(config.getProperties()).build()).getCache();
+	}
+
+	@Override
+	public String getName() {
+		return name;
+	}
 }
 //end of HotRodClient.java

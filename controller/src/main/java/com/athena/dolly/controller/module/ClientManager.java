@@ -57,7 +57,7 @@ public class ClientManager implements InitializingBean {
 	
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		if (DollyConfig.properties == null || config == null) {
+		if (config == null) {
     		try {
                 config = new DollyConfig().load();
 			} catch (ConfigurationException e) {
