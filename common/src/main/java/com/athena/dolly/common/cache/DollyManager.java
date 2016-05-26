@@ -43,7 +43,7 @@ import com.athena.dolly.common.stats.DollyStats;
  */
 public class DollyManager {
 	
-	private static Map<String, DollyClient> clientMap = new HashMap<String, DollyClient>();
+	private static Map<String, AbstractDollyClient> clientMap = new HashMap<String, AbstractDollyClient>();
     private static DollyClient _client;
 	private static DollyConfig config;
 	
@@ -56,7 +56,7 @@ public class DollyManager {
 	 * @param name
 	 * @return
 	 */
-	public static DollyClient getClient(String name) {
+	public static AbstractDollyClient getClient(String name) {
 		
 		return clientMap.get(name);
     }
@@ -69,9 +69,9 @@ public class DollyManager {
 	 * @param prop
 	 * @return
 	 */
-	public static DollyClient createClient(String name, Properties prop) {
+	public static AbstractDollyClient createClient(String name, Properties prop) {
     	
-		DollyClient client = clientMap.get(name);
+		AbstractDollyClient client = clientMap.get(name);
     	
     	if (client != null) {
 			return client;
@@ -136,12 +136,19 @@ public class DollyManager {
     }
     
     public synchronized static void setSkipConnection(String name) {
-    	if (!skipConnection) {
+    	if (name == null && !skipConnection) {
     		skipConnection = true;
 
     		System.out.println("[Dolly] Could not connect to session server. Connection will be blocked by the time server is running.");
     		
     		new ConnectionCheckThread(name).start();
+    	} else if(name != null) {
+    		AbstractDollyClient client = DollyManager.getClient(name);
+    		
+    		if(client.isUseable()) {
+    			new ConnectionCheckThread(name).start();
+    		}
+    		
     	}
     }
     
@@ -242,10 +249,11 @@ class ConnectionCheckThread extends Thread {
 					DollyManager.resetClient();
 					DollyManager.resetSkipConnection();
 				} else {
-					DollyClient client = DollyManager.getClient(name);
+					AbstractDollyClient client = DollyManager.getClient(name);
+					client.setUseable(false);
+					
 					client.healthCheck();
 					client.initClient();
-					DollyManager.resetSkipConnection();
 				}
 				
 				System.out.println("client init success.");
