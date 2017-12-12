@@ -134,7 +134,7 @@ public class CouchbaseClient implements DollyClient {
 	public Object get(String cacheKey, String dataKey) {
 		if (!DollyManager.isSkipConnection()) {
 			try {
-		    	Map<String, Object> attribute = (Map<String, Object>)get(cacheKey);
+				Map<String, Object> attribute = (Map<String, Object>)get(cacheKey);
 				
 				if (attribute == null) {
 					return null;
@@ -186,14 +186,20 @@ public class CouchbaseClient implements DollyClient {
 		if (!DollyManager.isSkipConnection()) {
 			try {
 				if (dataKey != null) {
-			    	Map<String, Object> attribute = (Map<String, Object>)get(cacheKey);
-					
-					if (attribute == null) {
-						attribute = new ConcurrentHashMap<String, Object>();
+					if (config.getSessionKeyList().size() < 1 || config.getSessionKeyList().contains(dataKey) || dataKey.equals("jvmRoute")) {
+						Map<String, Object> attribute = (Map<String, Object>)get(cacheKey);
+						
+						if (attribute == null) {
+							attribute = new ConcurrentHashMap<String, Object>();
+						}
+						
+						attribute.put(dataKey, value);
+						client.set(cacheKey, config.getTimeout() * 60, gson.toJson(attribute)).get();
+					} else {
+						if (config.isVerbose()) {
+							System.out.println("[Dolly] \"" + dataKey + "\" is not a member of \"dolly.session.key.list\".");
+						}
 					}
-					
-					attribute.put(dataKey, value);
-					client.set(cacheKey, config.getTimeout() * 60, gson.toJson(attribute)).get();
 				}
 			} catch (Exception e) {
 				if (e instanceof TransportException || e instanceof ConnectException) {
@@ -268,7 +274,7 @@ public class CouchbaseClient implements DollyClient {
 	public Enumeration<String> getValueNames(String cacheKey) {
 		if (!DollyManager.isSkipConnection()) {
 			try {
-		    	Map<String, Object> attribute = (Map<String, Object>)get(cacheKey);
+		    		Map<String, Object> attribute = (Map<String, Object>)get(cacheKey);
 				
 				if (attribute == null) {
 					return null;
@@ -290,6 +296,46 @@ public class CouchbaseClient implements DollyClient {
 		
 		return null;
     }//end of getValueNames()
+    
+    /* (non-Javadoc)
+	 * @see com.athena.dolly.common.cache.client.DollyClient#getValueNames(java.lang.String, java.util.Enumeration)
+	 */
+    @SuppressWarnings("unchecked")
+	public Enumeration<String> getValueNames(String cacheKey, Enumeration<String> obj) {
+		if (!DollyManager.isSkipConnection()) {
+			try {
+		    		Map<String, Object> attribute = (Map<String, Object>)get(cacheKey);
+				
+				if (attribute == null) {
+					return obj;
+				} else {
+					List<String> keyList1 = new ArrayList<String>(attribute.keySet());
+					List<String> keyList2 = Collections.list(obj);
+					
+					for (String key : keyList2) {
+						if (!keyList1.contains(key)) {
+							keyList1.add(key);
+						}
+					}
+					
+					//return Collections.enumeration(attribute.keySet());
+					return Collections.enumeration(keyList1);
+				}
+			} catch (Exception e) {
+				if (e instanceof TransportException || e instanceof ConnectException) {
+					DollyManager.setSkipConnection();
+				} else if (e instanceof com.couchbase.client.vbucket.ConfigurationException) {
+					DollyManager.setSkipConnection();
+				} else if (e.getMessage().startsWith("Timed out waiting for")) {
+					DollyManager.setSkipConnection();
+				} else {
+					e.printStackTrace();
+				}
+			}
+		}
+		
+		return obj;
+    }
 
 	/* (non-Javadoc)
 	 * @see com.athena.dolly.enhancer.client.DollyClient#getKeys()

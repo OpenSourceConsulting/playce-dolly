@@ -71,7 +71,7 @@ public class HotRodClient implements DollyClient {
 			}
 		}
 
-    	//https://issues.jboss.org/browse/ISPN-4468
+		// https://issues.jboss.org/browse/ISPN-4468
 		ConfigurationBuilder builder = new ConfigurationBuilder();
 	    cache = new RemoteCacheManager(builder.withProperties(DollyConfig.properties).build()).getCache();
 	}//end of Default Contructor()
@@ -104,7 +104,7 @@ public class HotRodClient implements DollyClient {
 	public Object get(String cacheKey, String dataKey) {
 		if (!DollyManager.isSkipConnection()) {
 			try {
-		    	Map<String, Object> attribute = (Map<String, Object>)cache.get(cacheKey);
+				Map<String, Object> attribute = (Map<String, Object>)cache.get(cacheKey);
 				
 				if (attribute == null) {
 					return null;
@@ -156,14 +156,20 @@ public class HotRodClient implements DollyClient {
 		if (!DollyManager.isSkipConnection()) {
 			try {
 				if (dataKey != null) {
-			    	Map<String, Object> attribute = (Map<String, Object>)cache.get(cacheKey);
-					
-					if (attribute == null) {
-						attribute = new ConcurrentHashMap<String, Object>();
+					if (config.getSessionKeyList().size() < 1 || config.getSessionKeyList().contains(dataKey) || dataKey.equals("jvmRoute")) {
+				    		Map<String, Object> attribute = (Map<String, Object>)cache.get(cacheKey);
+						
+						if (attribute == null) {
+							attribute = new ConcurrentHashMap<String, Object>();
+						}
+						
+						attribute.put(dataKey, value);
+						cache.put(cacheKey, attribute, -1, TimeUnit.SECONDS, config.getTimeout() * 60, TimeUnit.SECONDS);
+					} else {
+						if (config.isVerbose()) {
+							System.out.println("[Dolly] \"" + dataKey + "\" is not a member of \"dolly.session.key.list\".");
+						}
 					}
-					
-					attribute.put(dataKey, value);
-					cache.put(cacheKey, attribute, -1, TimeUnit.SECONDS, config.getTimeout() * 60, TimeUnit.SECONDS);
 				}
 			} catch (Exception e) {
 				if (e instanceof TransportException || e instanceof ConnectException) {
@@ -207,7 +213,7 @@ public class HotRodClient implements DollyClient {
 	public synchronized void remove(String cacheKey, String dataKey) throws Exception {
 		if (!DollyManager.isSkipConnection()) {
 			try {
-		    	Map<String, Object> attribute = (Map<String, Object>)cache.get(cacheKey);
+				Map<String, Object> attribute = (Map<String, Object>)cache.get(cacheKey);
 				
 				if (attribute != null) {
 					attribute.remove(dataKey);
@@ -235,7 +241,7 @@ public class HotRodClient implements DollyClient {
 	public Enumeration<String> getValueNames(String cacheKey) {
 		if (!DollyManager.isSkipConnection()) {
 			try {
-		    	Map<String, Object> attribute = (Map<String, Object>)cache.get(cacheKey);
+		    		Map<String, Object> attribute = (Map<String, Object>)cache.get(cacheKey);
 				
 				if (attribute == null) {
 					return null;
@@ -257,6 +263,46 @@ public class HotRodClient implements DollyClient {
 		
 		return null;
     }//end of getValueNames()
+
+	/* (non-Javadoc)
+	 * @see com.athena.dolly.common.cache.client.DollyClient#getValueNames(java.lang.String, java.util.Enumeration)
+	 */
+    @SuppressWarnings("unchecked")
+	public Enumeration<String> getValueNames(String cacheKey, Enumeration<String> obj) {
+		if (!DollyManager.isSkipConnection()) {
+			try {
+		    		Map<String, Object> attribute = (Map<String, Object>)cache.get(cacheKey);
+				
+				if (attribute == null) {
+					return obj;
+				} else {
+					List<String> keyList1 = new ArrayList<String>(attribute.keySet());
+					List<String> keyList2 = Collections.list(obj);
+					
+					for (String key : keyList2) {
+						if (!keyList1.contains(key)) {
+							keyList1.add(key);
+						}
+					}
+					
+					//return Collections.enumeration(attribute.keySet());
+					return Collections.enumeration(keyList1);
+				}
+			} catch (Exception e) {
+				if (e instanceof TransportException || e instanceof ConnectException) {
+					DollyManager.setSkipConnection();
+				} else if (e instanceof com.couchbase.client.vbucket.ConfigurationException) {
+					DollyManager.setSkipConnection();
+				} else if (e.getMessage().startsWith("Timed out waiting for")) {
+					DollyManager.setSkipConnection();
+				} else {
+					e.printStackTrace();
+				}
+			}
+		}
+		
+		return obj;
+	}
 
 	/* (non-Javadoc)
 	 * @see com.athena.dolly.enhancer.client.DollyClient#getKeys()
@@ -335,23 +381,23 @@ public class HotRodClient implements DollyClient {
 	    
 	    Enumeration<String> cacheKeys = Collections.enumeration(cache.keySet());
 	    String cacheKey = null;
-    	Object data = null;
+    		Object data = null;
 	    int i = 1;
 	    while (cacheKeys.hasMoreElements()) {
-	    	cacheKey = cacheKeys.nextElement();
-    		System.out.println("================== Element index [" + i + "] ==================");
-    		System.out.println("Cache Key : " + cacheKey);
-	    	
-	    	data = cache.get(cacheKey);
-	    	
-	    	if (data != null) {
-    			System.out.println("Cache Data : " + data.toString());
-	    	} else {
-	    		System.out.println("Cache Data is NULL.");
-	    	}
-    		
-    		System.out.println("");
-    		i++;  
+		    	cacheKey = cacheKeys.nextElement();
+	    		System.out.println("================== Element index [" + i + "] ==================");
+	    		System.out.println("Cache Key : " + cacheKey);
+		    	
+		    	data = cache.get(cacheKey);
+		    	
+		    	if (data != null) {
+	    			System.out.println("Cache Data : " + data.toString());
+		    	} else {
+		    		System.out.println("Cache Data is NULL.");
+		    	}
+	    		
+	    		System.out.println("");
+	    		i++;  
 	    }
     }//end of printAllCache()
 	

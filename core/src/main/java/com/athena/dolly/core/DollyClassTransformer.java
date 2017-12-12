@@ -300,11 +300,18 @@ public class DollyClassTransformer implements ClassFileTransformer {
 						body += "	System.out.println(\"[Dolly] Session(\" + _id + \") getAttributeNames() has called.\");";
 	                }
 	                
+//					body +=	   "	java.util.Enumeration obj = null;" +
+//							   "	try { obj = com.athena.dolly.common.cache.DollyManager.getClient().getValueNames(_id); } catch (Exception e) { e.printStackTrace(); }" +
+//							   "	if (obj == null) {" +
+//							   "		try { obj = _getAttributeNames(); } catch (Exception e) { e.printStackTrace(); }" +
+//							   "	}" +
+//							   "	return obj;" +
+//							   "}";
+
+	                
 					body +=	   "	java.util.Enumeration obj = null;" +
-							   "	try { obj = com.athena.dolly.common.cache.DollyManager.getClient().getValueNames(_id); } catch (Exception e) { e.printStackTrace(); }" +
-							   "	if (obj == null) {" +
-							   "		try { obj = _getAttributeNames(); } catch (Exception e) { e.printStackTrace(); }" +
-							   "	}" +
+							   "try { obj = _getAttributeNames(); } catch (Exception e) { e.printStackTrace(); }" + 
+							   "	try { obj = com.athena.dolly.common.cache.DollyManager.getClient().getValueNames(_id, obj); } catch (Exception e) { e.printStackTrace(); }" +
 							   "	return obj;" +
 							   "}";
 					isEnhanced = true;

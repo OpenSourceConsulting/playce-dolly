@@ -107,6 +107,16 @@ public interface DollyClient {
 	
 	/**
 	 * <pre>
+	 * Map 형태의 Data에서 key 목록을 조회한다.
+	 * </pre>
+	 * @param cacheKey
+	 * @param obj
+	 * @return
+	 */
+	public Enumeration<String> getValueNames(String cacheKey, Enumeration<String> obj);
+	
+	/**
+	 * <pre>
 	 * Cache에 저장된 Cache Key를 조회한다.
 	 * </pre>
 	 * @return
