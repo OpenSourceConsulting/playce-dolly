@@ -347,25 +347,39 @@ public class HotRodClient implements DollyClient {
 	 */
 	public DollyStats getStats() {
 		DollyStats stats = new DollyStats();
-		
-		stats.setProtocolVersion(cache.getProtocolVersion());
-		stats.setVersion(cache.getVersion());
-		stats.setName(cache.getName());
-		stats.setIsEmpty(cache.isEmpty());
-		stats.setSize(cache.size());
-		
-		ServerStatistics statistics = cache.stats();
-		stats.setTimeSinceStart(statistics.getStatistic(ServerStatistics.TIME_SINCE_START));
-		stats.setCurrentNumberOfEntries(statistics.getStatistic(ServerStatistics.CURRENT_NR_OF_ENTRIES));
-		stats.setTotalNumberOfEntries(statistics.getStatistic(ServerStatistics.TOTAL_NR_OF_ENTRIES));
-		stats.setStores(statistics.getStatistic(ServerStatistics.STORES));
-		stats.setRetrievals(statistics.getStatistic(ServerStatistics.RETRIEVALS));
-		stats.setHits(statistics.getStatistic(ServerStatistics.HITS));
-		stats.setMisses(statistics.getStatistic(ServerStatistics.MISSES));
-		stats.setRemoveHits(statistics.getStatistic(ServerStatistics.REMOVE_HITS));
-		stats.setRemoveMisses(statistics.getStatistic(ServerStatistics.REMOVE_MISSES));
-		
-		stats.setCacheKeys(new ArrayList<String>(cache.keySet()));
+
+		if (!DollyManager.isSkipConnection()) {
+			try {
+				stats.setProtocolVersion(cache.getProtocolVersion());
+				stats.setVersion(cache.getVersion());
+				stats.setName(cache.getName());
+				stats.setIsEmpty(cache.isEmpty());
+				stats.setSize(cache.size());
+
+				ServerStatistics statistics = cache.stats();
+				stats.setTimeSinceStart(statistics.getStatistic(ServerStatistics.TIME_SINCE_START));
+				stats.setCurrentNumberOfEntries(statistics.getStatistic(ServerStatistics.CURRENT_NR_OF_ENTRIES));
+				stats.setTotalNumberOfEntries(statistics.getStatistic(ServerStatistics.TOTAL_NR_OF_ENTRIES));
+				stats.setStores(statistics.getStatistic(ServerStatistics.STORES));
+				stats.setRetrievals(statistics.getStatistic(ServerStatistics.RETRIEVALS));
+				stats.setHits(statistics.getStatistic(ServerStatistics.HITS));
+				stats.setMisses(statistics.getStatistic(ServerStatistics.MISSES));
+				stats.setRemoveHits(statistics.getStatistic(ServerStatistics.REMOVE_HITS));
+				stats.setRemoveMisses(statistics.getStatistic(ServerStatistics.REMOVE_MISSES));
+
+				stats.setCacheKeys(new ArrayList<String>(cache.keySet()));
+			} catch (Exception e) {
+				if (e instanceof TransportException || e instanceof ConnectException) {
+					DollyManager.setSkipConnection();
+				} else if (e instanceof com.couchbase.client.vbucket.ConfigurationException) {
+					DollyManager.setSkipConnection();
+				} else if (e.getMessage().startsWith("Timed out waiting for")) {
+					DollyManager.setSkipConnection();
+				} else {
+					e.printStackTrace();
+				}
+			}
+		}
 		
 		return stats;
 	}//end of getStats()
@@ -374,31 +388,45 @@ public class HotRodClient implements DollyClient {
 	 * @see com.athena.dolly.enhancer.client.DollyClient#printAllCache()
 	 */
 	public void printAllCache() {
-	    System.out.println("ProtocolVersion : " + cache.getProtocolVersion());
-	    System.out.println("Version : " + cache.getVersion());
-	    System.out.println("isEmpty : " + cache.isEmpty());
-	    System.out.println("Size : " + cache.size());
-	    
-	    Enumeration<String> cacheKeys = Collections.enumeration(cache.keySet());
-	    String cacheKey = null;
-    		Object data = null;
-	    int i = 1;
-	    while (cacheKeys.hasMoreElements()) {
-		    	cacheKey = cacheKeys.nextElement();
-	    		System.out.println("================== Element index [" + i + "] ==================");
-	    		System.out.println("Cache Key : " + cacheKey);
-		    	
-		    	data = cache.get(cacheKey);
-		    	
-		    	if (data != null) {
-	    			System.out.println("Cache Data : " + data.toString());
-		    	} else {
-		    		System.out.println("Cache Data is NULL.");
-		    	}
-	    		
-	    		System.out.println("");
-	    		i++;  
-	    }
+		if (!DollyManager.isSkipConnection()) {
+			try {
+				System.out.println("ProtocolVersion : " + cache.getProtocolVersion());
+				System.out.println("Version : " + cache.getVersion());
+				System.out.println("isEmpty : " + cache.isEmpty());
+				System.out.println("Size : " + cache.size());
+
+				Enumeration<String> cacheKeys = Collections.enumeration(cache.keySet());
+				String cacheKey = null;
+					Object data = null;
+				int i = 1;
+				while (cacheKeys.hasMoreElements()) {
+						cacheKey = cacheKeys.nextElement();
+						System.out.println("================== Element index [" + i + "] ==================");
+						System.out.println("Cache Key : " + cacheKey);
+
+						data = cache.get(cacheKey);
+
+						if (data != null) {
+							System.out.println("Cache Data : " + data.toString());
+						} else {
+							System.out.println("Cache Data is NULL.");
+						}
+
+						System.out.println("");
+						i++;
+				}
+			} catch (Exception e) {
+				if (e instanceof TransportException || e instanceof ConnectException) {
+					DollyManager.setSkipConnection();
+				} else if (e instanceof com.couchbase.client.vbucket.ConfigurationException) {
+					DollyManager.setSkipConnection();
+				} else if (e.getMessage().startsWith("Timed out waiting for")) {
+					DollyManager.setSkipConnection();
+				} else {
+					e.printStackTrace();
+				}
+			}
+		}
     }//end of printAllCache()
 	
 	/* (non-Javadoc)

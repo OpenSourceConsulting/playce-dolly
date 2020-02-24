@@ -24,7 +24,7 @@
         <project.build.source.version>1.7</project.build.source.version>
         <project.build.target.version>1.7</project.build.target.version>
         <lib.javassist.version>3.12.1.GA</lib.javassist.version>
-        <lib.infinispan.version>6.0.0.Final</lib.infinispan.version>
+        <lib.infinispan.version>7.2.5.Final</lib.infinispan.version>
 		<skipTests>true</skipTests>
 	</properties>
 
