@@ -162,9 +162,11 @@ public class HotRodClient implements DollyClient {
 						if (attribute == null) {
 							attribute = new ConcurrentHashMap<String, Object>();
 						}
-						
-						attribute.put(dataKey, value);
-						cache.put(cacheKey, attribute, -1, TimeUnit.SECONDS, config.getTimeout() * 60, TimeUnit.SECONDS);
+
+						if (value != null) {
+							attribute.put(dataKey, value);
+							cache.put(cacheKey, attribute, -1, TimeUnit.SECONDS, config.getTimeout() * 60, TimeUnit.SECONDS);
+						}
 					} else {
 						if (config.isVerbose()) {
 							System.out.println("[Dolly] \"" + dataKey + "\" is not a member of \"dolly.session.key.list\".");
@@ -176,7 +178,7 @@ public class HotRodClient implements DollyClient {
 					DollyManager.setSkipConnection();
 				} else if (e instanceof com.couchbase.client.vbucket.ConfigurationException) {
 					DollyManager.setSkipConnection();
-				} else if (e.getMessage().startsWith("Timed out waiting for")) {
+				} else if (e.getMessage() != null && e.getMessage().startsWith("Timed out waiting for")) {
 					DollyManager.setSkipConnection();
 				} else {
 					e.printStackTrace();

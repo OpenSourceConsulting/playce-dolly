@@ -151,7 +151,7 @@ public class InfinispanStarter {
     	    	    .jmxStatistics().enable()
     	    	    .eviction()
     	    	    	.strategy(EvictionStrategy.LRU)
-    	    	    	.maxEntries(8192L)
+    	    	    	.maxEntries(8192)
     	    	    .persistence()
     	    	    	.passivation(true)
     	    	    	.addSingleFileStore()
