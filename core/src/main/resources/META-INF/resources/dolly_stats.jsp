@@ -1,8 +1,8 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@ page import="java.util.*" %>
-<%@ page import="com.athena.dolly.enhancer.*" %>
-<%@ page import="com.athena.dolly.stats.*" %>
+<%@ page import="com.athena.dolly.common.cache.*" %>
+<%@ page import="com.athena.dolly.common.stats.*" %>
 <html>
 <head>
 <title>Dolly Session Statistics</title>
@@ -20,7 +20,7 @@
 </style>
 <body>
 <%
-	DollyStats stats = DollyManager.getInstance().getStats();
+	DollyStats stats = DollyManager.getClient().getStats();
 %>
 <h2>Dolly Session Statistics</h2>
 <ul>
@@ -88,7 +88,7 @@
 
 				int i = 1;
 				for (String key : cacheKeys) {
-					values = DollyManager.getInstance().getValue(key);
+					values = DollyManager.getClient().get(key);
 			%>
 			<tr>
 				<td class=td_center><%= i++ %></td>
