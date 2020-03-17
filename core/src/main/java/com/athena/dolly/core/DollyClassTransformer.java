@@ -186,7 +186,7 @@ public class DollyClassTransformer implements ClassFileTransformer {
 		                }
 		                
 						body +=	   "	try { com.athena.dolly.common.cache.DollyManager.getClient().put(_id, $1, $2); } catch (Exception e) { e.printStackTrace(); }" +
-								   "	try { _setAttribute($1, $2); } catch (Exception e) { e.printStackTrace(); }" + 
+								   "	try { _setAttribute($1, $2); } catch (Exception e) { if (e instanceof java.lang.IllegalStateException && e.getMessage().contains(\"invalidated\")) {  } else { e.printStackTrace(); } }" +
 								   "}";
 						isEnhanced = true;
 					}
@@ -231,7 +231,7 @@ public class DollyClassTransformer implements ClassFileTransformer {
 					   		   "					com.athena.dolly.common.cache.DollyManager.getClient().put(_id, key, _getAttribute(key));" +
 							   "				}" +
 							   "			}" +
-							   "		} catch (Exception e) { e.printStackTrace(); }" +
+							   "		} catch (Exception e) { if (e instanceof java.lang.IllegalStateException && e.getMessage().contains(\"invalidated\")) {  } else { e.printStackTrace(); } }" +
 							   "	}";
 							   
 					if (verbose) {
@@ -337,7 +337,7 @@ public class DollyClassTransformer implements ClassFileTransformer {
 		                }
 		                
 						body +=	   "	try { com.athena.dolly.common.cache.DollyManager.getClient().remove(_id, $1); } catch (Exception e) { e.printStackTrace(); }" +
-								   "	try { _removeAttribute($1); } catch (Exception e) { e.printStackTrace(); }" +
+								   "	try { _removeAttribute($1); } catch (Exception e) { if (e instanceof java.lang.IllegalStateException && e.getMessage().contains(\"invalidated\")) {  } else { e.printStackTrace(); } }" +
 								   "}";
 						isEnhanced = true;
 					}
