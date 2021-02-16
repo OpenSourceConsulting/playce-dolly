@@ -49,16 +49,17 @@ public class DollyConfig {
 	// Property for core
 	private static final String CLIENT_TYPE		 			= "dolly.client.type";
 	private static final String VERBOSE_PROPERTY 			= "dolly.verbose";
-	private static final String ENABLE_SSO_PROPERTY 			= "dolly.enableSSO";
-	private static final String SSO_DOMAIN_LIST_PROPERTY 		= "dolly.sso.domain.list";
+	private static final String VIEW_STAT 					= "dolly.view.stat";
+	private static final String ENABLE_SSO_PROPERTY 		= "dolly.enableSSO";
+	private static final String SSO_DOMAIN_LIST_PROPERTY 	= "dolly.sso.domain.list";
 	private static final String SSO_PARAMETER_KEY 			= "dolly.sso.parameter.key";
 	private static final String TIMEOUT_PROPERTY 			= "dolly.session.timeout";
-    private static final String SESSION_KEY_LIST				= "dolly.session.key.list";
-    //private static final String TARGET_CLASS_PROPERTY 		= "dolly.instrument.target.class";
+    private static final String SESSION_KEY_LIST			= "dolly.session.key.list";
+    //private static final String TARGET_CLASS_PROPERTY 	= "dolly.instrument.target.class";
     
     private static final String USE_EMBEDDED 				= "dolly.use.infinispan.embedded";
-    private static final String HOTROD_HOST 					= "dolly.hotrod.host";
-    private static final String HOTROD_PORT 					= "dolly.hotrod.port";
+    private static final String HOTROD_HOST 				= "dolly.hotrod.host";
+    private static final String HOTROD_PORT 				= "dolly.hotrod.port";
     private static final String JGROUPS_STACK 				= "dolly.jgroups.stack";
     private static final String JGROUPS_BIND_ADDR 			= "dolly.jgroups.tcp.bind.address";
     private static final String JGROUPS_BIND_PORT 			= "dolly.jgroups.tcp.bind.port";
@@ -71,13 +72,14 @@ public class DollyConfig {
 
     // Property for controller
 	private static final String EMBEDDED 					= "infinispan.embedded";
-	private static final String JMX_SERVER_LIST 				= "infinispan.jmx.server.list";
+	private static final String JMX_SERVER_LIST 			= "infinispan.jmx.server.list";
 	private static final String JMX_USER 					= "infinispan.jmx.user.list";
     private static final String JMX_PASSWD 					= "infinispan.jmx.passwd.list";
     
     public static Properties properties;
 
     private boolean verbose;
+    private boolean viewStat;
     private String clientType;
     private List<String> classList = new ArrayList<String>();
     private List<String> ssoDomainList = new ArrayList<String>();
@@ -125,16 +127,16 @@ public class DollyConfig {
      * @throws ConfigurationException
      */
     private Properties loadConfigFile() throws ConfigurationException {
-    		InputStream configResource = null;
+		InputStream configResource = null;
     	
         try {
-	        	String configFile = System.getProperty(CONFIG_FILE);
-	        	
-	        	if (configFile != null && !"".equals(configFile)) {
-	        		configResource = new BufferedInputStream(new FileInputStream(configFile));
-	        	} else {
-	        		configResource = Thread.currentThread().getContextClassLoader().getResourceAsStream(CONFIG_FILE);
-	        	}
+			String configFile = System.getProperty(CONFIG_FILE);
+
+			if (configFile != null && !"".equals(configFile)) {
+				configResource = new BufferedInputStream(new FileInputStream(configFile));
+			} else {
+				configResource = Thread.currentThread().getContextClassLoader().getResourceAsStream(CONFIG_FILE);
+			}
         	
             if (configResource == null) {
                 throw new FileNotFoundException("Could not locate " + CONFIG_FILE + " in the classpath or System Poroperty(-Ddolly.properties=Full Qualified File Name) path.");
@@ -160,7 +162,7 @@ public class DollyConfig {
      * @throws ConfigurationException
      */
     private void parseConfigFile(Properties config) throws ConfigurationException {
-    		extractTargetClasses(config);
+    	extractTargetClasses(config);
         extractSsoDomainList(config);
         extractSessionKeyList(config);
         extractOthers(config);
@@ -173,25 +175,25 @@ public class DollyConfig {
      * @param config
      */
     private void extractTargetClasses(Properties config) {
-	    	String[] classNames = new String[]{
-	    		"org.apache.catalina.session.StandardSessionFacade",
-	    		"org.apache.catalina.session.ManagerBase",
-	    		"org.apache.catalina.connector.Request",
-	    		"jeus.sessionmanager.session.HttpSessionWrapper",
-	    		"weblogic.servlet.internal.session.SessionData",
-	    		"weblogic.servlet.internal.ServletRequestImpl"
-	    	};
-	    	
-	    	//String[] classNames = config.getProperty(TARGET_CLASS_PROPERTY, "").split(",");
-	    	
-	    	for (String clazzName : classNames) {
-	    		if (!"".equals(clazzName)) {
-	    			if (verbose) {
-	    				System.out.println(clazzName + " will be enhanced.");
-	    			}
-	    			classList.add(clazzName.replace(".", "/"));
-	    		}
-	    	}
+		String[] classNames = new String[]{
+			"org.apache.catalina.session.StandardSessionFacade",
+			"org.apache.catalina.session.ManagerBase",
+			"org.apache.catalina.connector.Request",
+			"jeus.sessionmanager.session.HttpSessionWrapper",
+			"weblogic.servlet.internal.session.SessionData",
+			"weblogic.servlet.internal.ServletRequestImpl"
+		};
+
+		//String[] classNames = config.getProperty(TARGET_CLASS_PROPERTY, "").split(",");
+
+		for (String clazzName : classNames) {
+			if (!"".equals(clazzName)) {
+				if (verbose) {
+					System.out.println(clazzName + " will be enhanced.");
+				}
+				classList.add(clazzName.replace(".", "/"));
+			}
+		}
     }//end of extractTargetClasses()
 
     /**
@@ -201,13 +203,13 @@ public class DollyConfig {
      * @param config
      */
     private void extractSsoDomainList(Properties config) {
-	    	String[] domainNames = config.getProperty(SSO_DOMAIN_LIST_PROPERTY, "").split(",");
-	    	
-	    	for (String domainName : domainNames) {
-	    		if (!"".equals(domainName)) {
-	    			ssoDomainList.add(domainName);
-	    		}
-	    	}
+		String[] domainNames = config.getProperty(SSO_DOMAIN_LIST_PROPERTY, "").split(",");
+
+		for (String domainName : domainNames) {
+			if (!"".equals(domainName)) {
+				ssoDomainList.add(domainName);
+			}
+		}
     }//end of extractSsoDomainList()
 
     /**
@@ -217,13 +219,13 @@ public class DollyConfig {
      * @param config
      */
     private void extractSessionKeyList(Properties config) {
-	    	String[] keys = config.getProperty(SESSION_KEY_LIST, "").split(",");
-	    	
-	    	for (String key : keys) {
-	    		if (!"".equals(key)) {
-	    			sessionKeyList.add(key);
-	    		}
-	    	}
+		String[] keys = config.getProperty(SESSION_KEY_LIST, "").split(",");
+
+		for (String key : keys) {
+			if (!"".equals(key)) {
+				sessionKeyList.add(key);
+			}
+		}
     }//end of extractSessionKeyList()
 
     /**
@@ -234,40 +236,41 @@ public class DollyConfig {
      */
     private void extractOthers(Properties config) {
         this.verbose = Boolean.parseBoolean(config.getProperty(VERBOSE_PROPERTY, "false"));
+        this.viewStat = Boolean.parseBoolean(config.getProperty(VIEW_STAT, "false"));
         this.clientType = config.getProperty(CLIENT_TYPE, "infinispan");
         this.enableSSO = Boolean.parseBoolean(config.getProperty(ENABLE_SSO_PROPERTY, "false"));
 		this.ssoParamKey = config.getProperty(SSO_PARAMETER_KEY, null);
-	    	this.timeout = Integer.parseInt(config.getProperty(TIMEOUT_PROPERTY, "30"));
-	    	
-	    	this.useEmbedded = Boolean.parseBoolean(config.getProperty(USE_EMBEDDED, "false"));
-	    	this.hotrodHost = config.getProperty(HOTROD_HOST, "0.0.0.0");
-	    	this.hotrodPort = Integer.parseInt(config.getProperty(HOTROD_PORT, "11222"));
-	    	this.jgroupsStack = config.getProperty(JGROUPS_STACK, "udp");
-	    	this.jgroupsBindAddress = config.getProperty(JGROUPS_BIND_ADDR, "127.0.0.1");
-	    	this.jgroupsBindPort = config.getProperty(JGROUPS_BIND_PORT, "7800");
-	    	this.jgroupsInitialHosts = config.getProperty(JGROUPS_INIT_HOSTS, "localhost[7800],localhost[7801]");
-	    	this.jgroupsMulticastPort = config.getProperty(JGROUPS_MULTICAST_PORT, "45588");
-	    	
-	    	this.couchbaseUris = config.getProperty(COUCHBASE_URIS, "");
-	    	this.couchbaseBucketName = config.getProperty(COUCHBASE_BUCKET_NAME, "");
-	    	this.couchbaseBucketPasswd = config.getProperty(COUCHBASE_BUCKET_PASSWD, "");
-	
-	    	this.embedded = Boolean.parseBoolean(config.getProperty(EMBEDDED, "false"));
-	    	
-	    	String list = config.getProperty(JMX_SERVER_LIST, "");
-	    	if (!"".equals(list)) {
-	    		this.jmxServers = list.split(";");
-	    	}
-	
-	    	list = config.getProperty(JMX_USER, "");
-	    	if (!"".equals(list)) {
-	    		this.users = list.split(";");
-	    	}
-	    	
-	    	list = config.getProperty(JMX_PASSWD, "");
-	    	if (!"".equals(list)) {
-	    		this.passwds = list.split(";");
-	    	}
+		this.timeout = Integer.parseInt(config.getProperty(TIMEOUT_PROPERTY, "30"));
+
+		this.useEmbedded = Boolean.parseBoolean(config.getProperty(USE_EMBEDDED, "false"));
+		this.hotrodHost = config.getProperty(HOTROD_HOST, "0.0.0.0");
+		this.hotrodPort = Integer.parseInt(config.getProperty(HOTROD_PORT, "11222"));
+		this.jgroupsStack = config.getProperty(JGROUPS_STACK, "udp");
+		this.jgroupsBindAddress = config.getProperty(JGROUPS_BIND_ADDR, "127.0.0.1");
+		this.jgroupsBindPort = config.getProperty(JGROUPS_BIND_PORT, "7800");
+		this.jgroupsInitialHosts = config.getProperty(JGROUPS_INIT_HOSTS, "localhost[7800],localhost[7801]");
+		this.jgroupsMulticastPort = config.getProperty(JGROUPS_MULTICAST_PORT, "45588");
+
+		this.couchbaseUris = config.getProperty(COUCHBASE_URIS, "");
+		this.couchbaseBucketName = config.getProperty(COUCHBASE_BUCKET_NAME, "");
+		this.couchbaseBucketPasswd = config.getProperty(COUCHBASE_BUCKET_PASSWD, "");
+
+		this.embedded = Boolean.parseBoolean(config.getProperty(EMBEDDED, "false"));
+
+		String list = config.getProperty(JMX_SERVER_LIST, "");
+		if (!"".equals(list)) {
+			this.jmxServers = list.split(";");
+		}
+
+		list = config.getProperty(JMX_USER, "");
+		if (!"".equals(list)) {
+			this.users = list.split(";");
+		}
+
+		list = config.getProperty(JMX_PASSWD, "");
+		if (!"".equals(list)) {
+			this.passwds = list.split(";");
+		}
     }//end of extractOthers()
 
 	/**
@@ -282,6 +285,13 @@ public class DollyConfig {
 	 */
 	public boolean isVerbose() {
 		return verbose;
+	}
+
+	/**
+	 * @return the boolean
+	 */
+	public boolean isViewStat() {
+		return viewStat;
 	}
 
 	/**

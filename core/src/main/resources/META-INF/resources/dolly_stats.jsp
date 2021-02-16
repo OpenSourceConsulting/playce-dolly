@@ -20,7 +20,10 @@
 </style>
 <body>
 <%
-	DollyStats stats = DollyManager.getClient().getStats();
+	DollyConfig cfg = new DollyConfig().load();
+
+	if (cfg != null && cfg.isViewStat()) {
+		DollyStats stats = DollyManager.getClient().getStats();
 %>
 <h2>Dolly Session Statistics</h2>
 <ul>
@@ -101,5 +104,12 @@
 		</table>
 	</li>
 </ul>
+<%
+	} else {
+%>
+Please set <b><i>dolly.view.stat=true</i></b> in dolly.properties to view this page.
+<%
+	}
+%>
 </body>
 </html>

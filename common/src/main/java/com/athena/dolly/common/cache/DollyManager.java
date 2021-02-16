@@ -61,6 +61,25 @@ public class DollyManager {
         return _client;
     }//end of getInstance()
 
+	/**
+	 * <pre>
+	 * Singleton 형태의 DollyManager로부터 DollyClient 인스턴스를 가져온다.
+	 * </pre>
+	 * @return
+	 */
+	public synchronized static DollyConfig getConfig() {
+		if (DollyConfig.properties == null || config == null) {
+			try {
+				config = new DollyConfig().load();
+			} catch (ConfigurationException e) {
+				System.err.println("[Dolly] Configuration error : " + e.getMessage());
+				e.printStackTrace();
+			}
+		}
+
+		return config;
+	}//end of getInstance()
+
     public static boolean isSkipConnection() {
     	return skipConnection;
     }

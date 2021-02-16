@@ -209,7 +209,13 @@ public class DollyClassTransformer implements ClassFileTransformer {
 	                
 					// Expiration(time-out) 갱신을 위해 Session Server에서 먼저 조회한다.
 					body +=	   "	java.lang.Object obj = null;" +
-							   "	try { obj = com.athena.dolly.common.cache.DollyManager.getClient().get(_id, $1); } catch (Exception e) { e.printStackTrace(); }";
+							   "	try { " +
+							   "		obj = com.athena.dolly.common.cache.DollyManager.getClient().get(_id, $1); " +
+							   "	} catch (Exception e) { " +
+							   "    	System.out.println(\"[Dolly] Unhandled exception occurred while get attribute in session.\"); " +
+							   "		System.out.println(\"[Dolly] Session(\" + _id + \") getAttribute(\" + $1 + \") has called.\");" +
+							   "    	e.printStackTrace(); " +
+							   "}";
 
 	                if (verbose) {
 						body += "	if (obj == null) { System.out.println(\"[Dolly] Attribute does not exist in Session Server. Trying search in Local Session.\"); }";
