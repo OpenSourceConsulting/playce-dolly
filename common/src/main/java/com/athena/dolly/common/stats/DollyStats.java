@@ -24,6 +24,7 @@
  */
 package com.athena.dolly.common.stats;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -266,6 +267,10 @@ public class DollyStats {
 	 * @return the cacheKeys
 	 */
 	public List<String> getCacheKeys() {
+		if (cacheKeys == null) {
+			cacheKeys = new ArrayList<>();
+		}
+
 		return cacheKeys;
 	}
 

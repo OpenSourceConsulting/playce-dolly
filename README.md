@@ -1,18 +1,18 @@
-athena-dolly
+playce-dolly
 ============
-Athena-Dolly는 WAS에 비종속적인 세션 클러스터링 솔루션으로 현재 Apache Tomcat 6/7, JBoss EAP 6, WebLogic 11이 지원 가능하며 추후 Jeus, WebSphere등 다양한 WAS로도 지원을 확대할 계획이다.
+Playce-Dolly는 WAS에 비종속적인 세션 클러스터링 솔루션으로 현재 Apache Tomcat 6/7, JBoss EAP 6, WebLogic 11이 지원 가능하며 추후 Jeus, WebSphere등 다양한 WAS로도 지원을 확대할 계획이다.
 
-1. Athena-Dolly의 특징
+1. Playce-Dolly의 특징
    - 이기종 WAS 간의 세션 클러스터링이 가능할 뿐만 아니라 기존 웹 애플리케이션의 수정이 전혀 필요하지 않다. 
    - 세션 클러스터링을 위한 캐시 서버로 JBoss Data Grid(Infinispan)과 Couchbase를 지원하고 있으며 추후 Redis를 추가적으로 지원할 계획이다.
    - 캐시 서버 구축에 부담이 있다면 Infinispan을 WAS 구동 시 내장되어 동작하도록 Embedded 모드로 동작시키거나, 별도의 Standalone Application으로 동작시킬 수 있다.
    - 순수 서버사이드 SSO(Single Sign On) 기능을 지원하고 있어 에어전트 설치 없이 여러 도메인 간 로그인 상태를 유지시킬 수 있다.
    - 캐시 서버의 CPU, Memory 모니터링과 세션 데이터 조회 및 통계정보를 확인할 수 있는 웹 애플리케이션을 제공한다.
 
-2. Athena-Dolly의 설치
-   - mvn install을 수행하게 되면 athena-dolly/core/target 디렉토리에 core-0.0.1-SNAPSHOT-bin.zip 파일이 생성되며, 해당 파일을 설치하고자 하는 서버로 복사한다.
-   - core-0.0.1-SNAPSHOT-bin.zip 파일을 압축 해제하게 되면 dolly-agent 라는 디렉토리가 생성되고, 하위에 dolly.properties 파일 및 lib 디렉토리가 존재하며 lib 디렉토리 안에 관련 라이브러리 파일들이 존재한다.
-   - dolly.properties 파일에는 Athena Dolly 관련 설정이 포함되며, 아래의 각 항목을 용도에 맞게 수정한다.
+2. Playce-Dolly의 설치
+   - mvn install을 수행하게 되면 playce-dolly/core/target 디렉토리에 core-1.1.0-bin.zip 파일이 생성되며, 해당 파일을 설치하고자 하는 서버로 복사한다.
+   - core-1.1.0-bin.zip 파일을 압축 해제하게 되면 dolly-agent 라는 디렉토리가 생성되고, 하위에 dolly.properties 파일 및 lib 디렉토리가 존재하며 lib 디렉토리 안에 관련 라이브러리 파일들이 존재한다.
+   - dolly.properties 파일에는 Playce Dolly 관련 설정이 포함되며, 아래의 각 항목을 용도에 맞게 수정한다.
      
 3. dolly.properties 수정
    - _**dolly.verbose**_ : Verbosity 여부
@@ -24,6 +24,7 @@ Athena-Dolly는 WAS에 비종속적인 세션 클러스터링 솔루션으로 �
    - _**dolly.enableSSO**_ : SSO 사용 여부
    - _**dolly.sso.domain.list**_ : SSO 사용 대상 도메인 목록
    - _**dolly.sso.parameter.key**_ : SSO 사용 시 다른 도메인에 Session ID를 넘겨줄 때 사용하는 Query Parameter Key
+   - _**dolly.session.listener.class**_ : HttpSessionListener를 구현한 클래스를 사용하는 경우 sessionDestroyed() 내의 로직에 의해 만료 대상 세션 데이터가 다시 세션서버로 복제되는 현상이 있다. HttpSessionListener 구현 클래스를 명사하면 sessionDestroyed()시 명시적으로 세션 서버에서 세션 데이터를 삭제한다.
    - _**couchbase.xxx**_ : Couchbase 관련 정보(uri, name, password)
    - _**infinispan.client.hotrod.xxx**_ : Infinispan Hotrod Client 설정(기본 값으로 사용 권고)
    - _**infinispan.client.hotrod.server_list**_ : Infinispan Hotrod Server 목록
@@ -37,14 +38,14 @@ Athena-Dolly는 WAS에 비종속적인 세션 클러스터링 솔루션으로 �
        - -Dcom.sun.management.jmxremote.authenticate=false
         
    - Standalone 형태로 구동을 원할 경우 다음과 같은 명령으로 실행 시킬 수 있다.
-       - java -Ddolly.properties=/opt/dolly-agent/dolly.properties -jar core-1.0.0-SNAPSHOT.jar 9999
+       - java -Ddolly.properties=/opt/dolly-agent/dolly.properties -jar core-1.1.0.jar 9999
 	  - 9999는 JMX 포트 번호로써 주어지지 않을 경우 9999를 기본 값으로 사용한다.
-	  - "nohup java -Ddolly.properties=/opt/dolly-agent/dolly.properties -jar core-1.0.0-SNAPSHOT.jar 9999 > /dev/null 2>&1 &" 로 실행하여 Backgroud로 실행할 수 있다.
+	  - "nohup java -Ddolly.properties=/opt/dolly-agent/dolly.properties -jar core-1.1.0.jar 9999 > /dev/null 2>&1 &" 로 실행하여 Backgroud로 실행할 수 있다.
 
-5. Athena-Dolly 실행을 위한 WAS 구동 옵션 추가
-   - Athena-Dolly 실행을 위해서 dolly.properties에 해당하는 System Property 및 javaagent 옵션이 필요하다.
+5. Playce-Dolly 실행을 위한 WAS 구동 옵션 추가
+   - Playce-Dolly 실행을 위해서 dolly.properties에 해당하는 System Property 및 javaagent 옵션이 필요하다.
        - -Ddolly.properties=/opt/dolly-agent/dolly.properties 
-       - -javaagent:/opt/dolly-agent/lib/core-0.0.1-SNAPSHOT.jar
+       - -javaagent:/opt/dolly-agent/lib/core-1.1.0.jar
 	
    - JBoss EAP 6 버전에서는 jboss.modules.system.pkgs 옵션에 com.athena.dolly 추가
        - -Djboss.modules.system.pkgs=org.jboss.byteman,com.athena.dolly

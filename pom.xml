@@ -1,16 +1,16 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>athena-dolly</groupId>
-	<artifactId>athena-dolly</artifactId>
-	<version>1.0.0-SNAPSHOT</version>
+	<groupId>playce-dolly</groupId>
+	<artifactId>playce-dolly</artifactId>
+	<version>1.1.0</version>
 	<packaging>pom</packaging>
 	
 	<scm>
-		<connection>scm:git:git://github.com/OpenSourceConsulting/athena-dolly.git</connection>
-		<developerConnection>scm:git:ssh://git@github.com/OpenSourceConsulting/athena-dolly.git</developerConnection>
+		<connection>scm:git:git://github.com/OpenSourceConsulting/playce-dolly.git</connection>
+		<developerConnection>scm:git:ssh://git@github.com/OpenSourceConsulting/playce-dolly.git</developerConnection>
 		<tag>HEAD</tag>
-		<url>https://github.com/OpenSourceConsulting/athena-dolly</url>
+		<url>https://github.com/OpenSourceConsulting/playce-dolly</url>
 	</scm>
 
 	<organization>

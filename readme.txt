@@ -2,9 +2,9 @@ Athena-Dolly는 Infinispan Data Grid를 이용한 WAS에 비종속적인 세션 
 추후 Weblogic, Jeus, WebSphere등 다양한 WAS로도 지원을 확대할 계획이다.
 
 1. Athena-Dolly의 설치
-   - mvn install을 수행하게 되면 target 디렉토리에 athena-dolly-0.0.1-SNAPSHOT-bin.zip 파일이 생성되며,
+   - mvn install을 수행하게 되면 target 디렉토리에 playce-dolly-1.1.0-bin.zip 파일이 생성되며,
      해당 파일을 설치하고자 하는 서버로 복사한다.
-   - athena-dolly-0.0.1-SNAPSHOT-bin.zip 파일을 압축 해제하게 되면 dolly-agent 라는 디렉토리가 생성되고,
+   - playce-dolly-1.1.0-bin.zip 파일을 압축 해제하게 되면 dolly-agent 라는 디렉토리가 생성되고,
      하위에 dolly.properties 파일 및 lib 디렉토리가 존재하며 lib 디렉토리 안에 관련 라이브러리 파일들이 존재한다.
    - dolly.properties 파일에는 BCI를 위한 타깃 클래스 목록 및 Infinispan 관련 설정이 포함되며, 
      infinispan.client.hotrod.server_list 항목은 ";" 구분자를 이용하여 현재 동작하고 있는 Infinispan hotrod
@@ -13,12 +13,12 @@ Athena-Dolly는 Infinispan Data Grid를 이용한 WAS에 비종속적인 세션 
 2. Athena-Dolly 실행을 위한 WAS 구동 옵션 추가
    - Athena-Dolly 실행을 위해서 dolly.properties에 해당하는 System Property 및 javaagent 옵션이 필요하다.
    (eg) -Ddolly.properties=/opt/dolly-agent/dolly.properties 
-        -javaagent:/opt/dolly-agent/lib/athena-dolly-0.0.1-SNAPSHOT.jar
+        -javaagent:/opt/dolly-agent/lib/playce-dolly-1.1.0.jar
 
 3. 상태정보 확인
    - WAS 구동 후 http://${SERVER_IP}:${SERVER_PORT}/${CONTEXT}/dolly_stats.jsp 파일을 호출하면
      Infinispan Properties, Infinispan Stats, Cache Data List 조회 화면이 표시된다.
-     단, WAS에 따라서 표시가 되지 않을 수 있으며 athena-dolly-0.0.1-SNAPSHOT.jar 파일 내의
+     단, WAS에 따라서 표시가 되지 않을 수 있으며 playce-dolly-1.1.0.jar 파일 내의
      /META-INF/resources/dolly_stats.jsp 파일을 WebRoot로 복사하면 호출 가능하다.
      
 4. Infinispan file-store 활성화

@@ -14,7 +14,7 @@
                 "width": null
             }
         },
-        "urlPrefix": "http://localhost:1841/athena-dolly-ui/",
+        "urlPrefix": "http://localhost:1841/playce-dolly-ui/",
         "exportPath": "/Users/nices96/Desktop",
         "spacesToIndent": 4,
         "sdkPath": "",

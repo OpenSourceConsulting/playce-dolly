@@ -90,18 +90,22 @@ public class DollyClassTransformer implements ClassFileTransformer {
                 cl = pool.makeClass(new ByteArrayInputStream(classfileBuffer));
                 
                 if (cl.subtypeOf(pool.get("javax.servlet.http.HttpSession"))) {
-                	return instumentHttpSession(className, cl);
-                } 
-                
-                // SSO 활성화 시 주어진 SessionID 값을 JSESSIONID로 사용하도록 변환 
+                	return instrumentHttpSession(className, cl);
+                }
+
+				if (cl.subtypeOf(pool.get("javax.servlet.http.HttpSessionListener"))) {
+					return instrumentHttpSessionListener(className, cl);
+				}
+
+				// SSO 활성화 시 주어진 SessionID 값을 JSESSIONID로 사용하도록 변환
 				if (cl.subtypeOf(pool.get("javax.servlet.http.HttpServletRequest"))) {
-					return instumentRequest(className, cl, enableSSO);
+					return instrumentRequest(className, cl, enableSSO);
 				}
                 
                 // Tomcat, JBoss 외의 WAS에서는 org.apache.catalina.session.ManagerBase로 타입 검사를 수행할 경우 
                 // ClassNotFound Exception이 발생하므로 문자열을 비교한다.
                 if (className.startsWith("org/apache/catalina/session/ManagerBase")) {
-                	return instumentManager(className, cl);
+                	return instrumentManager(className, cl);
                 }
                 
                 // Debug 용으로써 Target Class로 지정된 클래스(위 HttpSession과 ManagerBase 등은 제외)의 모든 메소드의 실행 시 로깅을 수행한다.
@@ -141,7 +145,7 @@ public class DollyClassTransformer implements ClassFileTransformer {
 	 * @return
 	 * @throws Exception
 	 */
-	private byte[] instumentHttpSession(String className, CtClass cl) throws Exception {
+	private byte[] instrumentHttpSession(String className, CtClass cl) throws Exception {
 		byte[] redefinedClassfileBuffer = null;
 
 		if (cl.isInterface() == false) {
@@ -182,7 +186,7 @@ public class DollyClassTransformer implements ClassFileTransformer {
 									"	}";
 
 		                if (verbose) {
-							body += "	System.out.println(\"[Dolly] Session(\" + _id + \") setAttribute(\" + $1 + \", \" + $2 + \") has called.\");";
+							body += "	System.out.println(\"[Dolly] Session(\" + _id + \") setAttribute(\" + $1 + \", \" + $2 + \") has been called.\");";
 		                }
 		                
 						body +=	   "	try { com.athena.dolly.common.cache.DollyManager.getClient().put(_id, $1, $2); } catch (Exception e) { e.printStackTrace(); }" +
@@ -204,7 +208,7 @@ public class DollyClassTransformer implements ClassFileTransformer {
 								"	}";
 					
 					if (verbose) {
-						body += "	System.out.println(\"[Dolly] Session(\" + _id + \") getAttribute(\" + $1 + \") has called.\");";
+						body += "	System.out.println(\"[Dolly] Session(\" + _id + \") getAttribute(\" + $1 + \") has been called.\");";
 	                }
 	                
 					// Expiration(time-out) 갱신을 위해 Session Server에서 먼저 조회한다.
@@ -213,7 +217,7 @@ public class DollyClassTransformer implements ClassFileTransformer {
 							   "		obj = com.athena.dolly.common.cache.DollyManager.getClient().get(_id, $1); " +
 							   "	} catch (Exception e) { " +
 							   "    	System.out.println(\"[Dolly] Unhandled exception occurred while get attribute in session.\"); " +
-							   "		System.out.println(\"[Dolly] Session(\" + _id + \") getAttribute(\" + $1 + \") has called.\");" +
+							   "		System.out.println(\"[Dolly] Session(\" + _id + \") getAttribute(\" + $1 + \") has been called.\");" +
 							   "    	e.printStackTrace(); " +
 							   "}";
 
@@ -256,7 +260,7 @@ public class DollyClassTransformer implements ClassFileTransformer {
 								"	}";
 					
 	                if (verbose) {
-						body += "	System.out.println(\"[Dolly] Session(\" + _id + \") getAttribute(\" + $1 + \") has called.\");";
+						body += "	System.out.println(\"[Dolly] Session(\" + _id + \") getAttribute(\" + $1 + \") has been called.\");";
 	                }
 	                
 					body +=	   "	java.lang.Object obj = null;" +
@@ -307,7 +311,7 @@ public class DollyClassTransformer implements ClassFileTransformer {
 								"	}";
 
 	                if (verbose) {
-						body += "	System.out.println(\"[Dolly] Session(\" + _id + \") getAttributeNames() has called.\");";
+						body += "	System.out.println(\"[Dolly] Session(\" + _id + \") getAttributeNames() has been called.\");";
 	                }
 	                
 //					body +=	   "	java.util.Enumeration obj = null;" +
@@ -320,7 +324,7 @@ public class DollyClassTransformer implements ClassFileTransformer {
 
 	                
 					body +=	   "	java.util.Enumeration obj = null;" +
-							   "try { obj = _getAttributeNames(); } catch (Exception e) { e.printStackTrace(); }" + 
+							   "try { obj = _getAttributeNames(); } catch (Exception e) { e.printStackTrace(); }" +
 							   "	try { obj = com.athena.dolly.common.cache.DollyManager.getClient().getValueNames(_id, obj); } catch (Exception e) { e.printStackTrace(); }" +
 							   "	return obj;" +
 							   "}";
@@ -339,7 +343,7 @@ public class DollyClassTransformer implements ClassFileTransformer {
 									"	}";
 
 		                if (verbose) {
-							body += "	System.out.println(\"[Dolly] Session(\" + _id + \") removeAttribute(\" + $1 + \") has called.\");";
+							body += "	System.out.println(\"[Dolly] Session(\" + _id + \") removeAttribute(\" + $1 + \") has been called.\");";
 		                }
 		                
 						body +=	   "	try { com.athena.dolly.common.cache.DollyManager.getClient().remove(_id, $1); } catch (Exception e) { e.printStackTrace(); }" +
@@ -361,7 +365,7 @@ public class DollyClassTransformer implements ClassFileTransformer {
 									"	}";
 
 		                if (verbose) {
-							body += "	System.out.println(\"[Dolly] Session(\" + _id + \") invalidate() has called.\");";
+							body += "	System.out.println(\"[Dolly] Session(\" + _id + \") invalidate() has been called.\");";
 		                }
 		                
 						body +=	   "	try { com.athena.dolly.common.cache.DollyManager.getClient().remove(_id); } catch (Exception e) { e.printStackTrace(); }" +
@@ -392,7 +396,63 @@ public class DollyClassTransformer implements ClassFileTransformer {
 		}
 		
 		return redefinedClassfileBuffer;
-	}//end of instumentHttpSession()
+	}//end of instrumentHttpSession()
+
+	/**
+	 * <pre>
+	 * HttpSessionListener 구현 클래스에 대해 sessionDestroyed 메소드 호출 시
+	 * Infinispan Data Grid에 해당 내용을 함께 삭제하도록 byte code를 조작한다.
+	 * </pre>
+	 * @param className
+	 * @param cl
+	 * @return
+	 * @throws Exception
+	 */
+	private byte[] instrumentHttpSessionListener(String className, CtClass cl) throws Exception {
+		byte[] redefinedClassfileBuffer = null;
+
+		if (cl.isInterface() == false) {
+			CtMethod[] methods = cl.getDeclaredMethods();
+
+			for (int i = 0; i < methods.length; i++) {
+				if (methods[i].isEmpty()) {
+					continue;
+				}
+
+				if (methods[i].getName().equals("sessionDestroyed")) {
+					String body =	"{" +
+									"	try { _sessionDestroyed($1); } catch (Exception e) { e.printStackTrace(); }" +
+									"	try { " +
+									"		javax.servlet.http.HttpSession _session = $1.getSession();" +
+									"		java.lang.String _id = _session.getId();" +
+									"		_id = _id.split(\"!\")[0];" +
+									" 		java.lang.String[] _ids = _id.split(\"\\\\.\");" +
+									"		_id = _ids[0];" +
+									"		com.athena.dolly.common.cache.DollyManager.getClient().remove(_id);";
+
+					if (verbose) {
+						body += "System.out.println(\"[Dolly] Session(\" + _id + \") sessionDestroyed() has been called.\");";
+					}
+
+					body += "	} catch (Exception e) { e.printStackTrace(); }" +
+							"}";
+
+					CtMethod newMethod = CtNewMethod.copy(methods[i], cl, null);
+					methods[i].setName("_" + methods[i].getName());
+					newMethod.setBody(body);
+					cl.addMethod(newMethod);
+
+					if (verbose) {
+						System.out.println(className.replace('/', '.') + "." + methods[i].getName() + "() is successfully enhanced.");
+					}
+				}
+			}
+
+			redefinedClassfileBuffer = cl.toBytecode();
+		}
+
+		return redefinedClassfileBuffer;
+	}//end of instrumentHttpSessionListener()
 	
 	/**
 	 * <pre>
@@ -404,7 +464,7 @@ public class DollyClassTransformer implements ClassFileTransformer {
 	 * @return
 	 * @throws Exception
 	 */
-	private byte[] instumentManager(String className, CtClass cl) throws Exception {
+	private byte[] instrumentManager(String className, CtClass cl) throws Exception {
 		byte[] redefinedClassfileBuffer = null;
 		
 		CtMethod[] methods = cl.getDeclaredMethods();
@@ -451,7 +511,7 @@ public class DollyClassTransformer implements ClassFileTransformer {
 		redefinedClassfileBuffer = cl.toBytecode();
 		
 		return redefinedClassfileBuffer;
-	}//end of instumentManager()
+	}//end of instrumentManager()
 	
 	/**
 	 * <pre>
@@ -465,7 +525,7 @@ public class DollyClassTransformer implements ClassFileTransformer {
 	 * @return
 	 * @throws Exception
 	 */
-	private byte[] instumentRequest(String className, CtClass cl, boolean enableSSO) throws Exception {
+	private byte[] instrumentRequest(String className, CtClass cl, boolean enableSSO) throws Exception {
 		byte[] redefinedClassfileBuffer = null;
 		
 		CtMethod[] methods = cl.getDeclaredMethods();
@@ -690,7 +750,7 @@ public class DollyClassTransformer implements ClassFileTransformer {
 		redefinedClassfileBuffer = cl.toBytecode();
 		
 		return redefinedClassfileBuffer;
-	}//end of instumentRequest()
+	}//end of instrumentRequest()
 
 	/**
 	 * <pre>
@@ -731,6 +791,7 @@ public class DollyClassTransformer implements ClassFileTransformer {
         */
         
         for (String targetClass : classList) {
+        	
         	if (className.equals(targetClass)) {
         		return true;
         	}

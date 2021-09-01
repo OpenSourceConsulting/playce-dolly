@@ -90,6 +90,10 @@
 				Object values = null;
 
 				int i = 1;
+				if (cacheKeys == null) {
+					cacheKeys = new ArrayList<String>();
+				}
+
 				for (String key : cacheKeys) {
 					values = DollyManager.getClient().get(key);
 			%>

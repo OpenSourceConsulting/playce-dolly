@@ -55,8 +55,8 @@ public class DollyConfig {
 	private static final String SSO_PARAMETER_KEY 			= "dolly.sso.parameter.key";
 	private static final String TIMEOUT_PROPERTY 			= "dolly.session.timeout";
     private static final String SESSION_KEY_LIST			= "dolly.session.key.list";
-    //private static final String TARGET_CLASS_PROPERTY 	= "dolly.instrument.target.class";
-    
+    private static final String SESSION_LISTENER_CLASS		= "dolly.session.listener.class";
+
     private static final String USE_EMBEDDED 				= "dolly.use.infinispan.embedded";
     private static final String HOTROD_HOST 				= "dolly.hotrod.host";
     private static final String HOTROD_PORT 				= "dolly.hotrod.port";
@@ -65,7 +65,7 @@ public class DollyConfig {
     private static final String JGROUPS_BIND_PORT 			= "dolly.jgroups.tcp.bind.port";
     private static final String JGROUPS_INIT_HOSTS 			= "dolly.jgroups.tcp.initial.hosts";
     private static final String JGROUPS_MULTICAST_PORT		= "dolly.jgroups.udp.multicast.port";
-    
+
     private static final String COUCHBASE_URIS 				= "couchbase.cluter.uri.list";
     private static final String COUCHBASE_BUCKET_NAME 		= "couchbase.bucket.name";
     private static final String COUCHBASE_BUCKET_PASSWD		= "couchbase.bucket.passwd";
@@ -75,7 +75,7 @@ public class DollyConfig {
 	private static final String JMX_SERVER_LIST 			= "infinispan.jmx.server.list";
 	private static final String JMX_USER 					= "infinispan.jmx.user.list";
     private static final String JMX_PASSWD 					= "infinispan.jmx.passwd.list";
-    
+
     public static Properties properties;
 
     private boolean verbose;
@@ -87,7 +87,7 @@ public class DollyConfig {
     private boolean enableSSO;
     private String ssoParamKey;
     private int timeout = 30;
-    
+
     private boolean useEmbedded;
     private String hotrodHost;
     private int hotrodPort;
@@ -96,16 +96,16 @@ public class DollyConfig {
     private String jgroupsBindPort;
     private String jgroupsInitialHosts;
     private String jgroupsMulticastPort;
-    
+
     private String couchbaseUris;
     private String couchbaseBucketName;
     private String couchbaseBucketPasswd;
-    
+
     private boolean embedded;
     private String[] jmxServers;
     private String[] users;
     private String[] passwds;
-    
+
 	/**
 	 * <pre>
 	 * 프로퍼티 파일을 로드하고 파싱한다.
@@ -128,7 +128,7 @@ public class DollyConfig {
      */
     private Properties loadConfigFile() throws ConfigurationException {
 		InputStream configResource = null;
-    	
+
         try {
 			String configFile = System.getProperty(CONFIG_FILE);
 
@@ -137,23 +137,23 @@ public class DollyConfig {
 			} else {
 				configResource = Thread.currentThread().getContextClassLoader().getResourceAsStream(CONFIG_FILE);
 			}
-        	
+
             if (configResource == null) {
                 throw new FileNotFoundException("Could not locate " + CONFIG_FILE + " in the classpath or System Poroperty(-Ddolly.properties=Full Qualified File Name) path.");
             }
-            
+
             Properties config = new Properties();
             config.load(configResource);
 
             configResource.close();
-        	
+
             return config;
         } catch (IOException e) {
             throw new ConfigurationException("Could not load the configuration file (" + CONFIG_FILE + "). " +
                     "Please make sure it exists at the root of the classpath or System Poroperty(-Ddolly.properties=Full Qualified File Name) path.", e);
         }
     }//end of loadConfigFile()
-    
+
     /**
      * <pre>
      * 프로퍼티 파일을 파싱한다.
@@ -184,12 +184,21 @@ public class DollyConfig {
 			"weblogic.servlet.internal.ServletRequestImpl"
 		};
 
-		//String[] classNames = config.getProperty(TARGET_CLASS_PROPERTY, "").split(",");
+		String[] addClassNames = config.getProperty(SESSION_LISTENER_CLASS, "").split(",");
 
 		for (String clazzName : classNames) {
 			if (!"".equals(clazzName)) {
 				if (verbose) {
-					System.out.println(clazzName + " will be enhanced.");
+					System.out.println("[Dolly] " + clazzName + " will be enhanced.");
+				}
+				classList.add(clazzName.replace(".", "/"));
+			}
+		}
+
+		for (String clazzName : addClassNames) {
+			if (!"".equals(clazzName)) {
+				if (verbose) {
+					System.out.println("[Dolly] " + clazzName + " will be enhanced.");
 				}
 				classList.add(clazzName.replace(".", "/"));
 			}
