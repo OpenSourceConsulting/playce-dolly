@@ -59,15 +59,17 @@ public class DollyClassTransformer implements ClassFileTransformer {
 	private boolean verbose;
 	private boolean enableSSO;
     private String ssoParamKey;
+	private boolean readSessionLocalFirst;
 
 	private Map<ClassLoader, ClassPool> pools = new HashMap<ClassLoader, ClassPool>();
 	
-	public DollyClassTransformer(boolean verbose, List<String> classList, boolean enableSSO, List<String> ssoDomainList, String ssoParamKey) {
+	public DollyClassTransformer(boolean verbose, List<String> classList, boolean enableSSO, List<String> ssoDomainList, String ssoParamKey, boolean readSessionLocalFirst) {
 		this.verbose = verbose;
 		this.classList = classList;
 		this.enableSSO = enableSSO;
 		this.ssoDomainList = ssoDomainList;
 		this.ssoParamKey = ssoParamKey;
+		this.readSessionLocalFirst = readSessionLocalFirst;
 	}//end of constructor()
 
 	/* (non-Javadoc)
@@ -206,46 +208,92 @@ public class DollyClassTransformer implements ClassFileTransformer {
 								"			try { com.athena.dolly.common.cache.DollyManager.getClient().put(_id, \"jvmRoute\", _ids[1]); } catch (Exception e) { e.printStackTrace(); }" +
 								"		}" + 
 								"	}";
-					
-					if (verbose) {
-						body += "	System.out.println(\"[Dolly] Session(\" + _id + \") getAttribute(\" + $1 + \") has been called.\");";
-	                }
-	                
-					// Expiration(time-out) 갱신을 위해 Session Server에서 먼저 조회한다.
-					body +=	   "	java.lang.Object obj = null;" +
-							   "	try { " +
-							   "		obj = com.athena.dolly.common.cache.DollyManager.getClient().get(_id, $1); " +
-							   "	} catch (Exception e) { " +
-							   "    	System.out.println(\"[Dolly] Unhandled exception occurred while get attribute in session.\"); " +
-							   "		System.out.println(\"[Dolly] Session(\" + _id + \") getAttribute(\" + $1 + \") has been called.\");" +
-							   "    	e.printStackTrace(); " +
-							   "}";
 
-	                if (verbose) {
-						body += "	if (obj == null) { System.out.println(\"[Dolly] Attribute does not exist in Session Server. Trying search in Local Session.\"); }";
-	                }
+					if (readSessionLocalFirst) {
+						// Local Session에서 먼저 조회를 한다.
+						// 값이 없는 경우 Sesseion Server로부터 내용을 조회하고 값이 있는 경우 local에도 저장한다.
+						// 값이 있는 경우 Expiration(time-out) 갱신을 위해 Session Server로 동일 내용을 복사한다.
 
-					body +=	   "	if (obj == null) {" +
-							   "		try { " +
-							   "			obj = _getAttribute($1);" +
-							   " 			if (obj != null && !com.athena.dolly.common.cache.DollyManager.isSkipConnection()) {";
-							   
-					if (verbose) {
-						body += "			System.out.println(\"[Dolly] Attribute exists in Local Session and copy to Session Server.\");";
+						if (verbose) {
+							body += "	System.out.println(\"[Dolly] Session(\" + _id + \") getAttribute(\" + $1 + \") has been called and read first from local session.\");";
+						}
+
+						body +=	   	"	java.lang.Object obj = null;" +
+									"	try { " +
+									"		obj = _getAttribute($1);" +
+									"	} catch (Exception e) { " +
+									"    	System.out.println(\"[Dolly] Unhandled exception occurred while get attribute in session.\"); " +
+									"		System.out.println(\"[Dolly] Session(\" + _id + \") getAttribute(\" + $1 + \") has been called.\");" +
+									"    	e.printStackTrace(); " +
+									"	}";
+
+						if (verbose) {
+							body += "	if (obj == null) { System.out.println(\"[Dolly] Attribute does not exist in Local Session. Trying search in Session Server.\"); }";
+						}
+
+						body +=	   	"	if (obj == null) {" +
+									"		try { " +
+									"			obj = com.athena.dolly.common.cache.DollyManager.getClient().get(_id, $1);" +
+									" 			if (obj != null) {";
+
+						if (verbose) {
+							body += "				System.out.println(\"[Dolly] Attribute exists in Session Server and copy to Local Session.\");";
+						}
+
+						body +=	   	"				_setAttribute($1, obj);" +
+									"			}" +
+									"		} catch (Exception e) { " +
+									"    		System.out.println(\"[Dolly] Unhandled exception occurred while copy session data to local session.\"); " +
+									"    		e.printStackTrace(); " +
+									"		}" +
+									"	} else {" +
+									"		try { " +
+									"			com.athena.dolly.common.cache.DollyManager.getClient().put(_id, $1, obj);" +
+									"		} catch (Exception e) { " +
+									"    		System.out.println(\"[Dolly] Unhandled exception occurred while copy session data to session server.\"); " +
+									"    		e.printStackTrace(); " +
+									"		}" +
+									"	}";
+					} else {
+						if (verbose) {
+							body += "	System.out.println(\"[Dolly] Session(\" + _id + \") getAttribute(\" + $1 + \") has been called and read first from session server.\");";
+						}
+
+						body +=	   	"	java.lang.Object obj = null;" +
+									"	try { " +
+									"		obj = com.athena.dolly.common.cache.DollyManager.getClient().get(_id, $1);" +
+									"	} catch (Exception e) { " +
+									"    	System.out.println(\"[Dolly] Unhandled exception occurred while get attribute in session.\"); " +
+									"		System.out.println(\"[Dolly] Session(\" + _id + \") getAttribute(\" + $1 + \") has been called.\");" +
+									"    	e.printStackTrace(); " +
+									"	}";
+
+						if (verbose) {
+							body += "	if (obj == null) { System.out.println(\"[Dolly] Attribute does not exist in Session Server. Trying search in Local Session.\"); }";
+						}
+
+						body +=	   	"	if (obj == null) {" +
+									"		try { " +
+									"			obj = _getAttribute($1);" +
+									" 			if (obj != null && !com.athena.dolly.common.cache.DollyManager.isSkipConnection()) {";
+
+						if (verbose) {
+							body += "			System.out.println(\"[Dolly] Attribute exists in Local Session and copy to Session Server.\");";
+						}
+
+						body +=	   	"				java.util.Enumeration e = _getAttributeNames();" +
+									"				java.lang.String key = null;" +
+									"				while (e.hasMoreElements()) { " +
+									"					key = (java.lang.String) e.nextElement();" +
+									"					com.athena.dolly.common.cache.DollyManager.getClient().put(_id, key, _getAttribute(key));" +
+									"				}" +
+									"			}" +
+									"		} catch (Exception e) { if (e instanceof java.lang.IllegalStateException && e.getMessage().contains(\"invalidated\")) {  } else { e.printStackTrace(); } }" +
+									"	}";
 					}
-							   
-					body +=	   "				java.util.Enumeration e = _getAttributeNames();" + 
-							   "				java.lang.String key = null;" +
-							   "				while (e.hasMoreElements()) { " +
-							   "					key = (java.lang.String) e.nextElement();" +
-					   		   "					com.athena.dolly.common.cache.DollyManager.getClient().put(_id, key, _getAttribute(key));" +
-							   "				}" +
-							   "			}" +
-							   "		} catch (Exception e) { if (e instanceof java.lang.IllegalStateException && e.getMessage().contains(\"invalidated\")) {  } else { e.printStackTrace(); } }" +
-							   "	}";
-							   
+
 					if (verbose) {
-						body += "	System.out.println(\"[Dolly] Session(\" + _id + \") getAttribute()'s result => \" + obj);";
+						body += 	"	System.out.println(\"[Dolly] Session(\" + _id + \") getAttribute(\" + $1 + \")'s result => \" + obj);";
 					}
 					/*/    
 					body =		"{" +

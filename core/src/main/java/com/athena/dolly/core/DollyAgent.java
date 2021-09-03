@@ -164,7 +164,7 @@ public class DollyAgent implements ClassFileTransformer {
         }
 
         try {
-            transformer = instanciateTransformer(TRANSFORMER_CLASS, verbose, config.getClassList(), config.isEnableSSO(), config.getSsoDomainList(), config.getSsoParamKey());
+            transformer = instanciateTransformer(TRANSFORMER_CLASS, verbose, config.getClassList(), config.isEnableSSO(), config.getSsoDomainList(), config.getSsoParamKey(), config.isReadSessionLocalFirst());
         } catch (Exception e) {
             System.err.println("[Dolly] Initialization error : " + e.getMessage());
             e.printStackTrace();
@@ -202,13 +202,14 @@ public class DollyAgent implements ClassFileTransformer {
      * @param enableSSO
      * @param ssoDomainList
      * @param ssoParamKey
+     * @param readSessionLocalFirst
      * @return
      * @throws Exception
      */
-    private ClassFileTransformer instanciateTransformer(String className, boolean verbose, List<String> classList, boolean enableSSO, List<String> ssoDomainList, String ssoParamKey) throws Exception {
+    private ClassFileTransformer instanciateTransformer(String className, boolean verbose, List<String> classList, boolean enableSSO, List<String> ssoDomainList, String ssoParamKey, boolean readSessionLocalFirst) throws Exception {
         Class<?> clazz = Class.forName(className);
-        Constructor<?> clazzConstructor = clazz.getConstructor(new Class[]{Boolean.TYPE, List.class, Boolean.TYPE, List.class, String.class});
-        return (ClassFileTransformer) clazzConstructor.newInstance(verbose, classList, enableSSO, ssoDomainList, ssoParamKey);
+        Constructor<?> clazzConstructor = clazz.getConstructor(new Class[]{Boolean.TYPE, List.class, Boolean.TYPE, List.class, String.class, Boolean.TYPE});
+        return (ClassFileTransformer) clazzConstructor.newInstance(verbose, classList, enableSSO, ssoDomainList, ssoParamKey, readSessionLocalFirst);
     }//end of instanciateTransformer()
 }
 //end of DollyAgent.java
