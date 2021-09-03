@@ -57,6 +57,8 @@ public class DollyConfig {
     private static final String SESSION_KEY_LIST			= "dolly.session.key.list";
     private static final String SESSION_LISTENER_CLASS		= "dolly.session.listener.class";
 
+	private static final String READ_SESSION_LOCAL_FIRST	= "dolly.read.session.local.first";
+
     private static final String USE_EMBEDDED 				= "dolly.use.infinispan.embedded";
     private static final String HOTROD_HOST 				= "dolly.hotrod.host";
     private static final String HOTROD_PORT 				= "dolly.hotrod.port";
@@ -84,6 +86,7 @@ public class DollyConfig {
     private List<String> classList = new ArrayList<String>();
     private List<String> ssoDomainList = new ArrayList<String>();
     private List<String> sessionKeyList = new ArrayList<String>();
+	private boolean readSessionLocalFirst;
     private boolean enableSSO;
     private String ssoParamKey;
     private int timeout = 30;
@@ -250,6 +253,7 @@ public class DollyConfig {
         this.enableSSO = Boolean.parseBoolean(config.getProperty(ENABLE_SSO_PROPERTY, "false"));
 		this.ssoParamKey = config.getProperty(SSO_PARAMETER_KEY, null);
 		this.timeout = Integer.parseInt(config.getProperty(TIMEOUT_PROPERTY, "30"));
+		this.readSessionLocalFirst = Boolean.parseBoolean(config.getProperty(READ_SESSION_LOCAL_FIRST, "false"));
 
 		this.useEmbedded = Boolean.parseBoolean(config.getProperty(USE_EMBEDDED, "false"));
 		this.hotrodHost = config.getProperty(HOTROD_HOST, "0.0.0.0");
@@ -336,6 +340,13 @@ public class DollyConfig {
 	 */
 	public List<String> getSessionKeyList() {
 		return sessionKeyList;
+	}
+
+	/**
+	 * @return the readSessionLocalFirst
+	 */
+	public boolean isReadSessionLocalFirst() {
+		return readSessionLocalFirst;
 	}
 
 	/**

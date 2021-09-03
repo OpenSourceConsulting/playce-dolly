@@ -23,6 +23,7 @@ Playce-Dolly는 WAS에 비종속적인 세션 클러스터링 솔루션으로 �
    - _**dolly.jgroups.xxx**_ : Infinispan Embedded 시 사용될 Clustering 설정(jgroups)
    - _**dolly.enableSSO**_ : SSO 사용 여부
    - _**dolly.sso.domain.list**_ : SSO 사용 대상 도메인 목록
+   - _**dolly.read.session.local.first**_ : 세션 데이터를 로컬 세션에서 먼저 조회할지 여부 (기본 false)
    - _**dolly.sso.parameter.key**_ : SSO 사용 시 다른 도메인에 Session ID를 넘겨줄 때 사용하는 Query Parameter Key
    - _**dolly.session.listener.class**_ : HttpSessionListener를 구현한 클래스를 사용하는 경우 sessionDestroyed() 내의 로직에 의해 만료 대상 세션 데이터가 다시 세션서버로 복제되는 현상이 있다. HttpSessionListener 구현 클래스를 명사하면 sessionDestroyed()시 명시적으로 세션 서버에서 세션 데이터를 삭제한다.
    - _**couchbase.xxx**_ : Couchbase 관련 정보(uri, name, password)
