@@ -59,6 +59,8 @@ public class DollyConfig {
 
 	private static final String READ_SESSION_LOCAL_FIRST	= "dolly.read.session.local.first";
 	private static final String PROPAGATE_SESSION			= "dolly.propagate.session";
+	private static final String SESSION_MAP_SIZE			= "dolly.session.map.size";
+	private static final String SESSION_CHECK_TIME 			= "dolly.session.map.check.time.sec";
 
     private static final String USE_EMBEDDED 				= "dolly.use.infinispan.embedded";
     private static final String HOTROD_HOST 				= "dolly.hotrod.host";
@@ -89,6 +91,8 @@ public class DollyConfig {
     private List<String> sessionKeyList = new ArrayList<String>();
 	private boolean readSessionLocalFirst;
 	private boolean propagateSession;
+	private int dollyMapSize;
+	private long dollyMapCheckTime;
     private boolean enableSSO;
     private String ssoParamKey;
     private int timeout = 30;
@@ -257,6 +261,8 @@ public class DollyConfig {
 		this.timeout = Integer.parseInt(config.getProperty(TIMEOUT_PROPERTY, "30"));
 		this.readSessionLocalFirst = Boolean.parseBoolean(config.getProperty(READ_SESSION_LOCAL_FIRST, "false"));
 		this.propagateSession = Boolean.parseBoolean(config.getProperty(PROPAGATE_SESSION, "true"));
+		this.dollyMapSize = Integer.parseInt(config.getProperty(SESSION_MAP_SIZE, "50"));
+		this.dollyMapCheckTime = Long.parseLong(config.getProperty(SESSION_CHECK_TIME, "60"));
 
 		this.useEmbedded = Boolean.parseBoolean(config.getProperty(USE_EMBEDDED, "false"));
 		this.hotrodHost = config.getProperty(HOTROD_HOST, "0.0.0.0");
@@ -357,6 +363,20 @@ public class DollyConfig {
 	 */
 	public boolean isPropagateSession() {
 		return propagateSession;
+	}
+
+	/**
+	 * @return the dollyMapSize
+	 */
+	public Integer getDollyMapSize() {
+		return dollyMapSize;
+	}
+
+	/**
+	 * @return the dollyMapCheckTime
+	 */
+	public Long getDollyMapCheckTime() {
+		return dollyMapCheckTime;
 	}
 
 	/**

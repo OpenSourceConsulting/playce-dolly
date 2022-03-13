@@ -250,6 +250,16 @@ public class DollyClassTransformer implements ClassFileTransformer {
 									"	}";
 
 						if (propagateSession) {
+							body +=	"	if (obj != null) {" +
+									"		try { " +
+									"			com.athena.dolly.common.cache.DollyManager.put(_id, $1, obj);" +
+									"		} catch (Exception e) { " +
+									"    		System.out.println(\"[Dolly] Unhandled exception occurred while copy session data to session server.\"); " +
+									"    		e.printStackTrace(); " +
+									"		}" +
+									"	}";
+
+							/*
 							if (verbose) {
 								body += "				System.out.println(\"[Dolly] Attribute exists in Local Session and copy to Session Server.\");";
 							}
@@ -262,6 +272,7 @@ public class DollyClassTransformer implements ClassFileTransformer {
 									"    		e.printStackTrace(); " +
 									"		}" +
 									"	}";
+							*/
 						}
 					} else {
 						if (verbose) {
