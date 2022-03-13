@@ -70,6 +70,7 @@ public class DollyClassTransformer implements ClassFileTransformer {
 		this.enableSSO = enableSSO;
 		this.ssoDomainList = ssoDomainList;
 		this.ssoParamKey = ssoParamKey;
+		this.readSessionLocalFirst = readSessionLocalFirst;
 		this.propagateSession = propagateSession;
 	}//end of constructor()
 

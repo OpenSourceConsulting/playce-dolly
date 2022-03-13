@@ -150,23 +150,31 @@ public class DollyManager {
 	 * @param value
 	 */
 	public synchronized static void put(String cacheKey, String dataKey, Object value) throws Exception {
-		if (config.isVerbose()) {
-			System.out.println("[Dolly] Attribute exists in Local Session and copy to Session Server.");
-		}
-
 		Long currentTimestamp = System.currentTimeMillis();
 		Long timestamp = dollyMap.get(cacheKey);
 
 		// Map에 sessionID가 없으면 Session Server로 데이터 저장한다.
 		if (timestamp == null) {
+			if (config.isVerbose()) {
+				System.out.println("[Dolly] DollyManager.put() sessionId not exist in dolly session map and will be copied to Session Server.");
+			}
+
 			getClient().put(cacheKey, dataKey, value);
 			dollyMap.put(cacheKey, currentTimestamp);
 		} else {
 			// Map에 sessionID가 있으면 일정 시간 이상 경과한 경우에만 Session Server로 데이터 저장 후 Map에 추가
 			if (timestamp < (currentTimestamp - (config.getDollyMapCheckTime() * 1000))) {
+				if (config.isVerbose()) {
+					System.out.println("[Dolly] DollyManager.put() OLD sessionId exist in dolly session map and will be copied to Session Server..");
+				}
+
 				getClient().put(cacheKey, dataKey, value);
 				dollyMap.remove(cacheKey);
 				dollyMap.put(cacheKey, currentTimestamp);
+			} else {
+				if (config.isVerbose()) {
+					System.out.println("[Dolly] DollyManager.put() FRESH sessionId exist in dolly session map and will not be copied.");
+				}
 			}
 		}
 	}
