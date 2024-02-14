@@ -24,6 +24,8 @@ Playce-Dolly는 WAS에 비종속적인 세션 클러스터링 솔루션으로 �
    - _**dolly.enableSSO**_ : SSO 사용 여부
    - _**dolly.sso.domain.list**_ : SSO 사용 대상 도메인 목록
    - _**dolly.read.session.local.first**_ : 세션 데이터를 로컬 세션에서 먼저 조회할지 여부 (기본 false)
+   - _**dolly.session.map.size**_ : dolly.read.session.local.first 옵션 사용시 세션 서버로 전달된 세션의 아이디와 시간 값이 저장될 Map 객체의 크기 (기본 50)
+   - _**dolly.session.map.check.time.sec**_ : dolly.read.session.local.first 옵션 사용시 해당 Map에 저장된 세션의 시간 값이 이 옵션으로 지정된 시간 차 이전의 값이면 세션 서버로 재 전달 (기본 60)
    - _**dolly.sso.parameter.key**_ : SSO 사용 시 다른 도메인에 Session ID를 넘겨줄 때 사용하는 Query Parameter Key
    - _**dolly.session.listener.class**_ : HttpSessionListener를 구현한 클래스를 사용하는 경우 sessionDestroyed() 내의 로직에 의해 만료 대상 세션 데이터가 다시 세션서버로 복제되는 현상이 있다. HttpSessionListener 구현 클래스를 명사하면 sessionDestroyed()시 명시적으로 세션 서버에서 세션 데이터를 삭제한다.
    - _**couchbase.xxx**_ : Couchbase 관련 정보(uri, name, password)

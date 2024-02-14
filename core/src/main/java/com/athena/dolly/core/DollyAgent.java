@@ -164,7 +164,7 @@ public class DollyAgent implements ClassFileTransformer {
         }
 
         try {
-            transformer = instanciateTransformer(TRANSFORMER_CLASS, verbose, config.getClassList(), config.isEnableSSO(), config.getSsoDomainList(), config.getSsoParamKey(), config.isReadSessionLocalFirst());
+            transformer = instanciateTransformer(TRANSFORMER_CLASS, verbose, config.getClassList(), config.isEnableSSO(), config.getSsoDomainList(), config.getSsoParamKey(), config.isReadSessionLocalFirst(), config.isPropagateSession());
         } catch (Exception e) {
             System.err.println("[Dolly] Initialization error : " + e.getMessage());
             e.printStackTrace();
@@ -206,10 +206,10 @@ public class DollyAgent implements ClassFileTransformer {
      * @return
      * @throws Exception
      */
-    private ClassFileTransformer instanciateTransformer(String className, boolean verbose, List<String> classList, boolean enableSSO, List<String> ssoDomainList, String ssoParamKey, boolean readSessionLocalFirst) throws Exception {
+    private ClassFileTransformer instanciateTransformer(String className, boolean verbose, List<String> classList, boolean enableSSO, List<String> ssoDomainList, String ssoParamKey, boolean readSessionLocalFirst, boolean propagateSession) throws Exception {
         Class<?> clazz = Class.forName(className);
-        Constructor<?> clazzConstructor = clazz.getConstructor(new Class[]{Boolean.TYPE, List.class, Boolean.TYPE, List.class, String.class, Boolean.TYPE});
-        return (ClassFileTransformer) clazzConstructor.newInstance(verbose, classList, enableSSO, ssoDomainList, ssoParamKey, readSessionLocalFirst);
+        Constructor<?> clazzConstructor = clazz.getConstructor(new Class[]{Boolean.TYPE, List.class, Boolean.TYPE, List.class, String.class, Boolean.TYPE, Boolean.TYPE});
+        return (ClassFileTransformer) clazzConstructor.newInstance(verbose, classList, enableSSO, ssoDomainList, ssoParamKey, readSessionLocalFirst, propagateSession);
     }//end of instanciateTransformer()
 }
 //end of DollyAgent.java

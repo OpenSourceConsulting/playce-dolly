@@ -60,16 +60,18 @@ public class DollyClassTransformer implements ClassFileTransformer {
 	private boolean enableSSO;
     private String ssoParamKey;
 	private boolean readSessionLocalFirst;
+	private boolean propagateSession;
 
 	private Map<ClassLoader, ClassPool> pools = new HashMap<ClassLoader, ClassPool>();
 	
-	public DollyClassTransformer(boolean verbose, List<String> classList, boolean enableSSO, List<String> ssoDomainList, String ssoParamKey, boolean readSessionLocalFirst) {
+	public DollyClassTransformer(boolean verbose, List<String> classList, boolean enableSSO, List<String> ssoDomainList, String ssoParamKey, boolean readSessionLocalFirst, boolean propagateSession) {
 		this.verbose = verbose;
 		this.classList = classList;
 		this.enableSSO = enableSSO;
 		this.ssoDomainList = ssoDomainList;
 		this.ssoParamKey = ssoParamKey;
 		this.readSessionLocalFirst = readSessionLocalFirst;
+		this.propagateSession = propagateSession;
 	}//end of constructor()
 
 	/* (non-Javadoc)
@@ -246,7 +248,24 @@ public class DollyClassTransformer implements ClassFileTransformer {
 									"    		System.out.println(\"[Dolly] Unhandled exception occurred while copy session data to local session.\"); " +
 									"    		e.printStackTrace(); " +
 									"		}" +
-									"	} else {" +
+									"	}";
+
+						if (propagateSession) {
+							body +=	"	if (obj != null) {" +
+									"		try { " +
+									"			com.athena.dolly.common.cache.DollyManager.put(_id, $1, obj);" +
+									"		} catch (Exception e) { " +
+									"    		System.out.println(\"[Dolly] Unhandled exception occurred while copy session data to session server.\"); " +
+									"    		e.printStackTrace(); " +
+									"		}" +
+									"	}";
+
+							/*
+							if (verbose) {
+								body += "				System.out.println(\"[Dolly] Attribute exists in Local Session and copy to Session Server.\");";
+							}
+
+							body +=	"	if (obj != null) {" +
 									"		try { " +
 									"			com.athena.dolly.common.cache.DollyManager.getClient().put(_id, $1, obj);" +
 									"		} catch (Exception e) { " +
@@ -254,6 +273,8 @@ public class DollyClassTransformer implements ClassFileTransformer {
 									"    		e.printStackTrace(); " +
 									"		}" +
 									"	}";
+							*/
+						}
 					} else {
 						if (verbose) {
 							body += "	System.out.println(\"[Dolly] Session(\" + _id + \") getAttribute(\" + $1 + \") has been called and read first from session server.\");";
