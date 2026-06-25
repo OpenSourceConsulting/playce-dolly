@@ -53,12 +53,21 @@ import com.athena.dolly.common.stats.DollyStats;
  */
 public class HotRodClient implements DollyClient {
 
+	/**
+	 * 동일 cacheKey(세션 ID)에 대한 read-modify-write 원자성만 보장하기 위한 락 스트라이프 수.
+	 * 인스턴스 전역 synchronized 대신 키 해시로 분산된 락을 사용하여 서로 다른 세션은 병렬로 처리한다.
+	 */
+	private static final int LOCK_STRIPES = 256;
+
 	private DollyConfig config;
 	private RemoteCache<String, Object> cache;
 
+	/** cacheKey 해시 기반 락 스트라이프. 생성 시 한 번만 채우고 이후 불변. */
+	private final Object[] locks;
+
     /**
      * <pre>
-     * 주어진 프로퍼티를 이용하여 Infinispan Data Grid Server에 접속하여 RemoteCache object를 가져온다. 
+     * 주어진 프로퍼티를 이용하여 Infinispan Data Grid Server에 접속하여 RemoteCache object를 가져온다.
      * </pre>
      */
 	public HotRodClient() {
@@ -71,10 +80,28 @@ public class HotRodClient implements DollyClient {
 			}
 		}
 
+		Object[] stripes = new Object[LOCK_STRIPES];
+		for (int i = 0; i < LOCK_STRIPES; i++) {
+			stripes[i] = new Object();
+		}
+		this.locks = stripes;
+
 		// https://issues.jboss.org/browse/ISPN-4468
 		ConfigurationBuilder builder = new ConfigurationBuilder();
 	    cache = new RemoteCacheManager(builder.withProperties(DollyConfig.properties).build()).getCache();
 	}//end of Default Contructor()
+
+	/**
+	 * <pre>
+	 * 주어진 cacheKey 에 해당하는 락 스트라이프를 반환한다.
+	 * 같은 키는 항상 같은 락에 매핑되어 read-modify-write 원자성이 보장되고,
+	 * 다른 키는 (해시 충돌이 없는 한) 서로 다른 락을 사용하여 병렬 처리된다.
+	 * </pre>
+	 */
+	private Object lockFor(String cacheKey) {
+		int hash = (cacheKey == null) ? 0 : cacheKey.hashCode();
+		return locks[(hash & 0x7fffffff) % LOCK_STRIPES];
+	}//end of lockFor()
 
 	public Object get(String cacheKey) {
 		Object obj = null;
@@ -130,10 +157,12 @@ public class HotRodClient implements DollyClient {
 	/* (non-Javadoc)
 	 * @see com.athena.dolly.enhancer.client.DollyClient#put(java.lang.String, java.lang.Object)
 	 */
-	public synchronized void put(String cacheKey, Object value) throws Exception {
+	public void put(String cacheKey, Object value) throws Exception {
 		if (!DollyManager.isSkipConnection()) {
 			try {
-				cache.put(cacheKey, value, -1, TimeUnit.SECONDS, config.getTimeout() * 60, TimeUnit.SECONDS);
+				synchronized (lockFor(cacheKey)) {
+					cache.put(cacheKey, value, -1, TimeUnit.SECONDS, config.getTimeout() * 60, TimeUnit.SECONDS);
+				}
 			} catch (Exception e) {
 				if (e instanceof TransportException || e instanceof ConnectException) {
 					DollyManager.setSkipConnection();
@@ -152,20 +181,22 @@ public class HotRodClient implements DollyClient {
 	 * @see com.athena.dolly.enhancer.client.DollyClient#put(java.lang.String, java.lang.String, java.lang.Object)
 	 */
 	@SuppressWarnings("unchecked")
-	public synchronized void put(String cacheKey, String dataKey, Object value) throws Exception {
+	public void put(String cacheKey, String dataKey, Object value) throws Exception {
 		if (!DollyManager.isSkipConnection()) {
 			try {
 				if (dataKey != null) {
 					if (config.getSessionKeyList().size() < 1 || config.getSessionKeyList().contains(dataKey) || dataKey.equals("jvmRoute")) {
-				    		Map<String, Object> attribute = (Map<String, Object>)cache.get(cacheKey);
-						
-						if (attribute == null) {
-							attribute = new ConcurrentHashMap<String, Object>();
-						}
+						synchronized (lockFor(cacheKey)) {
+					    		Map<String, Object> attribute = (Map<String, Object>)cache.get(cacheKey);
 
-						if (value != null) {
-							attribute.put(dataKey, value);
-							cache.put(cacheKey, attribute, -1, TimeUnit.SECONDS, config.getTimeout() * 60, TimeUnit.SECONDS);
+							if (attribute == null) {
+								attribute = new ConcurrentHashMap<String, Object>();
+							}
+
+							if (value != null) {
+								attribute.put(dataKey, value);
+								cache.put(cacheKey, attribute, -1, TimeUnit.SECONDS, config.getTimeout() * 60, TimeUnit.SECONDS);
+							}
 						}
 					} else {
 						if (config.isVerbose()) {
@@ -190,10 +221,12 @@ public class HotRodClient implements DollyClient {
 	/* (non-Javadoc)
 	 * @see com.athena.dolly.enhancer.client.DollyClient#remove(java.lang.String)
 	 */
-	public synchronized void remove(String cacheKey) throws Exception {
+	public void remove(String cacheKey) throws Exception {
 		if (!DollyManager.isSkipConnection()) {
 			try {
-				cache.remove(cacheKey);
+				synchronized (lockFor(cacheKey)) {
+					cache.remove(cacheKey);
+				}
 			} catch (Exception e) {
 				if (e instanceof TransportException || e instanceof ConnectException) {
 					DollyManager.setSkipConnection();
@@ -212,16 +245,18 @@ public class HotRodClient implements DollyClient {
      * @see com.athena.dolly.enhancer.client.DollyClient#remove(java.lang.String, java.lang.String)
      */
     @SuppressWarnings("unchecked")
-	public synchronized void remove(String cacheKey, String dataKey) throws Exception {
+	public void remove(String cacheKey, String dataKey) throws Exception {
 		if (!DollyManager.isSkipConnection()) {
 			try {
-				Map<String, Object> attribute = (Map<String, Object>)cache.get(cacheKey);
-				
-				if (attribute != null) {
-					attribute.remove(dataKey);
+				synchronized (lockFor(cacheKey)) {
+					Map<String, Object> attribute = (Map<String, Object>)cache.get(cacheKey);
+
+					if (attribute != null) {
+						attribute.remove(dataKey);
+					}
+
+					cache.put(cacheKey, attribute, -1, TimeUnit.SECONDS, config.getTimeout() * 60, TimeUnit.SECONDS);
 				}
-				
-				cache.put(cacheKey, attribute, -1, TimeUnit.SECONDS, config.getTimeout() * 60, TimeUnit.SECONDS);
 			} catch (Exception e) {
 				if (e instanceof TransportException || e instanceof ConnectException) {
 					DollyManager.setSkipConnection();

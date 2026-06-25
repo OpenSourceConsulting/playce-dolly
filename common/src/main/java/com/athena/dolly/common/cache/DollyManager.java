@@ -47,7 +47,10 @@ public class DollyManager {
 	private static DollyConfig config;
 
 	private static Map<String, Long> dollyMap;
-	
+
+	/** dollyMap(thread-safe하지 않은 LRU LinkedHashMap) 접근만 짧게 보호하기 위한 전용 락. */
+	private static final Object DOLLY_MAP_LOCK = new Object();
+
 	private static boolean skipConnection = false;
 
     /**
@@ -149,33 +152,44 @@ public class DollyManager {
 	 * @param dataKey
 	 * @param value
 	 */
-	public synchronized static void put(String cacheKey, String dataKey, Object value) throws Exception {
-		Long currentTimestamp = System.currentTimeMillis();
-		Long timestamp = dollyMap.get(cacheKey);
+	public static void put(String cacheKey, String dataKey, Object value) throws Exception {
+		long currentTimestamp = System.currentTimeMillis();
 
-		// Map에 sessionID가 없으면 Session Server로 데이터 저장한다.
-		if (timestamp == null) {
-			if (config.isVerbose()) {
-				System.out.println("[Dolly] DollyManager.put() sessionId not exist in dolly session map and will be copied to Session Server.");
+		// dollyMap(LRU LinkedHashMap)은 thread-safe하지 않으므로 인메모리 체크/갱신 구간만 짧게 잠근다.
+		// 네트워크 I/O(getClient().put())는 락 밖에서 수행하여 전역 직렬화를 피한다.
+		boolean isNew = false;
+		boolean shouldWrite;
+		synchronized (DOLLY_MAP_LOCK) {
+			Long timestamp = dollyMap.get(cacheKey);
+
+			// Map에 sessionID가 없으면 Session Server로 데이터 저장한다.
+			if (timestamp == null) {
+				isNew = true;
+				shouldWrite = true;
+			} else {
+				// Map에 sessionID가 있으면 일정 시간 이상 경과한 경우에만 Session Server로 데이터 저장
+				shouldWrite = timestamp < (currentTimestamp - (config.getDollyMapCheckTime() * 1000));
 			}
 
-			getClient().put(cacheKey, dataKey, value);
-			dollyMap.put(cacheKey, currentTimestamp);
-		} else {
-			// Map에 sessionID가 있으면 일정 시간 이상 경과한 경우에만 Session Server로 데이터 저장 후 Map에 추가
-			if (timestamp < (currentTimestamp - (config.getDollyMapCheckTime() * 1000))) {
-				if (config.isVerbose()) {
-					System.out.println("[Dolly] DollyManager.put() OLD sessionId exist in dolly session map and will be copied to Session Server..");
-				}
-
-				getClient().put(cacheKey, dataKey, value);
+			if (shouldWrite) {
+				// 동일 cacheKey에 대한 동시 호출이 중복 쓰기를 하지 않도록 타임스탬프를 선(先)갱신한다.
 				dollyMap.remove(cacheKey);
 				dollyMap.put(cacheKey, currentTimestamp);
-			} else {
-				if (config.isVerbose()) {
-					System.out.println("[Dolly] DollyManager.put() FRESH sessionId exist in dolly session map and will not be copied.");
-				}
 			}
+		}
+
+		if (config.isVerbose()) {
+			if (isNew) {
+				System.out.println("[Dolly] DollyManager.put() sessionId not exist in dolly session map and will be copied to Session Server.");
+			} else if (shouldWrite) {
+				System.out.println("[Dolly] DollyManager.put() OLD sessionId exist in dolly session map and will be copied to Session Server..");
+			} else {
+				System.out.println("[Dolly] DollyManager.put() FRESH sessionId exist in dolly session map and will not be copied.");
+			}
+		}
+
+		if (shouldWrite) {
+			getClient().put(cacheKey, dataKey, value);
 		}
 	}
     
