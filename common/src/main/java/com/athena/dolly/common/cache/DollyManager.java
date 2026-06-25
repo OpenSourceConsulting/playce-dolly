@@ -48,9 +48,6 @@ public class DollyManager {
 
 	private static Map<String, Long> dollyMap;
 
-	/** dollyMap(thread-safe하지 않은 LRU LinkedHashMap) 접근만 짧게 보호하기 위한 전용 락. */
-	private static final Object DOLLY_MAP_LOCK = new Object();
-
 	private static boolean skipConnection = false;
 
     /**
@@ -156,10 +153,11 @@ public class DollyManager {
 		long currentTimestamp = System.currentTimeMillis();
 
 		// dollyMap(LRU LinkedHashMap)은 thread-safe하지 않으므로 인메모리 체크/갱신 구간만 짧게 잠근다.
-		// 네트워크 I/O(getClient().put())는 락 밖에서 수행하여 전역 직렬화를 피한다.
+		// init()의 dollyMap 재할당(getClient() 경로)과 동일한 DollyManager.class 모니터를 사용하여
+		// 락 일관성을 유지하고, 네트워크 I/O(getClient().put())는 락 밖에서 수행하여 전역 직렬화를 피한다.
 		boolean isNew = false;
 		boolean shouldWrite;
-		synchronized (DOLLY_MAP_LOCK) {
+		synchronized (DollyManager.class) {
 			Long timestamp = dollyMap.get(cacheKey);
 
 			// Map에 sessionID가 없으면 Session Server로 데이터 저장한다.
